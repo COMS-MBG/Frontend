@@ -1,18 +1,180 @@
 <template>
-  <div class="dummy-page">
-    <div class="dummy-card">
-      <span class="material-symbols-outlined dummy-icon">grid_view</span>
-      <h1>Dashboard</h1>
-      <p>Halaman ini sedang dalam pengembangan.</p>
+  <div class="dashboard">
+
+    <!-- ═══════════════════════════════════════
+         HEADER
+    ════════════════════════════════════════ -->
+    <DashboardHeader
+      section-label="RINGKASAN SISTEM"
+      title="Dashboard Operasional Bandung"
+    />
+
+    <!-- ═══════════════════════════════════════
+         ROW 1: Stat Cards
+    ════════════════════════════════════════ -->
+    <div class="stats-row">
+      <StatCard
+        label="PORSI HARI INI"
+        icon="restaurant"
+        value="45.820"
+        subtitle="Porsi siap didistribusikan"
+      />
+      <StatCard
+        label="ARMADA AKTIF"
+        icon="local_shipping"
+        value="86 / 90"
+        subtitle="Unit dalam perjalanan"
+      />
     </div>
+
+    <!-- ═══════════════════════════════════════
+         ROW 2: Supply  |  Logistics
+    ════════════════════════════════════════ -->
+    <div class="main-grid">
+      <SupplyStatusCard
+        section-label="MANAJEMEN GIZI"
+        title="Status Menu & Persediaan Bahan"
+        badge-text="Sesuai Standar Gizi"
+        menu-name="Nasi Ayam Sayur"
+        menu-calorie="Standar Kalori: 450 – 550 kkal"
+        :bahan-items="bahanItems"
+        action-label="Update Stok Bahan"
+        @update-stok="onUpdateStok"
+      />
+      <LogisticsCard
+        section-label="LOGISTIK"
+        title="Status Pengiriman"
+        icon="local_shipping"
+        :stats="deliveryStats"
+        action-label="Manajemen Armada →"
+        @action="onManajemenArmada"
+      />
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         ROW 3: Insight Map  |  Mini Info Cards
+    ════════════════════════════════════════ -->
+    <div class="bottom-grid">
+      <InsightMapCard
+        severity="CRITICAL"
+        category="INSIGHT STRATEGIS"
+        title="Blind Spot Detected: Kecamatan Batununggal"
+        description="1,200 siswa berada di luar radius efisien 5km dari dapur pusat terdekat. Hal ini meningkatkan biaya logistik sebesar 18% per pengiriman."
+        recommendation="Inisiasi SPPG Baru Wilayah Timur"
+        action-label="Detail Lokasi"
+        @detail="onDetailLokasi"
+      />
+
+      <div class="info-stack">
+        <MiniInfoCard
+          icon="school"
+          label="Data Sekolah Terdaftar"
+          value="156"
+          unit="Institusi Pendidikan"
+          variant="success"
+          badge-text="Verifikasi Dokumen 100%"
+        />
+        <MiniInfoCard
+          icon="assignment"
+          label="Laporan Menunggu BAST"
+          value="8"
+          unit="Berkas Tersisa"
+          variant="warning"
+          deadline-text="Deadline Laporan: 48 Jam Kedepan"
+        />
+      </div>
+    </div>
+
   </div>
 </template>
-<script setup lang="ts"></script>
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap');
-.dummy-page { display: flex; align-items: center; justify-content: center; height: 100%; }
-.dummy-card { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 3rem; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
-.dummy-icon { font-size: 3rem; color: #1a56db; opacity: 0.5; }
-h1 { font-family: 'Manrope', sans-serif; font-size: 1.5rem; font-weight: 700; color: #111827; margin: 0; }
-p { font-size: 0.875rem; color: #6b7280; margin: 0; }
+
+<script setup lang="ts">
+import DashboardHeader from '@/components/dashboard/DashboardHeader.vue'
+import StatCard from '@/components/dashboard/StatCard.vue'
+import SupplyStatusCard, { type BahanItem } from '@/components/dashboard/SupplyStatusCard.vue'
+import LogisticsCard, { type DeliveryStatItem } from '@/components/dashboard/LogisticsCard.vue'
+import InsightMapCard from '@/components/dashboard/InsightMapCard.vue'
+import MiniInfoCard from '@/components/dashboard/MiniInfoCard.vue'
+import DistribusiView from './DistribusiView.vue'
+
+// ── Data ────────────────────────────────
+const bahanItems: BahanItem[] = [
+  { name: 'Beras Premium', qty: '1.250 kg', percent: 83 },
+  { name: 'Daging Ayam',   qty: '850 kg',   percent: 57 },
+  { name: 'Sayuran Campur',qty: '450 kg',   percent: 30 },
+]
+
+const deliveryStats: DeliveryStatItem[] = [
+  { value: 12, label: 'PENDING'  },
+  { value:  5, label: 'JALAN'    },
+  { value: 40, label: 'SELESAI'  },
+]
+
+// ── Handlers (akan dihubungkan ke router/store nanti) ────
+function onUpdateStok()      { console.log('Update Stok Bahan') }
+function onManajemenArmada() { console.log('Manajemen Armada')  }
+function onDetailLokasi()    { console.log('Detail Lokasi')     }
+</script>
+
+<style scoped lang="scss">
+// ── Base ──
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  font-family: $font-body;
+  color: $color-text-primary;
+}
+
+// ── Row 1: Stats ──
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+}
+
+// ── Row 2: Main Grid ──
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: $space-4;
+  align-items: stretch;
+}
+
+// ── Row 3: Bottom Grid ──
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: $space-4;
+  align-items: start;
+}
+
+// ── Info stack ──
+.info-stack {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+// ════════════════════════════════════════
+//  RESPONSIVE
+// ════════════════════════════════════════
+
+@include tablet {
+  .main-grid,
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@include mobile {
+  .dashboard   { gap: $space-4; }
+  .stats-row   { grid-template-columns: 1fr; }
+  .info-stack  { grid-template-columns: 1fr; }
+}
 </style>

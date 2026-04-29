@@ -6,7 +6,7 @@
         <router-view />
       </section>
 
-      <!-- Kolom Kanan — image panel (45%), kosong, siap diisi gambar -->
+      <!-- Kolom Kanan — image panel (45%) -->
       <div class="auth-image-col">
         <!-- Taruh <img> atau background-image Anda di sini -->
       </div>
@@ -18,43 +18,40 @@
 // AuthLayout tidak memiliki logic — murni structural layout
 </script>
 
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
-
-/* ── Halaman: background #fff, flex center ── */
+<style scoped lang="scss">
+// ── Halaman: background putih, flex center ──
 .auth-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  padding: 1.5rem;
+  background-color: $color-bg-surface;
+  font-family: $font-body;
+  padding: $space-6;
   box-sizing: border-box;
 }
 
-/* ── Card: putih, border-radius 20px, shadow, max-width 900px ── */
+// ── Card: putih, border-radius 20px, shadow, max-width 900px ──
 .auth-card {
   display: flex;
   width: 100%;
   max-width: 900px;
   min-height: 580px;
-  background-color: #ffffff;
+  background-color: $color-bg-surface;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.20);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* ── Kolom Kiri (55%) — diisi slot dari view ── */
+// ── Kolom Kiri (55%) — diisi slot dari view ──
 .auth-form-col {
   width: 55%;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  /* padding diatur di dalam LoginView agar fleksibel */
 }
 
-/* ── Kolom Kanan (45%) — image panel ── */
+// ── Kolom Kanan (45%) — image panel ──
 .auth-image-col {
   width: 45%;
   background-color: #1f1f86;
@@ -64,18 +61,16 @@
   flex-shrink: 0;
 }
 
-/* ── Responsif Mobile ── */
-@media (max-width: 680px) {
+// ── Responsif Mobile ──
+@include auth-mobile {
   .auth-card {
     flex-direction: column;
     border-radius: 16px;
     min-height: auto;
   }
-  .auth-form-col {
-    width: 100%;
-  }
-  .auth-image-col {
-    display: none;
-  }
+
+  .auth-form-col { width: 100%; }
+
+  .auth-image-col { display: none; }
 }
 </style>

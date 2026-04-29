@@ -28,31 +28,31 @@ import AppNavbar from '@/components/layout/AppNavbar.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 </script>
 
-<style scoped>
-/* ── Root: kunci layout ke 100vh agar sidebar & navbar tidak ikut scroll ── */
+<style scoped lang="scss">
+// ── Root: kunci layout ke 100vh agar sidebar & navbar tidak ikut scroll ──
 .main-layout {
   display: flex;
-  height: 100vh;          /* PENTING: bukan min-height */
-  overflow: hidden;       /* PENTING: cegah body scroll */
-  background-color: #f8fafc;
-  font-family: 'Inter', sans-serif;
+  height: 100vh;         // PENTING: bukan min-height
+  overflow: hidden;      // PENTING: cegah body scroll
+  background-color: $color-bg-page;
+  font-family: $font-body;
 }
 
-/* ── Area kanan: flex column, tinggi penuh ── */
+// ── Area kanan: flex column, tinggi penuh ──
 .main-right {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100vh;          /* isi tinggi penuh */
+  height: 100vh;
   min-width: 0;
   overflow: hidden;
 }
 
-/* ── Konten: satu-satunya elemen yang boleh scroll ── */
+// ── Konten: satu-satunya elemen yang boleh scroll ──
 .main-content {
   flex: 1;
-  overflow-y: auto;       /* scroll hanya di sini */
-  padding: 1.75rem 1.5rem;
+  overflow-y: auto;
+  padding: 1.75rem $space-6;
   box-sizing: border-box;
 }
 </style>
