@@ -50,19 +50,10 @@
       </RouterLink>
     </nav>
 
-    <!-- ── Menu Bawah (Settings) ── -->
-    <div class="sidebar-bottom">
-      <RouterLink to="/dashboard/settings" class="nav-item" active-class="active">
-        <span class="material-symbols-outlined nav-icon">settings</span>
-        <span class="nav-label">Settings</span>
-      </RouterLink>
-    </div>
-
   </aside>
 </template>
 
 <script setup lang="ts">
-// Tidak ada logic — murni struktur visual
 </script>
 
 <style scoped>
@@ -90,7 +81,7 @@
   align-items: center;
   gap: 0.625rem;
   padding: 0 1rem;
-  height: 55px;
+  height: 56px;
   border-bottom: 1px solid #f0f4f8;
 }
 .brand-logo {
@@ -199,11 +190,5 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* ── Bottom area ── */
-.sidebar-bottom {
-  padding: 0.75rem 0;
-  border-top: 1px solid #f0f4f8;
 }
 </style>
