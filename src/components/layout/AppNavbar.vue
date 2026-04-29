@@ -113,38 +113,36 @@ function goSettings() {
 }
 </script>
 
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
-
-/* ── Navbar shell ── */
+<style scoped lang="scss">
+// ── Navbar shell ──
 .navbar {
   width: 100%;
-  height: 56px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
+  height: $navbar-height;
+  background-color: $color-bg-surface;
+  border-bottom: 1px solid $color-border-light;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 $space-6;
   box-sizing: border-box;
   flex-shrink: 0;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: $z-navbar;
 }
 
-/* ── Kiri ── */
+// ── Kiri ──
 .navbar-left { display: flex; align-items: center; }
+
 .navbar-title {
-  font-family: 'Manrope', sans-serif;
+  font-family: $font-heading;
   font-weight: 700;
-  font-size: 1.0625rem;
-  color: #1a56db;
+  font-size: $text-lg;
+  color: $color-primary;
   letter-spacing: 0.01em;
 }
 
-/* ── Kanan ── */
+// ── Kanan ──
 .navbar-right {
   position: relative;
   display: flex;
@@ -155,28 +153,30 @@ function goSettings() {
 .navbar-divider {
   width: 1px;
   height: 32px;
-  background-color: #e5e7eb;
+  background-color: $color-border;
 }
 
-/* ── Notifikasi ── */
+// ── Notifikasi ──
 .icon-btn {
   position: relative;
   background: none;
   border: none;
   padding: 0.375rem;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: $radius-md;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
-  transition: background-color 0.15s, color 0.15s;
+  color: $color-text-muted;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background-color: $color-primary-light;
+    color: $color-primary;
+  }
+
+  .material-symbols-outlined { font-size: 1.375rem; }
 }
-.icon-btn:hover {
-  background-color: #f0f4ff;
-  color: #1a56db;
-}
-.icon-btn .material-symbols-outlined { font-size: 1.375rem; }
 
 .notif-badge {
   position: absolute;
@@ -184,93 +184,97 @@ function goSettings() {
   right: 5px;
   width: 8px;
   height: 8px;
-  background: #ef4444;
+  background: $color-danger;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 2px solid $color-bg-surface;
 }
 
-/* ── User Card (clickable) ── */
+// ── User Card ──
 .user-card {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  gap: $space-2;
+  padding: $space-1 $space-2 $space-1 $space-1;
   border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color $transition-fast;
   user-select: none;
+
+  &:hover { background-color: $color-primary-light; }
 }
-.user-card:hover { background-color: #f0f4ff; }
 
 .user-avatar {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1a56db, #1145b0);
+  background: linear-gradient(135deg, $color-primary, $color-primary-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+
+  .avatar-icon { font-size: 1.125rem; color: $color-text-inverse; }
 }
-.avatar-icon { font-size: 1.125rem; color: #fff; }
 
 .user-text {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
+
 .user-name {
-  font-family: 'Inter', sans-serif;
+  font-family: $font-body;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #111827;
+  color: $color-text-primary;
   line-height: 1.2;
   white-space: nowrap;
 }
+
 .user-role {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.625rem;
+  font-family: $font-body;
+  font-size: $text-xs;
   font-weight: 500;
-  color: #6b7280;
+  color: $color-text-muted;
   text-transform: capitalize;
   letter-spacing: 0.03em;
 }
 
 .chevron {
   font-size: 1.125rem;
-  color: #9ca3af;
-  transition: transform 0.2s ease;
-}
-.chevron--open { transform: rotate(180deg); }
+  color: $color-text-faint;
+  transition: transform $transition-base;
 
-/* ── Dropdown ── */
+  &--open { transform: rotate(180deg); }
+}
+
+// ── Dropdown ──
 .dropdown {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
   min-width: 200px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: $color-bg-surface;
+  border: 1px solid $color-border;
   border-radius: 14px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  padding: 0.5rem;
-  z-index: 200;
+  box-shadow: $shadow-lg;
+  padding: $space-2;
+  z-index: $z-dropdown;
 }
 
-.dropdown-header {
-  padding: 0.375rem 0.625rem 0.5rem;
-}
+.dropdown-header { padding: 0.375rem 0.625rem 0.5rem; }
+
 .dropdown-email {
-  font-family: 'Inter', sans-serif;
+  font-family: $font-body;
   font-size: 0.6875rem;
-  color: #9ca3af;
+  color: $color-text-faint;
   word-break: break-all;
 }
 
 .dropdown-divider {
   border: none;
-  border-top: 1px solid #f0f0f0;
-  margin: 0.25rem 0;
+  border-top: 1px solid $color-border-light;
+  margin: $space-1 0;
 }
 
 .dropdown-item {
@@ -280,36 +284,42 @@ function goSettings() {
   gap: 0.625rem;
   background: none;
   border: none;
-  border-radius: 8px;
-  padding: 0.5rem 0.625rem;
-  font-family: 'Inter', sans-serif;
+  border-radius: $radius-md;
+  padding: $space-2 0.625rem;
+  font-family: $font-body;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #374151;
+  color: $color-text-secondary;
   cursor: pointer;
   text-align: left;
-  transition: background-color 0.15s, color 0.15s;
-}
-.dropdown-item:hover:not(:disabled) {
-  background-color: #f0f4ff;
-  color: #1a56db;
-}
-.dropdown-item .material-symbols-outlined { font-size: 1.125rem; }
+  transition: background-color $transition-fast, color $transition-fast;
 
-.dropdown-item--danger { color: #dc2626; }
-.dropdown-item--danger:hover:not(:disabled) {
-  background-color: #fef2f2;
-  color: #b91c1c;
-}
-.dropdown-item:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    background-color: $color-primary-light;
+    color: $color-primary;
+  }
 
-/* ── Transition ── */
+  .material-symbols-outlined { font-size: 1.125rem; }
+
+  &--danger {
+    color: $color-danger-dark;
+
+    &:hover:not(:disabled) {
+      background-color: $color-danger-bg;
+      color: $color-danger-darker;
+    }
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// ── Vue Transition ──
 .dropdown-enter-active {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all $transition-base cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: top right;
 }
 .dropdown-leave-active {
-  transition: all 0.15s ease;
+  transition: all $transition-fast;
   transform-origin: top right;
 }
 .dropdown-enter-from {
@@ -321,3 +331,4 @@ function goSettings() {
   transform: scale(0.95) translateY(-4px);
 }
 </style>
+

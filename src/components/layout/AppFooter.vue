@@ -26,71 +26,74 @@
 const currentYear = new Date().getFullYear()
 </script>
 
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-
+<style scoped lang="scss">
 .app-footer {
   width: 100%;
-  height: 44px;
-  background-color: #ffffff;
-  border-top: 1px solid #f0f0f0;
+  height: $footer-height;
+  background-color: $color-bg-surface;
+  border-top: 1px solid $color-border-light;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 $space-6;
   box-sizing: border-box;
   flex-shrink: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: $font-body;
 }
 
-/* ── Kiri ── */
+// ── Kiri ──
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: $space-2;
 }
+
 .footer-logo-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #1a56db;
+  background-color: $color-primary;
   flex-shrink: 0;
 }
+
 .footer-copy {
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
-.footer-copy strong {
-  color: #6b7280;
-  font-weight: 600;
+  font-size: $text-sm;
+  color: $color-text-faint;
+
+  strong {
+    color: $color-text-muted;
+    font-weight: 600;
+  }
 }
 
-/* ── Kanan ── */
+// ── Kanan ──
 .footer-right {
   display: flex;
   align-items: center;
   gap: 0.375rem;
 }
+
 .footer-version {
   font-size: 0.6875rem;
   font-weight: 600;
   color: #d1d5db;
   background-color: #f3f4f6;
   padding: 0.1rem 0.45rem;
-  border-radius: 999px;
+  border-radius: $radius-pill;
 }
+
 .footer-sep {
-  font-size: 0.75rem;
+  font-size: $text-sm;
   color: #d1d5db;
 }
+
 .footer-link {
   font-size: 0.6875rem;
   font-weight: 500;
-  color: #9ca3af;
+  color: $color-text-faint;
   text-decoration: none;
-  transition: color 0.15s;
-}
-.footer-link:hover {
-  color: #1a56db;
+  transition: color $transition-fast;
+
+  &:hover { color: $color-primary; }
 }
 </style>

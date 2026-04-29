@@ -56,139 +56,137 @@
 <script setup lang="ts">
 </script>
 
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
-
-/* ── Sidebar shell ── */
+<style scoped lang="scss">
+// ── Sidebar shell ──
 .sidebar {
-  width: 192px;
-  min-width: 192px;
+  width: $sidebar-width;
+  min-width: $sidebar-width;
   height: 100vh;
-  background-color: #ffffff;
+  background-color: $color-bg-surface;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #f0f0f0;
+  border-right: 1px solid $color-border-light;
   position: sticky;
   top: 0;
   flex-shrink: 0;
   overflow-y: auto;
 }
 
-/* ── Brand area ── */
+// ── Brand area ──
 .sidebar-brand {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0 1rem;
-  height: 56px;
-  border-bottom: 1px solid #f0f4f8;
+  padding: 0 $space-4;
+  height: $navbar-height;
+  border-bottom: 1px solid $color-border-subtle;
 }
+
 .brand-logo {
   width: 2rem;
   height: 2rem;
-  background-color: #1a56db;
+  background-color: $color-primary;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   overflow: hidden;
+
+  .brand-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 }
-.brand-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
+
 .brand-info {
   display: flex;
   flex-direction: column;
 }
+
 .brand-name {
-  font-family: 'Manrope', sans-serif;
+  font-family: $font-heading;
   font-weight: 700;
-  font-size: 0.875rem;
-  color: #1a56db;
+  font-size: $text-base;
+  color: $color-primary;
   line-height: 1.2;
 }
+
 .brand-sub {
-  font-family: 'Inter', sans-serif;
+  font-family: $font-body;
   font-size: 0.5625rem;
   font-weight: 500;
-  color: #9ca3af;
+  color: $color-text-faint;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-/* ── Nav ── */
+// ── Nav ──
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
+  padding: $space-4 0;
   flex: 1;
   gap: 0.125rem;
 }
 
-/* ── Nav Item ── */
+// ── Nav Item ──
 .nav-item {
   position: relative;
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.625rem 1rem;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.875rem;
+  padding: 0.625rem $space-4;
+  font-family: $font-body;
+  font-size: $text-base;
   font-weight: 500;
-  color: #6b7280;
+  color: $color-text-muted;
   text-decoration: none;
   border-radius: 0;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color $transition-fast, color $transition-fast;
   cursor: pointer;
-}
-.nav-item:hover {
-  background-color: #f0f4ff;
-  color: #1a56db;
-}
-.nav-item:hover .nav-icon {
-  color: #1a56db;
+
+  &:hover {
+    background-color: $color-primary-light;
+    color: $color-primary;
+
+    .nav-icon { color: $color-primary; }
+  }
+
+  // Active state
+  &.active {
+    color: $color-primary;
+    font-weight: 600;
+    background-color: $color-primary-light;
+
+    .nav-icon { color: $color-primary; }
+
+    .nav-indicator {
+      display: block;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 60%;
+      background-color: $color-primary;
+      border-radius: 2px 0 0 2px;
+    }
+  }
 }
 
-/* Active state */
-.nav-item.active {
-  color: #1a56db;
-  font-weight: 600;
-  background-color: #f0f4ff;
-}
-.nav-item.active .nav-icon {
-  color: #1a56db;
-}
-/* Garis indikator biru di kanan saat active */
-.nav-indicator {
-  display: none;
-}
-.nav-item.active .nav-indicator {
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 60%;
-  background-color: #1a56db;
-  border-radius: 2px 0 0 2px;
-}
+.nav-indicator { display: none; }
 
 .nav-icon {
   font-size: 1.25rem;
-  color: #9ca3af;
+  color: $color-text-faint;
   flex-shrink: 0;
   line-height: 1;
 }
 
 .nav-label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @include truncate;
 }
 </style>
