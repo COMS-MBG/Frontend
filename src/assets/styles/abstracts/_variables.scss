@@ -1,0 +1,225 @@
+// ────────────────────────────────────────
+// THEME VARIABLES (CSS VARIABLES)
+// ────────────────────────────────────────
+:root {
+  // COLOR — Primary (Blue)
+  --color-primary: #1a56db;
+  --color-primary-dark: #1145b0;
+  --color-primary-light: #f0f4ff;
+  --color-primary-muted: rgba(26, 86, 219, 0.1);
+
+  // COLOR — Success (Green)
+  --color-success: #059669;
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #a7f3d0;
+
+  // COLOR — Danger (Red)
+  --color-danger: #ef4444;
+  --color-danger-dark: #dc2626;
+  --color-danger-darker: #b91c1c;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+
+  // COLOR — Warning (Amber)
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+
+  // TEXT COLORS
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6b7280;
+  --color-text-faint: #9ca3af;
+  --color-text-inverse: #ffffff;
+
+  // BACKGROUND COLORS
+  --color-bg-page: #f4f6fb;
+  --color-bg-surface: #FAFAFA;
+  --color-bg-subtle: #f0f2f5;
+  --color-bg-muted: #f1f5f9;
+  --color-bg-overlay: rgba(255, 255, 255, 0.82);
+
+  // BORDERS
+  --color-border: #e5e7eb;
+  --color-border-light: #f0f0f0;
+  --color-border-subtle: #f0f4f8;
+
+  // SHADOWS
+  --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-primary: 0 4px 16px rgba(26, 86, 219, 0.25);
+  --shadow-primary-hover: 0 6px 24px rgba(26, 86, 219, 0.42);
+  --shadow-btn: 0 4px 16px rgba(26, 86, 219, 0.35);
+}
+
+[data-theme="dark"] {
+  // COLOR — Primary (Blue)
+  --color-primary: #3b82f6;
+  --color-primary-dark: #2563eb;
+  --color-primary-light: rgba(59, 130, 246, 0.15);
+  --color-primary-muted: rgba(59, 130, 246, 0.1);
+
+  // COLOR — Success (Green)
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-success-border: rgba(16, 185, 129, 0.3);
+
+  // COLOR — Danger (Red)
+  --color-danger: #f87171;
+  --color-danger-dark: #ef4444;
+  --color-danger-darker: #dc2626;
+  --color-danger-bg: rgba(248, 113, 113, 0.15);
+  --color-danger-border: rgba(248, 113, 113, 0.3);
+
+  // COLOR — Warning (Amber)
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(251, 191, 36, 0.15);
+  --color-warning-border: rgba(251, 191, 36, 0.3);
+
+  // TEXT COLORS
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #9ca3af;
+  --color-text-faint: #6b7280;
+  --color-text-inverse: #111827;
+
+  // BACKGROUND COLORS
+  --color-bg-page: #111827;
+  --color-bg-surface: #1f2937;
+  --color-bg-subtle: #374151;
+  --color-bg-muted: #4b5563;
+  --color-bg-overlay: rgba(17, 24, 39, 0.82);
+
+  // BORDERS
+  --color-border: #374151;
+  --color-border-light: #4b5563;
+  --color-border-subtle: #1f2937;
+
+  // SHADOWS (Lebih solid di dark mode)
+  --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-primary: 0 4px 16px rgba(59, 130, 246, 0.25);
+  --shadow-primary-hover: 0 6px 24px rgba(59, 130, 246, 0.42);
+  --shadow-btn: 0 4px 16px rgba(59, 130, 246, 0.35);
+}
+
+// ────────────────────────────────────────
+// MAPPING CSS VARIABLES TO SCSS
+// ────────────────────────────────────────
+
+// COLOR — Primary
+$color-primary:       var(--color-primary);
+$color-primary-dark:  var(--color-primary-dark);
+$color-primary-light: var(--color-primary-light);
+$color-primary-muted: var(--color-primary-muted);
+
+// COLOR — Success
+$color-success:        var(--color-success);
+$color-success-bg:     var(--color-success-bg);
+$color-success-border: var(--color-success-border);
+
+// COLOR — Danger
+$color-danger:         var(--color-danger);
+$color-danger-dark:    var(--color-danger-dark);
+$color-danger-darker:  var(--color-danger-darker);
+$color-danger-bg:      var(--color-danger-bg);
+$color-danger-border:  var(--color-danger-border);
+
+// COLOR — Warning
+$color-warning:        var(--color-warning);
+$color-warning-bg:     var(--color-warning-bg);
+$color-warning-border: var(--color-warning-border);
+
+// TEXT COLORS
+$color-text-primary:   var(--color-text-primary);
+$color-text-secondary: var(--color-text-secondary);
+$color-text-muted:     var(--color-text-muted);
+$color-text-faint:     var(--color-text-faint);
+$color-text-inverse:   var(--color-text-inverse);
+
+// BACKGROUND COLORS
+$color-bg-page:     var(--color-bg-page);
+$color-bg-surface:  var(--color-bg-surface);
+$color-bg-subtle:   var(--color-bg-subtle);
+$color-bg-muted:    var(--color-bg-muted);
+$color-bg-overlay:  var(--color-bg-overlay);
+
+// BORDERS
+$color-border:        var(--color-border);
+$color-border-light:  var(--color-border-light);
+$color-border-subtle: var(--color-border-subtle);
+
+// SHADOWS
+$shadow-xs:            var(--shadow-xs);
+$shadow-sm:            var(--shadow-sm);
+$shadow-md:            var(--shadow-md);
+$shadow-lg:            var(--shadow-lg);
+$shadow-primary:       var(--shadow-primary);
+$shadow-primary-hover: var(--shadow-primary-hover);
+$shadow-btn:           var(--shadow-btn);
+
+// ────────────────────────────────────────
+// BORDER RADIUS
+// ────────────────────────────────────────
+$radius-sm:   6px;
+$radius-md:   8px;
+$radius-lg:   12px;
+$radius-xl:   14px;
+$radius-2xl:  16px;
+$radius-pill: 999px;
+
+// ────────────────────────────────────────
+// SPACING (base 4px grid)
+// ────────────────────────────────────────
+$space-1:  0.25rem;
+$space-2:  0.5rem;
+$space-3:  0.75rem;
+$space-4:  1rem;
+$space-5:  1.25rem;
+$space-6:  1.5rem;
+$space-8:  2rem;
+$space-10: 2.5rem;
+$space-12: 3rem;
+
+// ────────────────────────────────────────
+// TYPOGRAPHY — Font Families
+// ────────────────────────────────────────
+$font-body:    'Inter', sans-serif;
+$font-heading: 'Manrope', sans-serif;
+$font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+// ────────────────────────────────────────
+// TYPOGRAPHY — Font Sizes
+// ────────────────────────────────────────
+$text-xs:   0.625rem;
+$text-sm:   0.75rem;
+$text-base: 0.875rem;
+$text-md:   1rem;
+$text-lg:   1.0625rem;
+$text-xl:   1.1rem;
+$text-2xl:  1.3rem;
+$text-3xl:  1.625rem;
+$text-4xl:  1.875rem;
+$text-hero: 2rem;
+
+// ────────────────────────────────────────
+// TRANSITIONS
+// ────────────────────────────────────────
+$transition-fast:   0.15s ease;
+$transition-base:   0.2s ease;
+$transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+$transition-spring: 0.6s ease;
+
+// ────────────────────────────────────────
+// LAYOUT
+// ────────────────────────────────────────
+$sidebar-width: 252px;
+$navbar-height: 56px;
+$footer-height: 44px;
+$z-navbar:      100;
+$z-dropdown:    200;
+$z-overlay:     50;

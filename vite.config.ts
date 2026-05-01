@@ -21,8 +21,8 @@ export default defineConfig({
         // Auto-import variables & mixins ke semua komponen Vue
         // Tidak perlu @use manual di setiap <style lang="scss">
         additionalData: `
-          @use "@/assets/styles/variables" as *;
-          @use "@/assets/styles/mixins" as *;
+          @use "@/assets/styles/abstracts/variables" as *;
+          @use "@/assets/styles/abstracts/mixins" as *;
         `,
       },
     },
