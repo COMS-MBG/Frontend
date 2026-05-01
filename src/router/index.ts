@@ -5,19 +5,13 @@ import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import LoginView          from '@/views/LoginView.vue'
 import DashboardView      from '@/views/DashboardView.vue'
-import ManajemenGiziView  from '@/views/ManajemenGiziView.vue'
-import DistribusiView     from '@/views/DistribusiView.vue'
-import MasterDataView     from '@/views/MasterDataView.vue'
-import LaporanView        from '@/views/LaporanView.vue'
-import SettingsView       from '@/views/SettingsView.vue'
-import ProfileView        from '@/views/ProfileView.vue'
 import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: AuthLayout,
-    meta: { guestOnly: true },         // hanya untuk tamu (belum login)
+    meta: { guestOnly: true },
     children: [
       { path: '',      redirect: '/login' },
       { path: 'login', name: 'login', component: LoginView },
@@ -29,13 +23,22 @@ const routes: RouteRecordRaw[] = [
     component: MainLayout,
     meta: { requiresAuth: true },
     children: [
-      { path: '',               name: 'dashboard',       component: DashboardView },
-      { path: 'manajemen-gizi', name: 'manajemen-gizi',  component: ManajemenGiziView },
-      { path: 'distribusi',     name: 'distribusi',      component: DistribusiView },
-      { path: 'master-data',    name: 'master-data',     component: MasterDataView },
-      { path: 'laporan',        name: 'laporan',         component: LaporanView },
-      { path: 'profile',        name: 'profile',         component: ProfileView },
-      { path: 'settings',       name: 'settings',        component: SettingsView },
+      { path: '', name: 'dashboard', component: DashboardView },
+      
+      // Manajemen Gizi
+      { path: 'master-resep', name: 'master-resep', component: () => import('@/views/gizi/MasterResepView.vue') },
+      { path: 'master-bahan', name: 'master-bahan', component: () => import('@/views/gizi/MasterBahanView.vue') },
+      { path: 'perencanaan-menu', name: 'perencanaan-menu', component: () => import('@/views/gizi/PerencanaanMenuView.vue') },
+
+      // Distribusi
+      { path: 'jadwal-pengiriman', name: 'jadwal-pengiriman', component: () => import('@/views/distribusi/JadwalPengirimanView.vue') },
+      { path: 'peta-spasial', name: 'peta-spasial', component: () => import('@/views/distribusi/PetaSpasialView.vue') },
+
+      // Standalone
+      { path: 'master-data', name: 'master-data', component: () => import('@/views/MasterDataView.vue') },
+      { path: 'laporan', name: 'laporan', component: () => import('@/views/LaporanView.vue') },
+      { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },
+      { path: 'settings', name: 'settings', component: () => import('@/views/SettingsView.vue') },
     ],
   },
 

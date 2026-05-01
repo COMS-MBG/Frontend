@@ -1,0 +1,72 @@
+export interface MenuItem {
+  id: string
+  title: string
+  icon: string
+  routeName?: string
+  children?: MenuItem[]
+}
+
+export const sidebarMenu: MenuItem[] = [
+  {
+    id: 'dashboard',
+    title: 'Dashboard',
+    icon: 'dashboard',
+    routeName: 'dashboard',
+  },
+  {
+    id: 'manajemen-gizi',
+    title: 'Manajemen Gizi',
+    icon: 'settings_accessibility',
+    children: [
+      {
+        id: 'master-resep',
+        title: 'Master Data Resep',
+        icon: 'receipt_long',
+        routeName: 'master-resep',
+      },
+      {
+        id: 'master-bahan',
+        title: 'Master Data Bahan Baku',
+        icon: 'kitchen',
+        routeName: 'master-bahan',
+      },
+      {
+        id: 'perencanaan-menu',
+        title: 'Perencanaan Menu',
+        icon: 'restaurant_menu',
+        routeName: 'perencanaan-menu',
+      },
+    ],
+  },
+  {
+    id: 'distribusi',
+    title: 'Distribusi',
+    icon: 'local_shipping',
+    children: [
+      {
+        id: 'jadwal-pengiriman',
+        title: 'Jadwal Pengiriman',
+        icon: 'calendar_month',
+        routeName: 'jadwal-pengiriman',
+      },
+      {
+        id: 'peta-spasial',
+        title: 'Peta Spasial & Analitik',
+        icon: 'map',
+        routeName: 'peta-spasial',
+      },
+    ],
+  },
+  {
+    id: 'master-data',
+    title: 'Master Data',
+    icon: 'storage',
+    routeName: 'master-data',
+  },
+  {
+    id: 'laporan',
+    title: 'Laporan',
+    icon: 'bar_chart',
+    routeName: 'laporan',
+  },
+]
