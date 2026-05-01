@@ -4,7 +4,7 @@ import App from './App.vue'
 import router from './router'
 
 // ── Global Styles ──────────────────────────────────────────
-import '@/assets/styles/styles.scss'   // Fonts + SCSS variables entry point
+import '@/assets/styles/main.scss'   
 
 const app = createApp(App)
 

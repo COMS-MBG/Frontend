@@ -1,0 +1,63 @@
+// ═══════════════════════════════════════════════════════════
+// PAGE — Dashboard
+// Styling khusus halaman DashboardView.vue
+// ═══════════════════════════════════════════════════════════
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Base ──
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  font-family: $font-body;
+  color: $color-text-primary;
+}
+
+// ── Row 1: Stats ──
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+}
+
+// ── Row 2: Main Grid ──
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: $space-4;
+  align-items: stretch;
+}
+
+// ── Row 3: Bottom Grid ──
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: $space-4;
+  align-items: start;
+}
+
+// ── Info stack ──
+.info-stack {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+@include tablet {
+  .main-grid,
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@include mobile {
+  .dashboard   { gap: $space-4; }
+  .stats-row   { grid-template-columns: 1fr; }
+  .info-stack  { grid-template-columns: 1fr; }
+}
