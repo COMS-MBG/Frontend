@@ -69,6 +69,7 @@
 import { computed } from 'vue'
 import BaseBadge from '@/components/common/BaseBadge.vue'
 import type { BahanItem, BahanKategori } from '@/types/gizi'
+import { formatNum, formatDec } from '@/utils/format'
 
 const props = defineProps<{
   item: BahanItem
@@ -94,14 +95,6 @@ const stokClass = computed(() => {
   if (props.item.stok <= 5) return 'stok--warning'
   return ''
 })
-
-function formatNum(val: number): string {
-  return val.toLocaleString('id-ID')
-}
-
-function formatDec(val: number): string {
-  return val.toFixed(1)
-}
 </script>
 
 <style scoped lang="scss">
@@ -214,55 +207,4 @@ function formatDec(val: number): string {
   font-weight: 700;
 }
 
-// ── Action buttons ──
-.action-group {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: $space-2; // Add gap between buttons for better layout
-}
-
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 1px solid transparent; // Add transparent border to match size properly
-  border-radius: $radius-md; // Make it slightly more rounded square instead of small radius
-  background: transparent;
-  cursor: pointer;
-  transition: all $transition-fast;
-
-  .material-symbols-outlined {
-    font-size: 1.15rem; // Slightly smaller icon to fit nicely
-  }
-
-  &:focus-visible {
-    outline: 2px solid $color-primary;
-    outline-offset: 2px;
-  }
-
-  &--edit {
-    color: $color-primary;
-    background-color: $color-primary-subtle; // Add subtle background by default
-    &:hover { 
-      background-color: $color-primary; 
-      color: $color-text-inverse;
-      box-shadow: $shadow-sm;
-      transform: translateY(-1px);
-    }
-  }
-
-  &--delete {
-    color: $color-danger;
-    background-color: $color-danger-bg; // Add subtle background by default
-    &:hover { 
-      background-color: $color-danger; 
-      color: $color-text-inverse;
-      box-shadow: $shadow-sm;
-      transform: translateY(-1px);
-    }
-  }
-}
 </style>

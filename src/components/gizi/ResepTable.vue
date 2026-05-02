@@ -38,18 +38,7 @@
 
 <script setup lang="ts">
 import ResepRow from './ResepRow.vue'
-
-export interface ResepItem {
-  id: number
-  nama: string
-  status: string
-  statusVariant: 'success' | 'warning' | 'danger' | 'info' | 'default'
-  kalori: number
-  protein: number
-  karbohidrat: number
-  lemak: number
-  image?: string
-}
+import type { ResepItem } from '@/types/resep'
 
 defineProps<{
   items: ResepItem[]

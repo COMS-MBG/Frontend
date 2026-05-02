@@ -96,10 +96,37 @@
 
 <script setup lang="ts">
 import { reactive, watch, computed } from 'vue'
+import { z } from 'zod'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseFormGroup from '@/components/common/BaseFormGroup.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import type { ResepItem } from './ResepTable.vue'
+import type { ResepItem } from '@/types/resep'
+
+/** Typed error shape for the modal form fields. */
+interface ModalFormErrors {
+  nama: string
+  kalori: string
+  protein: string
+  karbohidrat: string
+  lemak: string
+}
+
+const emptyErrors = (): ModalFormErrors => ({
+  nama: '',
+  kalori: '',
+  protein: '',
+  karbohidrat: '',
+  lemak: '',
+})
+
+// ── Zod schema for the modal form ──────────────────────────
+const modalSchema = z.object({
+  nama: z.string().min(1, { message: 'Nama resep wajib diisi' }),
+  kalori: z.coerce.number({ message: 'Kalori tidak valid' }).min(0, { message: 'Kalori tidak valid' }),
+  protein: z.coerce.number({ message: 'Protein tidak valid' }).min(0, { message: 'Protein tidak valid' }),
+  karbohidrat: z.coerce.number({ message: 'Karbohidrat tidak valid' }).min(0, { message: 'Karbohidrat tidak valid' }),
+  lemak: z.coerce.number({ message: 'Lemak tidak valid' }).min(0, { message: 'Lemak tidak valid' }),
+})
 
 const props = defineProps<{
   isOpen: boolean
@@ -126,13 +153,7 @@ const formData = reactive({
   lemak: '' as number | string
 })
 
-const errors = reactive({
-  nama: '',
-  kalori: '',
-  protein: '',
-  karbohidrat: '',
-  lemak: ''
-})
+const errors: ModalFormErrors = reactive(emptyErrors())
 
 // Reset and populate form
 watch(() => props.isOpen, (isOpen) => {
@@ -150,37 +171,23 @@ watch(() => props.isOpen, (isOpen) => {
       formData.karbohidrat = ''
       formData.lemak = ''
     }
-    // clear errors
-    Object.keys(errors).forEach(key => errors[key as keyof typeof errors] = '')
+    Object.assign(errors, emptyErrors())
   }
 })
 
-const validate = () => {
-  let isValid = true
-  Object.keys(errors).forEach(key => errors[key as keyof typeof errors] = '')
+const validate = (): boolean => {
+  Object.assign(errors, emptyErrors())
 
-  if (!formData.nama.trim()) {
-    errors.nama = 'Nama resep wajib diisi'
-    isValid = false
-  }
-  if (formData.kalori === '' || Number(formData.kalori) < 0) {
-    errors.kalori = 'Kalori tidak valid'
-    isValid = false
-  }
-  if (formData.protein === '' || Number(formData.protein) < 0) {
-    errors.protein = 'Protein tidak valid'
-    isValid = false
-  }
-  if (formData.karbohidrat === '' || Number(formData.karbohidrat) < 0) {
-    errors.karbohidrat = 'Karbohidrat tidak valid'
-    isValid = false
-  }
-  if (formData.lemak === '' || Number(formData.lemak) < 0) {
-    errors.lemak = 'Lemak tidak valid'
-    isValid = false
-  }
+  const result = modalSchema.safeParse(formData)
+  if (result.success) return true
 
-  return isValid
+  for (const issue of result.error.issues) {
+    const field = issue.path[0] as keyof ModalFormErrors | undefined
+    if (field && field in errors) {
+      errors[field] = issue.message
+    }
+  }
+  return false
 }
 
 const onSubmit = () => {

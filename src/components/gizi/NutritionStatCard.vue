@@ -17,13 +17,15 @@
 </template>
 
 <script setup lang="ts">
+import type { StatVariant } from '@/types/gizi'
+
 defineProps<{
   label: string
   value: string | number
   unit: string
   icon: string
   status?: string
-  variant?: 'success' | 'danger' | 'warning' | 'primary' | 'default'
+  variant?: StatVariant
 }>()
 </script>
 

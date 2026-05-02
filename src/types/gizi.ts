@@ -26,7 +26,7 @@ export interface MacroNutrient {
 }
 
 /** Stat variant for NutritionStatCard */
-export type StatVariant = 'default' | 'success' | 'danger' | 'warning'
+export type StatVariant = 'default' | 'success' | 'danger' | 'warning' | 'primary'
 
 /** Single nutrition stat entry */
 export interface NutritionStat {
