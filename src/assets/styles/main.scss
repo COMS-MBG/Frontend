@@ -11,9 +11,11 @@
 @use 'components/navbar';
 @use 'components/footer';
 @use 'components/modal';
+@use 'components/menu-planning-row';
 
 // ── Pages ──────────────────────────────────────────────────
 @use 'pages/dashboard';
 @use 'pages/gizi';
 @use 'pages/kalkulator-gizi';
 @use 'pages/master-bahan';
+@use 'pages/menu-planning';
