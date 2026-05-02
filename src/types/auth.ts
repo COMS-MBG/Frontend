@@ -34,9 +34,3 @@ export interface ApiResponse<T = unknown> {
   status: number
 }
 
-/** State untuk auth store */
-export interface AuthState {
-  user: User | null
-  isLoading: boolean
-  error: string | null
-}

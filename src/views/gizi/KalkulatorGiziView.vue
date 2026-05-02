@@ -12,7 +12,7 @@
         <RecipeBuilderCard
           v-model:nama-menu="formState.namaResep"
           :bahan-items="formState.bahanList"
-          :bahan-options="dummyBahanOptions"
+          :bahan-options="bahanOptions"
           :errors="errors"
           @add-bahan="addBahan"
           @remove-bahan="removeBahan"
@@ -61,7 +61,8 @@
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useResepForm } from '@/composables/useResepForm'
-import type { SelectOption } from '@/types/form'
+import { useBahanStore } from '@/stores/bahan.store'
+import { bahanDummy } from '@/data/bahan.dummy'
 
 import PageHeader from '@/components/common/PageHeader.vue'
 import RecipeBuilderCard from '@/components/gizi/RecipeBuilderCard.vue'
@@ -72,40 +73,39 @@ import HealthScoreCard from '@/components/gizi/HealthScoreCard.vue'
 const route = useRoute()
 const router = useRouter()
 
+// ── Ensure bahan store is seeded (needed for bahanOptions) ──
+const bahanStore = useBahanStore()
+onMounted(() => {
+  if (bahanStore.items.length === 0) {
+    bahanStore.setItems(bahanDummy)
+  }
+})
+
 // Initialize Composable
 const {
   formState,
+  bahanOptions,
   nutritionResult,
   errors,
-  validateForm,
   addBahan,
   removeBahan,
   calculate,
   loadRecipe,
-  resetForm
+  saveRecipe,
+  resetForm,
 } = useResepForm()
-
-const dummyBahanOptions: SelectOption[] = [
-  { label: 'Bayam Segar', value: 'bayam' },
-  { label: 'Jagung Manis Pipil', value: 'jagung' },
-  { label: 'Daging Ayam Dada', value: 'ayam' },
-  { label: 'Tahu Putih', value: 'tahu' },
-  { label: 'Tempe Kedelai', value: 'tempe' },
-]
 
 onMounted(() => {
   if (route.params.id) {
-    loadRecipe(route.params.id)
+    loadRecipe(Number(route.params.id))
   } else {
     resetForm()
   }
 })
 
 function onSubmit() {
-  if (!validateForm()) return
-
-  // TODO: Replace with actual API call
-  router.push({ name: 'master-resep' })
+  if (saveRecipe()) {
+    router.push({ name: 'master-resep' })
+  }
 }
 </script>
-

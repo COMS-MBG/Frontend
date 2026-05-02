@@ -20,10 +20,10 @@
     </td>
 
     <!-- Nutrisi -->
-    <td class="resep-row__num">{{ formatNumber(item.kalori) }}</td>
-    <td class="resep-row__num">{{ formatNumber(item.protein) }}</td>
-    <td class="resep-row__num">{{ formatNumber(item.karbohidrat) }}</td>
-    <td class="resep-row__num">{{ formatNumber(item.lemak) }}</td>
+    <td class="resep-row__num">{{ formatNum(item.kalori) }}</td>
+    <td class="resep-row__num">{{ formatNum(item.protein) }}</td>
+    <td class="resep-row__num">{{ formatNum(item.karbohidrat) }}</td>
+    <td class="resep-row__num">{{ formatNum(item.lemak) }}</td>
 
     <!-- Aksi -->
     <td class="resep-row__aksi">
@@ -39,7 +39,8 @@
 
 <script setup lang="ts">
 import BaseBadge from '@/components/common/BaseBadge.vue'
-import type { ResepItem } from './ResepTable.vue'
+import type { ResepItem } from '@/types/resep'
+import { formatNum } from '@/utils/format'
 
 defineProps<{
   item: ResepItem
@@ -49,10 +50,6 @@ defineEmits<{
   (e: 'edit', item: ResepItem): void
   (e: 'delete', item: ResepItem): void
 }>()
-
-function formatNumber(val: number) {
-  return val.toLocaleString('id-ID')
-}
 </script>
 
 <style scoped lang="scss">
@@ -135,30 +132,4 @@ function formatNumber(val: number) {
   }
 }
 
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: none;
-  border-radius: $radius-sm;
-  background: transparent;
-  cursor: pointer;
-  transition: background-color $transition-fast, color $transition-fast;
-
-  .material-symbols-outlined {
-    font-size: 1.25rem;
-  }
-
-  &--edit {
-    color: $color-primary;
-    &:hover { background-color: $color-primary-light; }
-  }
-
-  &--delete {
-    color: $color-danger;
-    &:hover { background-color: $color-danger-bg; }
-  }
-}
 </style>

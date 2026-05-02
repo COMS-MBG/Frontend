@@ -105,30 +105,6 @@ const filterOptions: SelectOption[] = [
   }
 }
 
-.btn-with-icon {
-  display: inline-flex;
-  align-items: center;
-  gap: $space-2;
-  white-space: nowrap;
-  padding: $space-2 $space-3;
-  border-radius: $radius-md;
-  font-family: $font-body;
-  font-size: $text-sm;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid $color-border;
-  background-color: $color-bg-subtle;
-  color: $color-text-primary;
-
-  .material-symbols-outlined {
-    font-size: 1.1rem;
-  }
-
-  &:hover {
-    background-color: $color-border;
-  }
-}
 
 @include tablet {
   .bahan-toolbar {

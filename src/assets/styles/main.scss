@@ -5,6 +5,7 @@
 @use 'base/reset';
 
 // ── Components ─────────────────────────────────────────────
+@use 'components/shared';
 @use 'components/button';
 @use 'components/sidebar';
 @use 'components/navbar';

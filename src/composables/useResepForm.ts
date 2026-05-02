@@ -1,11 +1,15 @@
 import { reactive, ref, computed, watch } from 'vue'
 import { resepSchema, mapResepErrors } from '@/validation/resep.schema'
+import { useResepStore } from '@/stores/resep.store'
+import { useBahanStore } from '@/stores/bahan.store'
 import type { BahanItemData, ResepFormErrors, NutritionResult, NutritionStat } from '@/types/gizi'
+import type { ResepItem } from '@/types/resep'
+import type { SelectOption } from '@/types/form'
 
 // ── Debounce utility (no external dep needed) ──────────────
-function debounce<T extends (...args: any[]) => void>(fn: T, ms: number): T {
+function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number): T {
   let timer: ReturnType<typeof setTimeout>
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     clearTimeout(timer)
     timer = setTimeout(() => fn(...args), ms)
   }) as T
@@ -35,13 +39,27 @@ function createEmptyBahan(): BahanItemData {
 /**
  * Composable for the Recipe Form — owns form state, validation, and nutrition result.
  * Keeps the View clean from business logic.
+ *
+ * Connected to `useResepStore` for save/update operations and
+ * `useBahanStore` for bahan option list.
  */
 export function useResepForm() {
+  const resepStore = useResepStore()
+  const bahanStore = useBahanStore()
+
   // ── Form State (user input only) ─────────────────────────
   const formState = reactive({
     namaResep: '',
     bahanList: [createEmptyBahan()] as BahanItemData[],
   })
+
+  /** Editing mode flag — set when loading an existing recipe. */
+  const editingId = ref<number | null>(null)
+
+  // ── Bahan Options (derived from store) ────────────────────
+  const bahanOptions = computed<SelectOption[]>(() =>
+    bahanStore.items.map(b => ({ label: b.nama, value: b.id })),
+  )
 
   // ── Nutrition Result (calculated output, separate concern) 
   const nutritionResult = ref<NutritionResult>(createEmptyResult())
@@ -103,17 +121,66 @@ export function useResepForm() {
   }
 
   // ── Load existing recipe (edit mode) ─────────────────────
-  function loadRecipe(id: string | string[]) {
-    formState.namaResep = 'Nasi Ayam Sayur (Edit Mode)'
-    formState.bahanList = [
-      { id: '1', bahanId: 'ayam', gram: 200 },
-      { id: '2', bahanId: 'bayam', gram: 100 },
-    ]
+  function loadRecipe(id: number): void {
+    const recipe = resepStore.getById(id)
+    if (!recipe) return
+
+    editingId.value = recipe.id
+    formState.namaResep = recipe.nama
+    formState.bahanList = recipe.bahanList.map(b => ({
+      id: Date.now().toString() + Math.random().toString(36).slice(2),
+      bahanId: b.bahanId,
+      gram: b.gram,
+    }))
     calculate()
+  }
+
+  // ── Save recipe to store ─────────────────────────────────
+  function saveRecipe(): boolean {
+    if (!validateForm()) return false
+
+    const bahanList = formState.bahanList.map(b => ({
+      bahanId: Number(b.bahanId),
+      gram: Number(b.gram),
+    }))
+
+    if (editingId.value !== null) {
+      // Update existing
+      const existing = resepStore.getById(editingId.value)
+      if (existing) {
+        resepStore.updateItem({
+          ...existing,
+          nama: formState.namaResep,
+          bahanList,
+          kalori: nutritionResult.value.calories,
+          protein: nutritionResult.value.protein.val,
+          karbohidrat: nutritionResult.value.karbo.val,
+          lemak: nutritionResult.value.lemak.val,
+        })
+      }
+    } else {
+      // Add new
+      const newId = Date.now()
+      const newRecipe: ResepItem = {
+        id: newId,
+        nama: formState.namaResep,
+        bahanList,
+        status: 'Sesuai Standar',
+        statusVariant: 'success',
+        kalori: nutritionResult.value.calories,
+        protein: nutritionResult.value.protein.val,
+        karbohidrat: nutritionResult.value.karbo.val,
+        lemak: nutritionResult.value.lemak.val,
+      }
+      resepStore.addItem(newRecipe)
+    }
+
+    return true
   }
 
   // ── Reset form ───────────────────────────────────────────
   function resetForm() {
+    editingId.value = null
     formState.namaResep = ''
     formState.bahanList = [createEmptyBahan()]
     nutritionResult.value = createEmptyResult()
@@ -122,6 +189,8 @@ export function useResepForm() {
 
   return {
     formState,
+    editingId,
+    bahanOptions,
     nutritionResult,
     errors,
     validateForm,
@@ -129,6 +198,7 @@ export function useResepForm() {
     removeBahan,
     calculate,
     loadRecipe,
+    saveRecipe,
     resetForm,
   }
 }

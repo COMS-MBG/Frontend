@@ -58,12 +58,13 @@
 
 <script setup lang="ts">
 import BaseCard from '@/components/common/BaseCard.vue'
+import type { MacroNutrient } from '@/types/gizi'
 
 defineProps<{
-  totalCalories: number | string
-  protein: { val: number | string, percent: number | string }
-  karbohidrat: { val: number | string, percent: number | string }
-  lemak: { val: number | string, percent: number | string }
+  totalCalories: number
+  protein: MacroNutrient
+  karbohidrat: MacroNutrient
+  lemak: MacroNutrient
 }>()
 </script>
 
