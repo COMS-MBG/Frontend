@@ -29,6 +29,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'master-resep', name: 'master-resep', component: () => import('@/views/gizi/MasterResepView.vue') },
       { path: 'master-bahan', name: 'master-bahan', component: () => import('@/views/gizi/MasterBahanView.vue') },
       { path: 'perencanaan-menu', name: 'perencanaan-menu', component: () => import('@/views/gizi/PerencanaanMenuView.vue') },
+      { path: 'kalkulator-gizi/:id?', name: 'kalkulator-gizi', component: () => import('@/views/gizi/KalkulatorGiziView.vue'), meta: { activeMenu: 'master-resep' } },
 
       // Distribusi
       { path: 'jadwal-pengiriman', name: 'jadwal-pengiriman', component: () => import('@/views/distribusi/JadwalPengirimanView.vue') },

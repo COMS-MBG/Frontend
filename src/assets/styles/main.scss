@@ -1,11 +1,17 @@
+// ── Abstracts ──────────────────────────────────────────────
 @use 'abstracts/fonts';
 
+// ── Base ───────────────────────────────────────────────────
 @use 'base/reset';
 
+// ── Components ─────────────────────────────────────────────
 @use 'components/button';
 @use 'components/sidebar';
 @use 'components/navbar';
 @use 'components/footer';
+@use 'components/modal';
 
+// ── Pages ──────────────────────────────────────────────────
 @use 'pages/dashboard';
 @use 'pages/gizi';
+@use 'pages/kalkulator-gizi';

@@ -1,0 +1,124 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ════════════════════════════════════════════════════════════════
+// COMPONENT: BaseModal
+// BEM: .modal / .modal__*
+// ════════════════════════════════════════════════════════════════
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $space-4;
+  backdrop-filter: blur(4px);
+}
+
+.modal-dialog {
+  background: $color-bg-surface;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+
+  &.modal-sm { max-width: 400px; }
+  &.modal-md { max-width: 600px; }
+  &.modal-lg { max-width: 800px; }
+  &.modal-xl { max-width: 1140px; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-4 $space-6;
+  border-bottom: 1px solid $color-border;
+
+  .modal-title {
+    margin: 0;
+    font-size: $text-lg;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    color: $color-text-secondary;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-1;
+    border-radius: $radius-sm;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $color-bg-subtle;
+      color: $color-text-primary;
+    }
+  }
+}
+
+.modal-body {
+  padding: $space-6;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: $space-4 $space-6;
+  border-top: 1px solid $color-border;
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-3;
+}
+
+// ── Animations ──────────────────────────────────────────────
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-active .modal-dialog {
+  animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-fade-leave-active .modal-dialog {
+  animation: modal-leave 0.2s ease-in forwards;
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modal-leave {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
