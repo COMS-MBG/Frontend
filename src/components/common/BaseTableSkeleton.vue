@@ -1,40 +1,29 @@
 <template>
-  <div class="bahan-skeleton-wrap">
-    <table class="bahan-skeleton-table">
-      <thead>
+  <div class="base-table-skeleton">
+    <table class="base-table-skeleton__table">
+      <thead v-if="headers.length > 0">
         <tr>
-          <th class="th-nama">NAMA BAHAN</th>
-          <th class="th-center">SATUAN</th>
-          <th class="th-center">STOK</th>
-          <th class="th-num">KALORI/100G</th>
-          <th class="th-num">PROTEIN/100G</th>
-          <th class="th-num">KARBO/100G</th>
-          <th class="th-num">LEMAK/100G</th>
-          <th class="th-aksi">AKSI</th>
+          <th v-for="(h, i) in headers" :key="i" :class="h.align ? `th-${h.align}` : ''">
+            {{ h.label }}
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="i in rows" :key="i" class="skeleton-row">
-          <td>
-            <div class="skeleton-cell-nama">
+        <tr v-for="r in rows" :key="r" class="skeleton-row">
+          <td v-for="(col, ci) in columns" :key="ci">
+            <div v-if="col.type === 'avatar-text'" class="skeleton-cell-avatar">
               <div class="skeleton-circle" />
               <div class="skeleton-text-group">
                 <div class="skeleton-bar skeleton-bar--name" />
                 <div class="skeleton-bar skeleton-bar--sub" />
               </div>
             </div>
-          </td>
-          <td><div class="skeleton-bar skeleton-bar--badge" /></td>
-          <td><div class="skeleton-bar skeleton-bar--short" /></td>
-          <td><div class="skeleton-bar skeleton-bar--num" /></td>
-          <td><div class="skeleton-bar skeleton-bar--num" /></td>
-          <td><div class="skeleton-bar skeleton-bar--num" /></td>
-          <td><div class="skeleton-bar skeleton-bar--num" /></td>
-          <td>
-            <div class="skeleton-action-group">
+            <div v-else-if="col.type === 'badge'" class="skeleton-bar skeleton-bar--badge" />
+            <div v-else-if="col.type === 'actions'" class="skeleton-action-group">
               <div class="skeleton-circle skeleton-circle--sm" />
               <div class="skeleton-circle skeleton-circle--sm" />
             </div>
+            <div v-else class="skeleton-bar skeleton-bar--default" :style="{ width: col.width || '64px' }" />
           </td>
         </tr>
       </tbody>
@@ -43,20 +32,43 @@
 </template>
 
 <script setup lang="ts">
+export interface SkeletonColumn {
+  type?: 'text' | 'avatar-text' | 'badge' | 'actions'
+  width?: string
+}
+
+export interface SkeletonHeader {
+  label: string
+  align?: 'left' | 'center' | 'right'
+}
+
 withDefaults(defineProps<{
   rows?: number
+  columns?: SkeletonColumn[]
+  headers?: SkeletonHeader[]
 }>(), {
-  rows: 6
+  rows: 6,
+  columns: () => [
+    { type: 'avatar-text' },
+    { type: 'badge' },
+    { type: 'text', width: '56px' },
+    { type: 'text', width: '64px' },
+    { type: 'text', width: '64px' },
+    { type: 'text', width: '64px' },
+    { type: 'text', width: '64px' },
+    { type: 'actions' },
+  ],
+  headers: () => [],
 })
 </script>
 
 <style scoped lang="scss">
-.bahan-skeleton-wrap {
+.base-table-skeleton {
   @include card-base($radius-lg, $shadow-xs);
   overflow: hidden;
 }
 
-.bahan-skeleton-table {
+.base-table-skeleton__table {
   width: 100%;
   border-collapse: collapse;
   font-family: $font-body;
@@ -75,13 +87,12 @@ withDefaults(defineProps<{
       text-transform: uppercase;
       color: $color-text-muted;
       white-space: nowrap;
+      text-align: left;
     }
-  }
 
-  .th-nama { text-align: left; color: $color-text-primary; }
-  .th-center { text-align: center; color: $color-text-primary; }
-  .th-num { text-align: right; color: $color-text-primary; }
-  .th-aksi { text-align: center; width: 100px; color: $color-text-primary; }
+    .th-center { text-align: center; }
+    .th-right { text-align: right; }
+  }
 }
 
 .skeleton-row {
@@ -93,7 +104,7 @@ withDefaults(defineProps<{
   }
 }
 
-// ── Skeleton primitives ──
+// ── Shimmer animation ──
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -109,8 +120,7 @@ withDefaults(defineProps<{
   &--name { width: 140px; height: 14px; }
   &--sub { width: 80px; height: 10px; margin-top: 4px; }
   &--badge { width: 48px; height: 22px; border-radius: 6px; margin: 0 auto; }
-  &--short { width: 56px; margin: 0 auto; }
-  &--num { width: 64px; margin-left: auto; }
+  &--default { margin: 0 auto; }
 }
 
 .skeleton-circle {
@@ -128,7 +138,7 @@ withDefaults(defineProps<{
   }
 }
 
-.skeleton-cell-nama {
+.skeleton-cell-avatar {
   display: flex;
   align-items: center;
   gap: $space-3;

@@ -3,8 +3,8 @@ import type { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
-import LoginView          from '@/views/LoginView.vue'
-import DashboardView      from '@/views/DashboardView.vue'
+import LoginView          from '@/views/auth/LoginView.vue'
+import DashboardView      from '@/views/dashboard/DashboardView.vue'
 import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
@@ -25,21 +25,29 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', name: 'dashboard', component: DashboardView },
       
-      // Manajemen Gizi
+      // ── Manajemen Gizi ──
       { path: 'master-resep', name: 'master-resep', component: () => import('@/views/gizi/MasterResepView.vue') },
       { path: 'master-bahan', name: 'master-bahan', component: () => import('@/views/gizi/MasterBahanView.vue') },
       { path: 'perencanaan-menu', name: 'perencanaan-menu', component: () => import('@/views/gizi/MenuPlanningView.vue') },
       { path: 'kalkulator-gizi/:id?', name: 'kalkulator-gizi', component: () => import('@/views/gizi/KalkulatorGiziView.vue'), meta: { activeMenu: 'master-resep' } },
 
-      // Distribusi
+      // ── Distribusi ──
+      { path: 'distribusi', name: 'distribusi', component: () => import('@/views/distribusi/DistribusiView.vue') },
       { path: 'jadwal-pengiriman', name: 'jadwal-pengiriman', component: () => import('@/views/distribusi/JadwalPengirimanView.vue') },
       { path: 'peta-spasial', name: 'peta-spasial', component: () => import('@/views/distribusi/PetaSpasialView.vue') },
 
-      // Standalone
-      { path: 'master-data', name: 'master-data', component: () => import('@/views/MasterDataView.vue') },
-      { path: 'laporan', name: 'laporan', component: () => import('@/views/LaporanView.vue') },
-      { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },
-      { path: 'settings', name: 'settings', component: () => import('@/views/SettingsView.vue') },
+      // ── Laporan ──
+      { path: 'laporan', name: 'laporan', component: () => import('@/views/laporan/LaporanView.vue') },
+
+      // ── User ──
+      { path: 'profile', name: 'profile', component: () => import('@/views/user/ProfileView.vue') },
+
+      // ── Settings ──
+      { path: 'settings', name: 'settings', component: () => import('@/views/settings/SettingsView.vue') },
+
+      // ── HR (Karyawan) ──
+      { path: 'karyawan', name: 'karyawan', component: () => import('@/views/hr/EmployeeView.vue') },
+      { path: 'hak-akses', name: 'hak-akses', component: () => import('@/views/hr/EmployeeAccessView.vue') },
     ],
   },
 
