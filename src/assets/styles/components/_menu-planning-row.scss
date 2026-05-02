@@ -1,0 +1,255 @@
+@use '../abstracts/variables' as *;
+
+.menu-planning__row {
+  .status-dropdown {
+    position: relative;
+    display: inline-block;
+    outline: none;
+    
+    .status-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: $space-2;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 9999px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      
+      &:hover {
+        background-color: $color-bg-subtle;
+        border-color: $color-border-light;
+      }
+      
+      .trigger-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background-color: $color-bg-surface;
+        box-shadow: $shadow-sm;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        .material-symbols-outlined {
+          font-size: 1.1rem;
+          color: $color-text-muted;
+          line-height: 1;
+        }
+      }
+    }
+    
+    &.is-open .trigger-icon {
+      transform: rotate(180deg);
+    }
+  }
+
+  .status-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-lg;
+    min-width: 190px;
+    z-index: 50;
+    padding: $space-1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .status-option {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-2 $space-3;
+    font-size: $text-sm;
+    color: $color-text-primary;
+    cursor: pointer;
+    border-radius: $radius-sm;
+    transition: all 0.2s;
+    
+    &:hover {
+      background-color: $color-bg-subtle;
+    }
+    
+    &.is-active {
+      background-color: rgba($color-primary, 0.05);
+      font-weight: 600;
+      color: $color-primary;
+    }
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      
+      &.indicator-draft { background-color: $color-text-muted; }
+      &.indicator-scheduled { background-color: $color-warning; }
+      &.indicator-published { background-color: $color-success; }
+    }
+  }
+
+  .fade-slide-enter-active,
+  .fade-slide-leave-active {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .fade-slide-enter-from,
+  .fade-slide-leave-to {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+
+  .text-muted {
+    color: $color-text-muted;
+  }
+
+  .text-sm {
+    font-size: $text-sm;
+  }
+
+  .empty-nutrition {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 40px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .nutrition-badges {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+    max-width: 170px;
+    margin: 0 auto;
+    width: 100%;
+    
+    .base-badge {
+      width: 100%;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+      box-sizing: border-box;
+      padding: 0.15rem 0.3rem;
+    }
+  }
+
+  /* ── Menu Selector UI ── */
+  .menu-selector {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 $space-3;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    min-height: 40px;
+    background-color: $color-bg-surface;
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+
+    &.is-empty {
+      border: 1px dashed $color-border;
+      color: $color-text-muted;
+
+      &:hover {
+        border-color: $color-primary;
+        background-color: $color-bg-subtle;
+      }
+
+      .menu-icon-add {
+        font-size: 1.1rem;
+      }
+      
+      .menu-placeholder {
+        font-size: $text-sm;
+        font-style: italic;
+      }
+    }
+
+    &.is-selected {
+      border: 1px solid $color-border-light;
+      background-color: $color-bg-subtle;
+      color: $color-text-primary;
+      justify-content: space-between;
+
+      &:hover {
+        filter: brightness(0.95);
+      }
+
+      .menu-selected-content {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+      }
+
+      .menu-icon {
+        color: $color-primary;
+        font-size: 1.1rem;
+      }
+      .menu-name {
+        font-size: $text-sm;
+        font-weight: 600;
+      }
+    }
+
+    &.is-repeated {
+      border: 1px solid $color-danger;
+      background-color: rgba($color-danger, 0.05);
+
+      &:hover {
+        background-color: rgba($color-danger, 0.08);
+      }
+    }
+  }
+
+  .btn-clear {
+    background: transparent;
+    border: none;
+    color: $color-text-muted;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    
+    &:hover {
+      color: $color-danger;
+      background: rgba($color-danger, 0.1);
+    }
+    
+    .material-symbols-outlined {
+      font-size: 1.1rem;
+    }
+  }
+
+  .menu-warning-text {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    color: $color-danger;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: $space-2;
+    width: 100%;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: flex-start;
+    
+    .material-symbols-outlined {
+      font-size: 0.9rem;
+    }
+  }
+}
