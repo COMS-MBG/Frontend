@@ -63,12 +63,6 @@ const describedById = computed(() => {
 .form-group {
   margin-bottom: $space-4;
 
-  &.has-error {
-    .form-label {
-      color: $color-danger;
-    }
-  }
-
   &.has-disabled {
     opacity: 0.7;
     .form-label {
