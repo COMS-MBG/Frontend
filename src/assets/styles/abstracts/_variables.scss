@@ -7,11 +7,13 @@
   --color-primary-dark: #1145b0;
   --color-primary-light: #f0f4ff;
   --color-primary-muted: rgba(26, 86, 219, 0.1);
+  --color-primary-subtle: #e8f0fe;
 
   // COLOR — Success (Green)
   --color-success: #059669;
   --color-success-bg: #ecfdf5;
   --color-success-border: #a7f3d0;
+  --color-success-subtle: #ecfdf5;
 
   // COLOR — Danger (Red)
   --color-danger: #ef4444;
@@ -24,6 +26,11 @@
   --color-warning: #f59e0b;
   --color-warning-bg: #fffbeb;
   --color-warning-border: #fde68a;
+  --color-warning-subtle: #fff4e5;
+
+  // COLOR — Purple
+  --color-purple: #7c3aed;
+  --color-purple-subtle: #f3e8ff;
 
   // TEXT COLORS
   --color-text-primary: #111827;
@@ -60,11 +67,13 @@
   --color-primary-dark: #2563eb;
   --color-primary-light: rgba(59, 130, 246, 0.15);
   --color-primary-muted: rgba(59, 130, 246, 0.1);
+  --color-primary-subtle: rgba(59, 130, 246, 0.15);
 
   // COLOR — Success (Green)
   --color-success: #10b981;
   --color-success-bg: rgba(16, 185, 129, 0.15);
   --color-success-border: rgba(16, 185, 129, 0.3);
+  --color-success-subtle: rgba(16, 185, 129, 0.15);
 
   // COLOR — Danger (Red)
   --color-danger: #f87171;
@@ -77,6 +86,11 @@
   --color-warning: #fbbf24;
   --color-warning-bg: rgba(251, 191, 36, 0.15);
   --color-warning-border: rgba(251, 191, 36, 0.3);
+  --color-warning-subtle: rgba(251, 191, 36, 0.15);
+
+  // COLOR — Purple
+  --color-purple: #8b5cf6;
+  --color-purple-subtle: rgba(139, 92, 246, 0.15);
 
   // TEXT COLORS
   --color-text-primary: #f9fafb;
@@ -116,11 +130,13 @@ $color-primary:       var(--color-primary);
 $color-primary-dark:  var(--color-primary-dark);
 $color-primary-light: var(--color-primary-light);
 $color-primary-muted: var(--color-primary-muted);
+$color-primary-subtle: var(--color-primary-subtle);
 
 // COLOR — Success
 $color-success:        var(--color-success);
 $color-success-bg:     var(--color-success-bg);
 $color-success-border: var(--color-success-border);
+$color-success-subtle: var(--color-success-subtle);
 
 // COLOR — Danger
 $color-danger:         var(--color-danger);
@@ -133,6 +149,11 @@ $color-danger-border:  var(--color-danger-border);
 $color-warning:        var(--color-warning);
 $color-warning-bg:     var(--color-warning-bg);
 $color-warning-border: var(--color-warning-border);
+$color-warning-subtle: var(--color-warning-subtle);
+
+// COLOR — Purple
+$color-purple:         var(--color-purple);
+$color-purple-subtle:  var(--color-purple-subtle);
 
 // TEXT COLORS
 $color-text-primary:   var(--color-text-primary);
