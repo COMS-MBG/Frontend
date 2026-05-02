@@ -65,10 +65,10 @@ import { useBahanStore } from '@/stores/bahan.store'
 import { bahanDummy } from '@/data/bahan.dummy'
 
 import PageHeader from '@/components/common/PageHeader.vue'
-import RecipeBuilderCard from '@/components/gizi/RecipeBuilderCard.vue'
-import NutritionSummaryCard from '@/components/gizi/NutritionSummaryCard.vue'
-import NutritionStatCard from '@/components/gizi/NutritionStatCard.vue'
-import HealthScoreCard from '@/components/gizi/HealthScoreCard.vue'
+import RecipeBuilderCard from '@/components/gizi/kalkulator-gizi/RecipeBuilderCard.vue'
+import NutritionSummaryCard from '@/components/gizi/kalkulator-gizi/NutritionSummaryCard.vue'
+import NutritionStatCard from '@/components/gizi/kalkulator-gizi/NutritionStatCard.vue'
+import HealthScoreCard from '@/components/gizi/kalkulator-gizi/HealthScoreCard.vue'
 
 const route = useRoute()
 const router = useRouter()

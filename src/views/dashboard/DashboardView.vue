@@ -95,8 +95,6 @@ import SupplyStatusCard, { type BahanItem } from '@/components/dashboard/SupplyS
 import LogisticsCard, { type DeliveryStatItem } from '@/components/dashboard/LogisticsCard.vue'
 import InsightMapCard from '@/components/dashboard/InsightMapCard.vue'
 import MiniInfoCard from '@/components/dashboard/MiniInfoCard.vue'
-import DistribusiView from './DistribusiView.vue'
-
 // ── Data ────────────────────────────────
 const bahanItems: BahanItem[] = [
   { name: 'Beras Premium', qty: '1.250 kg', percent: 83 },

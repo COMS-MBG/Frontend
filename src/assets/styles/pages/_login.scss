@@ -1,0 +1,365 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ══════════════════════════════════════════════════════════════
+// Login Page
+// ══════════════════════════════════════════════════════════════
+
+// ── Wrapper konten ──
+.login-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 3rem 2.75rem 2.25rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+
+
+// ── Brand ──
+.login-content .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: $space-8;
+}
+
+.login-content .brand-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  background-color: $color-primary;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+    color: $color-text-inverse;
+  }
+}
+
+.login-content .brand-name {
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: $text-lg;
+  color: $color-text-primary;
+  letter-spacing: -0.01em;
+}
+
+// ── Judul ──
+.login-content .title {
+  font-family: $font-heading;
+  font-size: $text-3xl;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: $color-text-primary;
+  margin: 0 0 0.375rem;
+}
+
+.login-content .subtitle {
+  font-size: $text-base;
+  color: $color-text-muted;
+  margin: 0 0 $space-5;
+  line-height: 1.5;
+}
+
+
+
+// ── Form ──
+.login-content .form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.login-content .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  &--error .field-label { color: $color-danger-darker; }
+}
+
+.login-content .field-label {
+  font-size: $text-xs;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $color-text-muted;
+  margin-left: $space-1;
+}
+
+.login-content .field-error-msg {
+  font-size: $text-sm;
+  color: $color-danger-dark;
+  margin-left: $space-1;
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  animation: login-shake 0.3s ease;
+}
+
+@keyframes login-shake {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-4px); }
+  75%       { transform: translateX(4px); }
+}
+
+// ── Input Pill ──
+.login-content .input-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background-color: $color-bg-subtle;
+  border-radius: $radius-pill;
+  border: 1.5px solid transparent;
+  padding: 0 $space-5;
+  transition: border-color $transition-base, background-color $transition-base, box-shadow $transition-base;
+
+  &:focus-within {
+    border-color: $color-primary;
+    background-color: $color-bg-surface;
+    box-shadow: 0 0 0 3px $color-primary-muted;
+  }
+
+  &--error {
+    border-color: #f87171 !important;
+    background-color: #fff5f5 !important;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: $font-body;
+    font-size: $text-base;
+    color: $color-text-primary;
+    padding: 0.8125rem 0;
+    outline: none;
+    min-width: 0;
+
+    &::placeholder { color: $color-text-faint; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}
+
+.login-content .input-icon {
+  font-size: 1.125rem;
+  color: $color-text-faint;
+  flex-shrink: 0;
+  user-select: none;
+  line-height: 1;
+}
+
+.login-content .toggle-pwd {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: $color-text-faint;
+  display: flex;
+  align-items: center;
+  transition: color $transition-fast;
+  flex-shrink: 0;
+
+  &:hover { color: $color-primary; }
+  .material-symbols-outlined { font-size: 1.125rem; }
+}
+
+// ── Options Row ──
+.login-content .options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  margin-top: 0.125rem;
+}
+
+.login-content .remember {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  color: $color-text-muted;
+  cursor: pointer;
+  user-select: none;
+
+  input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: $color-primary;
+    cursor: pointer;
+  }
+}
+
+.login-content .forgot {
+  color: $color-primary;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ── Tombol Masuk ──
+.login-content .btn-masuk {
+  width: 100%;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  color: $color-text-inverse;
+  font-family: $font-heading;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border: none;
+  border-radius: $radius-pill;
+  padding: 0.875rem;
+  cursor: pointer;
+  box-shadow: $shadow-btn;
+  transition: opacity $transition-base, transform $transition-base, box-shadow $transition-base;
+  margin-top: $space-1;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    opacity: 0.93;
+    transform: translateY(-1px);
+    box-shadow: $shadow-primary-hover;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// Dot spinner
+.login-content .btn-spinner {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
+  span {
+    width: 7px;
+    height: 7px;
+    background: #fff;
+    border-radius: 50%;
+    animation: login-dot-bounce 1.2s infinite ease-in-out;
+
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+@keyframes login-dot-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.6; }
+  40%            { transform: scale(1);   opacity: 1; }
+}
+
+// ── Divider ──
+.login-content .divider {
+  position: relative;
+  text-align: center;
+  margin: $space-6 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    border-top: 1px solid $color-border;
+  }
+}
+
+.login-content .divider-text {
+  position: relative;
+  background-color: $color-bg-surface;
+  padding: 0 0.875rem;
+  font-size: $text-xs;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $color-text-faint;
+}
+
+// ── Google SSO ──
+.login-content .btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  background-color: $color-bg-surface;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-pill;
+  padding: $space-3 $space-5;
+  font-family: $font-body;
+  font-size: $text-base;
+  font-weight: 600;
+  color: $color-text-primary;
+  cursor: pointer;
+  transition: background-color $transition-base, box-shadow $transition-base, transform $transition-base;
+
+  &:hover:not(:disabled) {
+    background-color: #f9fafb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// ── Dev hint ──
+.login-content .dev-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  margin-top: $space-4;
+  padding: $space-2 0.875rem;
+  background: #eff6ff;
+  border: 1px dashed #bfdbfe;
+  border-radius: 10px;
+  font-family: $font-body;
+  font-size: $text-sm;
+  color: #3b82f6;
+
+  .material-symbols-outlined { font-size: 0.9375rem; }
+  strong { color: #1d4ed8; }
+}
+
+// ── Footer Links ──
+.login-content .footer-links {
+  margin-top: auto;
+  padding-top: $space-6;
+  display: flex;
+  justify-content: center;
+  gap: $space-6;
+
+  a {
+    font-size: $text-xs;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $color-text-faint;
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover { color: $color-primary; }
+  }
+}
+
+// ── Transitions ──
+.login-content {
+  .fade-enter-active, .fade-leave-active { transition: opacity 0.25s ease; }
+  .fade-enter-from, .fade-leave-to       { opacity: 0; }
+
+  .slide-down-enter-active { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  .slide-down-leave-active { transition: all 0.2s ease; }
+  .slide-down-enter-from   { opacity: 0; transform: translateY(-8px); }
+  .slide-down-leave-to     { opacity: 0; transform: translateY(-4px); }
+}

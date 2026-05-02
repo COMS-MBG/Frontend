@@ -58,15 +58,28 @@ export const sidebarMenu: MenuItem[] = [
     ],
   },
   {
-    id: 'master-data',
-    title: 'Master Data',
-    icon: 'storage',
-    routeName: 'master-data',
-  },
-  {
     id: 'laporan',
     title: 'Laporan',
     icon: 'bar_chart',
     routeName: 'laporan',
+  },
+  {
+    id: 'hr',
+    title: 'Data Karyawan',
+    icon: 'badge',
+    children: [
+      {
+        id: 'karyawan',
+        title: 'Manajemen Karyawan',
+        icon: 'group',
+        routeName: 'karyawan',
+      },
+      {
+        id: 'hak-akses',
+        title: 'Hak Akses',
+        icon: 'admin_panel_settings',
+        routeName: 'hak-akses',
+      },
+    ],
   },
 ]

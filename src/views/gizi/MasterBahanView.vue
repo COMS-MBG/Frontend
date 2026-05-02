@@ -35,7 +35,13 @@
          2. STAT CARD
     ════════════════════════════════════════ -->
     <div class="master-bahan__stat">
-      <BahanStatCard :total="filteredItems.length" />
+      <StatCard
+        label="TOTAL KATALOG"
+        icon="inventory_2"
+        :value="`${filteredItems.length} Bahan`"
+        variant="horizontal"
+        icon-variant="blue"
+      />
     </div>
 
     <!-- ═══════════════════════════════════════
@@ -55,14 +61,23 @@
     <!-- ═══════════════════════════════════════
          4. LOADING STATE
     ════════════════════════════════════════ -->
-    <BahanSkeleton v-if="bahanStore.isLoading" :rows="6" />
+    <BaseTableSkeleton
+      v-if="bahanStore.isLoading"
+      :rows="6"
+      :columns="skeletonColumns"
+      :headers="skeletonHeaders"
+    />
 
     <!-- ═══════════════════════════════════════
          5. EMPTY STATE
     ════════════════════════════════════════ -->
-    <BahanEmptyState
+    <BaseEmptyState
       v-else-if="filteredItems.length === 0"
-      @add="onTambah"
+      icon="inventory_2"
+      title="Belum ada data bahan"
+      description="Mulai tambahkan bahan baku untuk membangun katalog nutrisi Anda."
+      action-label="Tambah Bahan"
+      @action="onTambah"
     />
 
     <!-- ═══════════════════════════════════════
@@ -97,12 +112,13 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
-import BahanStatCard from '@/components/gizi/BahanStatCard.vue'
-import BahanToolbar from '@/components/gizi/BahanToolbar.vue'
-import BahanTable from '@/components/gizi/BahanTable.vue'
-import BahanRow from '@/components/gizi/BahanRow.vue'
-import BahanEmptyState from '@/components/gizi/BahanEmptyState.vue'
-import BahanSkeleton from '@/components/gizi/BahanSkeleton.vue'
+import StatCard from '@/components/common/StatCard.vue'
+import BaseEmptyState from '@/components/common/BaseEmptyState.vue'
+import BaseTableSkeleton from '@/components/common/BaseTableSkeleton.vue'
+import type { SkeletonColumn, SkeletonHeader } from '@/components/common/BaseTableSkeleton.vue'
+import BahanToolbar from '@/components/gizi/master-bahan/BahanToolbar.vue'
+import BahanTable from '@/components/gizi/master-bahan/BahanTable.vue'
+import BahanRow from '@/components/gizi/master-bahan/BahanRow.vue'
 import { useBahanStore } from '@/stores/bahan.store'
 import { bahanDummy } from '@/data/bahan.dummy'
 import { usePagination } from '@/composables/usePagination'
@@ -110,6 +126,29 @@ import type { BahanItem } from '@/types/gizi'
 
 // ── Store ────────────────────────────────────────────────────
 const bahanStore = useBahanStore()
+
+// ── Skeleton Config ──────────────────────────────────────────
+const skeletonHeaders: SkeletonHeader[] = [
+  { label: 'NAMA BAHAN', align: 'left' },
+  { label: 'SATUAN', align: 'center' },
+  { label: 'STOK', align: 'center' },
+  { label: 'KALORI/100G', align: 'center' },
+  { label: 'PROTEIN/100G', align: 'center' },
+  { label: 'KARBO/100G', align: 'center' },
+  { label: 'LEMAK/100G', align: 'center' },
+  { label: 'AKSI', align: 'center' },
+]
+
+const skeletonColumns: SkeletonColumn[] = [
+  { type: 'avatar-text' },
+  { type: 'badge' },
+  { type: 'text', width: '56px' },
+  { type: 'text', width: '64px' },
+  { type: 'text', width: '64px' },
+  { type: 'text', width: '64px' },
+  { type: 'text', width: '64px' },
+  { type: 'actions' },
+]
 
 // ── Seed store on mount ──────────────────────────────────────
 // TODO: swap to `bahanStore.fetchItems()` when API is ready.
