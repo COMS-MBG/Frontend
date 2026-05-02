@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import DashboardHeader from '@/components/dashboard/DashboardHeader.vue'
-import StatCard from '@/components/dashboard/StatCard.vue'
+import StatCard from '@/components/common/StatCard.vue'
 import SupplyStatusCard, { type BahanItem } from '@/components/dashboard/SupplyStatusCard.vue'
 import LogisticsCard, { type DeliveryStatItem } from '@/components/dashboard/LogisticsCard.vue'
 import InsightMapCard from '@/components/dashboard/InsightMapCard.vue'
