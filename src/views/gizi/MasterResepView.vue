@@ -70,11 +70,14 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import PageHeader from '@/components/common/PageHeader.vue'
 import StatCard from '@/components/common/StatCard.vue'
 import ResepTable from '@/components/gizi/ResepTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 import type { ResepItem } from '@/components/gizi/ResepTable.vue'
+
+const router = useRouter()
 
 // ── Summary Stats ───────────────────────────────────────────
 const summaryStats = [
@@ -85,7 +88,7 @@ const summaryStats = [
 ]
 
 // ── Dummy Data ──────────────────────────────────────────────
-const allResep: ResepItem[] = [
+const allResep = ref<ResepItem[]>([
   {
     id: 1,
     nama: 'Nasi Ayam Sayur',
@@ -150,15 +153,16 @@ const allResep: ResepItem[] = [
   { id: 11, nama: 'Rendang Padang',       status: 'Lengkap',        statusVariant: 'success', kalori: 580, protein: 42.0, karbohidrat: 18.0, lemak: 35.0, image: '' },
   { id: 12, nama: 'Mie Goreng Sehat',     status: 'Sesuai Standar', statusVariant: 'success', kalori: 410, protein: 20.0, karbohidrat: 58.0, lemak: 14.0, image: '' },
 ]
+)
 
 // ── Pagination ──────────────────────────────────────────────
 const currentPage = ref(1)
 const perPage = 5
-const totalItems = computed(() => allResep.length)
+const totalItems = computed(() => allResep.value.length)
 
 const paginatedItems = computed(() => {
   const start = (currentPage.value - 1) * perPage
-  return allResep.slice(start, start + perPage)
+  return allResep.value.slice(start, start + perPage)
 })
 
 watch(currentPage, (val) => {
@@ -171,16 +175,20 @@ function onEkspor() {
 }
 
 function onTambah() {
-  console.log('Tambah Resep Baru')
+  router.push({ name: 'kalkulator-gizi' })
 }
 
 function onEdit(item: ResepItem) {
-  console.log('Edit:', item.nama)
+  router.push({ name: 'kalkulator-gizi', params: { id: item.id } })
 }
 
 function onDelete(item: ResepItem) {
-  console.log('Delete:', item.nama)
+  const index = allResep.value.findIndex(r => r.id === item.id)
+  if (index !== -1) {
+    allResep.value.splice(index, 1)
+  }
 }
+
 </script>
 
 <style scoped lang="scss">

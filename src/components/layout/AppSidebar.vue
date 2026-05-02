@@ -31,8 +31,7 @@
           <RouterLink
             :to="{ name: item.routeName }"
             class="nav-item"
-            active-class=""
-            exact-active-class="active"
+            :class="{ 'active': isRouteActive(item.routeName) }"
           >
             <span class="material-symbols-outlined nav-icon">{{ item.icon }}</span>
             <span class="nav-label">{{ item.title }}</span>
@@ -63,8 +62,7 @@
                 :key="child.id"
                 :to="{ name: child.routeName }"
                 class="sub-item"
-                active-class=""
-                exact-active-class="active"
+                :class="{ 'active': isRouteActive(child.routeName) }"
               >
                 <span class="sub-indicator"></span>
                 <span class="sub-label">{{ child.title }}</span>
@@ -103,11 +101,18 @@ function toggleMenu(id: string) {
   openMenus.value[id] = !openMenus.value[id]
 }
 
+function isRouteActive(routeName: string | undefined): boolean {
+  if (!routeName) return false
+  if (route.name === routeName) return true
+  if (route.meta?.activeMenu === routeName) return true
+  return false
+}
+
 // Cek apakah ada child route yang aktif
 function isParentActive(item: MenuItem): boolean {
-  if (item.routeName === route.name) return true
+  if (isRouteActive(item.routeName)) return true
   if (item.children) {
-    return item.children.some(child => child.routeName === route.name)
+    return item.children.some(child => isRouteActive(child.routeName))
   }
   return false
 }
