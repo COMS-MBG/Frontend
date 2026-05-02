@@ -2,7 +2,7 @@
   <div class="kalkulator">
     <PageHeader
       title="Kalkulator Gizi"
-      subtitle="Daftar resep makanan bergizi yang telah disimpan dari Kalkulator Gizi untuk distribusi wilayah Bandung."
+      subtitle="Kalkulasi resep makanan untuk penyaluran bantuan pangan"
       :breadcrumb="['Manajemen Gizi', 'Master Data Resep', 'Kalkulator Gizi']"
     />
 
@@ -10,13 +10,13 @@
       <!-- LEFT COLUMN -->
       <div class="kalkulator__form">
         <RecipeBuilderCard
-          v-model:nama-menu="state.namaResep"
-          :bahan-items="state.bahanList"
+          v-model:nama-menu="formState.namaResep"
+          :bahan-items="formState.bahanList"
           :bahan-options="dummyBahanOptions"
           :errors="errors"
-          @add-bahan="onAddBahan"
-          @remove-bahan="onRemoveBahan"
-          @calculate="onCalculate"
+          @add-bahan="addBahan"
+          @remove-bahan="removeBahan"
+          @calculate="calculate"
           @save="onSubmit"
         />
 
@@ -32,15 +32,15 @@
       <!-- RIGHT COLUMN -->
       <div class="kalkulator__result">
         <NutritionSummaryCard
-          :total-calories="state.nutritionResult.calories"
-          :protein="state.nutritionResult.protein"
-          :karbohidrat="state.nutritionResult.karbo"
-          :lemak="state.nutritionResult.lemak"
+          :total-calories="nutritionResult.calories"
+          :protein="nutritionResult.protein"
+          :karbohidrat="nutritionResult.karbo"
+          :lemak="nutritionResult.lemak"
         />
 
         <div class="kalkulator__stat-grid">
           <NutritionStatCard
-            v-for="stat in state.nutritionResult.stats"
+            v-for="stat in nutritionResult.stats"
             :key="stat.label"
             :label="stat.label"
             :value="stat.value"
@@ -58,11 +58,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted, ref, computed, watch } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { resepSchema, mapResepErrors } from '@/validation/resep.schema'
+import { useResepForm } from '@/composables/useResepForm'
 import type { SelectOption } from '@/types/form'
-import type { ResepFormErrors, StatVariant } from '@/types/gizi'
+
 import PageHeader from '@/components/common/PageHeader.vue'
 import RecipeBuilderCard from '@/components/gizi/RecipeBuilderCard.vue'
 import NutritionSummaryCard from '@/components/gizi/NutritionSummaryCard.vue'
@@ -72,6 +72,19 @@ import HealthScoreCard from '@/components/gizi/HealthScoreCard.vue'
 const route = useRoute()
 const router = useRouter()
 
+// Initialize Composable
+const {
+  formState,
+  nutritionResult,
+  errors,
+  validateForm,
+  addBahan,
+  removeBahan,
+  calculate,
+  loadRecipe,
+  resetForm
+} = useResepForm()
+
 const dummyBahanOptions: SelectOption[] = [
   { label: 'Bayam Segar', value: 'bayam' },
   { label: 'Jagung Manis Pipil', value: 'jagung' },
@@ -80,92 +93,13 @@ const dummyBahanOptions: SelectOption[] = [
   { label: 'Tempe Kedelai', value: 'tempe' },
 ]
 
-const state = reactive({
-  namaResep: '',
-  bahanList: [
-    { id: '1', bahanId: '', gram: 0 }
-  ],
-  nutritionResult: {
-    calories: 0,
-    protein: { val: 0, percent: 0 },
-    karbo: { val: 0, percent: 0 },
-    lemak: { val: 0, percent: 0 },
-    stats: [
-      { label: 'Serat', value: 0, unit: 'g', icon: 'eco', status: '', variant: 'default' as StatVariant },
-      { label: 'Natrium', value: 0, unit: 'mg', icon: 'water_drop', status: '', variant: 'default' as StatVariant },
-      { label: 'Vit. C', value: 0, unit: 'mg', icon: 'nutrition', status: '', variant: 'default' as StatVariant },
-      { label: 'Kalsium', value: 0, unit: 'mg', icon: 'vaccines', status: '', variant: 'default' as StatVariant },
-    ]
-  }
-})
-
 onMounted(() => {
   if (route.params.id) {
-    state.namaResep = 'Nasi Ayam Sayur (Edit Mode)'
-    state.bahanList = [
-      { id: '1', bahanId: 'ayam', gram: 200 },
-      { id: '2', bahanId: 'bayam', gram: 100 }
-    ]
-    onCalculate()
+    loadRecipe(route.params.id)
   } else {
-    state.namaResep = ''
-    state.bahanList = [
-      { id: '1', bahanId: '', gram: 0 }
-    ]
+    resetForm()
   }
 })
-
-const onAddBahan = () => {
-  state.bahanList.push({ id: Date.now().toString(), bahanId: '', gram: 0 })
-}
-
-const onRemoveBahan = (index: number) => {
-  state.bahanList.splice(index, 1)
-}
-
-const onCalculate = () => {
-  state.nutritionResult = {
-    calories: 342,
-    protein: { val: 18.4, percent: 22 },
-    karbo: { val: 42.1, percent: 48 },
-    lemak: { val: 11.5, percent: 30 },
-    stats: [
-      { label: 'Serat', value: 5.2, unit: 'g', icon: 'eco', status: '+12% Daily Target', variant: 'success' as StatVariant },
-      { label: 'Natrium', value: 420, unit: 'mg', icon: 'water_drop', status: 'High Sodium Alert', variant: 'danger' as StatVariant },
-      { label: 'Vit. C', value: 24, unit: 'mg', icon: 'nutrition', status: 'Excellent Source', variant: 'warning' as StatVariant },
-      { label: 'Kalsium', value: 85, unit: 'mg', icon: 'vaccines', status: 'Moderate', variant: 'default' as StatVariant },
-    ]
-  }
-}
-
-const errors = ref<ResepFormErrors>({})
-
-function validateForm(): boolean {
-  const result = resepSchema.safeParse({
-    nama: state.namaResep,
-    bahanList: state.bahanList,
-  })
-
-  if (!result.success) {
-    errors.value = mapResepErrors(result.error)
-    return false
-  }
-
-  errors.value = {}
-  return true
-}
-
-// Debounced watcher — only watches form fields, not nutritionResult
-let debounceTimer: ReturnType<typeof setTimeout>
-const formData = computed(() => ({
-  nama: state.namaResep,
-  bahanList: state.bahanList,
-}))
-
-watch(formData, () => {
-  clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => validateForm(), 300)
-}, { deep: true })
 
 function onSubmit() {
   if (!validateForm()) return

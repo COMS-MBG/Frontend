@@ -46,3 +46,22 @@ export interface NutritionResult {
   lemak: MacroNutrient
   stats: NutritionStat[]
 }
+
+// ── Master Bahan Domain Types ──────────────────────────────
+
+/** Kategori bahan baku */
+export type BahanKategori = 'protein' | 'karbo' | 'lemak' | 'serat' | 'lainnya'
+
+/** Single ingredient master data item */
+export interface BahanItem {
+  id: number
+  nama: string
+  kategori: BahanKategori
+  satuan: 'kg' | 'liter' | 'pcs'
+  stok: number
+  kalori: number
+  protein: number
+  karbohidrat: number
+  lemak: number
+  image?: string
+}
