@@ -10,20 +10,20 @@
       </thead>
       <tbody>
         <tr v-for="r in rows" :key="r" class="skeleton-row">
-          <td v-for="(col, ci) in columns" :key="ci">
-            <div v-if="col.type === 'avatar-text'" class="skeleton-cell-avatar">
+          <td v-for="(col, ci) in columns" :key="ci" :style="{ textAlign: col.align || 'left' }">
+            <div v-if="col.type === 'avatar-text'" class="skeleton-cell-avatar" :style="{ justifyContent: col.align === 'center' ? 'center' : col.align === 'right' ? 'flex-end' : 'flex-start' }">
               <div class="skeleton-circle" />
               <div class="skeleton-text-group">
                 <div class="skeleton-bar skeleton-bar--name" />
                 <div class="skeleton-bar skeleton-bar--sub" />
               </div>
             </div>
-            <div v-else-if="col.type === 'badge'" class="skeleton-bar skeleton-bar--badge" />
-            <div v-else-if="col.type === 'actions'" class="skeleton-action-group">
+            <div v-else-if="col.type === 'badge'" class="skeleton-bar skeleton-bar--badge" :style="{ margin: col.align === 'center' ? '0 auto' : col.align === 'right' ? '0 0 0 auto' : '0' }" />
+            <div v-else-if="col.type === 'actions'" class="skeleton-action-group" :style="{ justifyContent: col.align === 'center' ? 'center' : col.align === 'right' ? 'flex-end' : 'flex-start' }">
               <div class="skeleton-circle skeleton-circle--sm" />
               <div class="skeleton-circle skeleton-circle--sm" />
             </div>
-            <div v-else class="skeleton-bar skeleton-bar--default" :style="{ width: col.width || '64px' }" />
+            <div v-else class="skeleton-bar skeleton-bar--default" :style="{ maxWidth: col.width || '64px', width: '100%', margin: col.align === 'center' ? '0 auto' : col.align === 'right' ? '0 0 0 auto' : '0' }" />
           </td>
         </tr>
       </tbody>
@@ -35,6 +35,7 @@
 export interface SkeletonColumn {
   type?: 'text' | 'avatar-text' | 'badge' | 'actions'
   width?: string
+  align?: 'left' | 'center' | 'right'
 }
 
 export interface SkeletonHeader {
@@ -71,6 +72,7 @@ withDefaults(defineProps<{
 .base-table-skeleton__table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-family: $font-body;
 
   thead {
@@ -117,10 +119,9 @@ withDefaults(defineProps<{
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 
-  &--name { width: 140px; height: 14px; }
-  &--sub { width: 80px; height: 10px; margin-top: 4px; }
-  &--badge { width: 48px; height: 22px; border-radius: 6px; margin: 0 auto; }
-  &--default { margin: 0 auto; }
+  &--name { width: 100%; max-width: 140px; height: 14px; }
+  &--sub { width: 60%; max-width: 80px; height: 10px; margin-top: 4px; }
+  &--badge { width: 48px; height: 22px; border-radius: 6px; }
 }
 
 .skeleton-circle {

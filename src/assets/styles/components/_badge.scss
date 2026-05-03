@@ -1,0 +1,9 @@
+@use '../abstracts/variables' as *;
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}

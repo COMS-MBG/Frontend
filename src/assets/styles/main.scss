@@ -12,6 +12,8 @@
 @use 'components/footer';
 @use 'components/modal';
 @use 'components/menu-planning-row';
+@use 'components/table';
+@use 'components/badge';
 
 // ── Pages ──────────────────────────────────────────────────
 @use 'pages/login';
@@ -20,3 +22,4 @@
 @use 'pages/kalkulator-gizi';
 @use 'pages/master-bahan';
 @use 'pages/menu-planning';
+@use 'pages/distribution';
