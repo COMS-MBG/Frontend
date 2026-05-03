@@ -1,7 +1,7 @@
 <template>
   <button 
     class="base-button" 
-    :class="[`btn-${variant}`, { 'is-fullwidth': fullWidth, 'is-outline': outline }]"
+    :class="[`btn-${variant}`, size ? `btn-${size}` : '', { 'is-fullwidth': fullWidth, 'is-outline': outline }]"
     v-bind="$attrs"
   >
     <span v-if="icon" class="material-symbols-outlined btn-icon">{{ icon }}</span>
@@ -14,6 +14,7 @@ defineOptions({ inheritAttrs: false })
 
 defineProps<{
   variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'dark'
+  size?: 'sm' | 'md' | 'lg'
   fullWidth?: boolean
   outline?: boolean
   icon?: string
@@ -37,6 +38,16 @@ defineProps<{
 
   &.is-fullwidth {
     width: 100%;
+  }
+
+  &.btn-sm {
+    padding: $space-2 $space-3;
+    font-size: 0.75rem;
+    border-radius: $radius-sm;
+
+    .btn-icon {
+      font-size: 1rem;
+    }
   }
 
   /* Default / Primary */
