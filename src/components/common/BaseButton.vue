@@ -103,6 +103,7 @@ defineProps<{
 
   .btn-icon {
     font-size: 1.25rem;
+    color: inherit;
   }
 }
 </style>
