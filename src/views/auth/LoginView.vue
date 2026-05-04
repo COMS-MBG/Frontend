@@ -190,7 +190,7 @@ async function handleLogin() {
     })
 
     // Redirect ke halaman asal (jika ada query ?redirect=) atau dashboard
-    const redirectTo = (route.query.redirect as string) || '/dasboard'
+    const redirectTo = (route.query.redirect as string) || '/dashboard'
     router.push(redirectTo)
   } catch {
     // Error sudah dihandle di store → authStore.error sudah terisi
