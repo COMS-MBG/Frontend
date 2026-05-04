@@ -27,8 +27,14 @@
         </template>
 
         <tr v-else>
-          <td colspan="7" class="empty-state">
-            Tidak ada data karyawan
+          <td colspan="7" class="empty-state-cell">
+            <BaseEmptyState
+              icon="group_off"
+              title="Belum ada data karyawan"
+              description="Mulai tambahkan karyawan untuk mengelola data personalia Anda."
+              action-label="Tambah Karyawan"
+              @action="$emit('add')"
+            />
           </td>
         </tr>
       </tbody>
@@ -42,6 +48,7 @@
 
 <script setup lang="ts">
 import EmployeeRow from './EmployeeRow.vue'
+import BaseEmptyState from '@/components/common/BaseEmptyState.vue'
 import type { Employee } from '@/types/employee'
 
 defineProps<{
@@ -54,6 +61,7 @@ defineEmits<{
   (e: 'edit', item: Employee): void
   (e: 'delete', item: Employee): void
   (e: 'toggle-status', item: Employee): void
+  (e: 'add'): void
 }>()
 </script>
 
@@ -113,10 +121,8 @@ defineEmits<{
   background-color: $color-bg-surface;
 }
 
-.empty-state {
-  text-align: center;
+.empty-state-cell {
   padding: $space-6;
-  color: $color-text-muted;
-  font-size: $text-sm;
+  background-color: $color-bg-surface;
 }
 </style>

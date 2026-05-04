@@ -8,17 +8,31 @@
  */
 import { defineStore } from 'pinia'
 import { ref, computed, type Ref } from 'vue'
+import Fuse from 'fuse.js'  
 import { useAuthStore } from '@/stores/auth'
 import type { Employee, EmployeeRole } from '@/types/employee'
 
 export const useEmployeeStore = defineStore('employee', () => {
   // ── State ──────────────────────────────────────────────────
-  const items     = ref<Employee[]>([]) as Ref<Employee[]>
-  const isLoading = ref(false)
-  const error     = ref<string | null>(null)
+  const items       = ref<Employee[]>([]) as Ref<Employee[]>
+  const isLoading   = ref(false)
+  const error       = ref<string | null>(null)
+
+  // ── UI State (Table Controls) ──────────────────────────────
+  const searchQuery  = ref('')
+  const selectedRole = ref('all')
+  const rowsPerPage  = ref(10)
 
   // ── Auth (resolved once at setup) ──────────────────────────
   const auth = useAuthStore()
+
+  // ── Fuzzy Search Setup ─────────────────────────────────────
+  const fuseInstance = computed(() => {
+    return new Fuse(items.value, {
+      keys: ['nama', 'nrp', 'departemen'],
+      threshold: 0.3,
+    })
+  })
 
   // ── Getters ────────────────────────────────────────────────
   const totalItems  = computed(() => items.value.length)
@@ -29,6 +43,27 @@ export const useEmployeeStore = defineStore('employee', () => {
     () => (id: number): Employee | undefined =>
       items.value.find(i => i.id === id),
   )
+
+  const filteredItems = computed(() => {
+    let result = items.value
+
+    // 1. Role Filter
+    if (selectedRole.value !== 'all') {
+      result = result.filter(e => e.role === selectedRole.value)
+    }
+
+    // 2. Fuzzy Search
+    if (searchQuery.value.trim()) {
+      // Need to search on the filtered result if role is active
+      const localFuse = new Fuse(result, {
+        keys: ['nama', 'nrp', 'departemen'],
+        threshold: 0.3,
+      })
+      result = localFuse.search(searchQuery.value).map(res => res.item)
+    }
+
+    return result
+  })
 
   // ── Access Logic (derived from auth store) ─────────────────
   const canAdd = computed(() => {
@@ -44,7 +79,20 @@ export const useEmployeeStore = defineStore('employee', () => {
     return auth.userRole?.toLowerCase() === 'admin'
   })
 
-  // ── Actions ────────────────────────────────────────────────
+  // ── Actions (Toolbar) ──────────────────────────────────────
+  function setSearchQuery(query: string): void {
+    searchQuery.value = query
+  }
+
+  function setRoleFilter(filter: string): void {
+    selectedRole.value = filter
+  }
+
+  function setRowsPerPage(num: number): void {
+    rowsPerPage.value = num
+  }
+
+  // ── Actions (Data) ─────────────────────────────────────────
 
   /** Bulk-load data (used with dummy / imported data). */
   function setItems(data: Employee[]): void {
@@ -99,13 +147,20 @@ export const useEmployeeStore = defineStore('employee', () => {
     items,
     isLoading,
     error,
+    searchQuery,
+    selectedRole,
+    rowsPerPage,
     totalItems,
     activeCount,
     adminCount,
     getById,
+    filteredItems,
     canAdd,
     canEdit,
     canDelete,
+    setSearchQuery,
+    setRoleFilter,
+    setRowsPerPage,
     setItems,
     addItem,
     updateItem,

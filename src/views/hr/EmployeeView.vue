@@ -8,20 +8,7 @@
       title="Data Karyawan"
       subtitle="Kelola data pegawai, jabatan, dan akses sistem."
       :breadcrumb="['Data Karyawan', 'Manajemen Karyawan']"
-    >
-      <template #actions>
-        <button
-          v-if="employeeStore.canAdd"
-          class="btn-primary btn-with-icon"
-          @click="onTambah"
-          aria-label="Tambah Karyawan"
-          title="Tambah Karyawan Baru"
-        >
-          <span class="material-symbols-outlined">add</span>
-          Tambah Karyawan
-        </button>
-      </template>
-    </PageHeader>
+    />
 
     <!-- ═══════════════════════════════════════
          2. SUMMARY STAT CARDS
@@ -53,37 +40,20 @@
     <!-- ═══════════════════════════════════════
          3. TOOLBAR (Search + Filter)
     ════════════════════════════════════════ -->
-    <EmployeeToolbar
-      :search="search"
-      :filter="filter"
-      @update:search="onSearchUpdate"
-      @update:filter="filter = $event"
-    />
+    <EmployeeToolbar @add="onTambah" />
 
     <!-- ═══════════════════════════════════════
          4. LOADING STATE
     ════════════════════════════════════════ -->
     <BaseTableSkeleton
-      v-if="employeeStore.isLoading"
+      v-if="isLoading"
       :rows="6"
       :columns="skeletonColumns"
       :headers="skeletonHeaders"
     />
 
     <!-- ═══════════════════════════════════════
-         5. EMPTY STATE
-    ════════════════════════════════════════ -->
-    <BaseEmptyState
-      v-else-if="filteredItems.length === 0"
-      icon="group_off"
-      title="Belum ada data karyawan"
-      description="Mulai tambahkan karyawan untuk mengelola data personalia Anda."
-      action-label="Tambah Karyawan"
-      @action="onTambah"
-    />
-
-    <!-- ═══════════════════════════════════════
-         6. DATA TABLE + PAGINATION
+         5. DATA TABLE + PAGINATION
     ════════════════════════════════════════ -->
     <EmployeeTable
       v-else
@@ -93,13 +63,14 @@
       @edit="onEdit"
       @delete="onDelete"
       @toggle-status="onToggleStatus"
+      @add="onTambah"
     >
       <template #pagination>
         <BasePagination
-          v-if="filteredItems.length > perPage"
+          v-if="filteredItems.length > rowsPerPage"
           v-model="page"
           :total="filteredItems.length"
-          :per-page="perPage"
+          :per-page="rowsPerPage"
           item-label="karyawan"
         />
       </template>
@@ -134,8 +105,11 @@ import { employeeDummy } from '@/data/employee.dummy'
 import { usePagination } from '@/composables/usePagination'
 import type { Employee } from '@/types/employee'
 
+import { storeToRefs } from 'pinia'
+
 // ── Store ────────────────────────────────────────────────────
 const employeeStore = useEmployeeStore()
+const { filteredItems, rowsPerPage, searchQuery, selectedRole, isLoading } = storeToRefs(employeeStore)
 
 // ── Skeleton Config ──────────────────────────────────────────
 const skeletonHeaders: SkeletonHeader[] = [
@@ -167,43 +141,21 @@ onMounted(() => {
 })
 
 // ── UI State (view-local only) ───────────────────────────────
-const search      = ref('')
-const filter      = ref('all')
 const isModalOpen = ref(false)
 const editTarget  = ref<Employee | null>(null)
 
-// ── Derived: Filter + Search ─────────────────────────────────
-const filteredItems = computed(() => {
-  let result = employeeStore.items
-
-  if (filter.value !== 'all') {
-    result = result.filter(e => e.role === filter.value)
-  }
-
-  if (search.value.trim()) {
-    const q = search.value.toLowerCase()
-    result = result.filter(e =>
-      e.nama.toLowerCase().includes(q) ||
-      e.nrp.toLowerCase().includes(q) ||
-      e.departemen.toLowerCase().includes(q)
-    )
-  }
-
-  return result
-})
-
-// Reset page when filter/search changes
-watch([search, filter], () => {
-  page.value = 1
-})
-
 // ── Pagination (extracted composable) ────────────────────────
-const { page, perPage, paginatedItems } = usePagination(filteredItems, 5)
+const { page, paginatedItems } = usePagination(filteredItems, rowsPerPage)
+
+// Reset page when search, filter, or per-page size changes
+watch(
+  [searchQuery, selectedRole, rowsPerPage], 
+  () => {
+    page.value = 1
+  }
+)
 
 // ── Handlers ────────────────────────────────────────────────
-function onSearchUpdate(val: string | number | null): void {
-  search.value = String(val ?? '')
-}
 
 function onTambah(): void {
   editTarget.value = null

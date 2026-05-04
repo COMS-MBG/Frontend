@@ -6,22 +6,17 @@
       :breadcrumb="['Manajemen Gizi', 'Perencanaan Menu']"
     >
       <template #actions>
-        <button class="btn-secondary btn-with-icon" @click="onCopyLastWeek" aria-label="Salin Jadwal Minggu Lalu" :disabled="menuStore.isSaving">
-          <span class="material-symbols-outlined">content_copy</span>
-          Salin Minggu Lalu
-        </button>
-        <button class="btn-primary btn-with-icon" @click="onSaveAll" aria-label="Simpan Semua Perubahan" :disabled="menuStore.isSaving || !menuStore.isDirty">
-          <span v-if="menuStore.isSaving" class="material-symbols-outlined is-spinning" style="animation: spin 1s linear infinite;">sync</span>
-          <span v-else class="material-symbols-outlined">save</span>
-          {{ menuStore.isSaving ? 'Menyimpan...' : 'Simpan Semua Perubahan' }}
-        </button>
+        <!-- Actions moved to MenuPlanningToolbar for unified UI -->
       </template>
     </PageHeader>
 
     <MenuNutritionSummary />
 
     <div class="menu-planning__controls">
-      <MenuPlanningToolbar />
+      <MenuPlanningToolbar 
+        @save="onSaveAll" 
+        @copy="onCopyLastWeek" 
+      />
     </div>
 
     <MenuPlanningTable

@@ -2,63 +2,56 @@
   <BaseTableToolbar
     :search-value="localSearch"
     @update:search-value="onSearchInput"
-    :per-page-value="bahanStore.rowsPerPage"
-    @update:per-page-value="bahanStore.setRowsPerPage"
+    :per-page-value="resepStore.rowsPerPage"
+    @update:per-page-value="resepStore.setRowsPerPage"
     :show-search="true"
     :show-filter="false"
     :show-import="false"
     :show-export="false"
     :show-per-page="true"
     :show-add="true"
-    add-label="Tambah Bahan"
-    search-placeholder="Cari bahan..."
+    add-label="Tambah Resep"
+    search-placeholder="Cari resep..."
     @add="$emit('add')"
   />
 </template>
 
 <script setup lang="ts">
 /**
- * BahanToolbar.vue — Thin domain wrapper around BaseTableToolbar
+ * ResepToolbar.vue — Thin domain wrapper around BaseTableToolbar
  *
  * Responsibilities:
- *  1. Sync search with Pinia store (debounced search)
- *  2. Emit add events to the parent view
+ *  1. Sync search with Pinia store (debounced search via useDebounce)
+ *  2. Sync rowsPerPage with Pinia store
+ *  3. Emit add events to the parent view
  *
  * All layout, styling, and responsive behavior is handled
  * by the reusable BaseTableToolbar component.
  */
-import { ref, watch, onUnmounted, computed } from 'vue'
+import { ref, watch } from 'vue'
 import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
-import { useBahanStore } from '@/stores/bahan.store'
+import { useResepStore } from '@/stores/resep.store'
 import { useDebounce } from '@/composables/useDebounce'
 
-// Only emits if we have other actions, but currently none.
-// We can remove defineEmits if we don't have custom emits from this wrapper anymore.
-
-const props = defineProps<{
-  perPage?: number
-}>()
-
 const emit = defineEmits<{
-  (e: 'update:perPage', val: number): void
   (e: 'add'): void
 }>()
 
 // ── Store ─────────────────────────────────────────────────────
-const bahanStore = useBahanStore()
+const resepStore = useResepStore()
 
 // ── Local state (synced → Pinia) ──────────────────────────────
-const localSearch = ref(bahanStore.searchQuery)
+const localSearch = ref(resepStore.searchQuery)
 
 // ── Debounced search → Pinia (300ms) ──────────────────────────
 const debouncedSearch = useDebounce(localSearch, 300)
 
 watch(debouncedSearch, (newVal) => {
-  bahanStore.setSearchQuery(newVal)
+  resepStore.setSearchQuery(newVal)
 })
 
 // ── Sync back from Pinia (e.g. resetToolbar) ─────────────────
-watch(() => bahanStore.searchQuery, (v) => { localSearch.value = v })
+watch(() => resepStore.searchQuery, (v) => { localSearch.value = v })
 
 function onSearchInput(val: string) {
   localSearch.value = val
