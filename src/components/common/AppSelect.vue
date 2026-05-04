@@ -238,7 +238,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutside))
     
     /* When selected, hovering shouldn't change the color to subtle bg */
     &:hover, &.is-highlighted {
-      background-color: darken(#2563eb, 5%); // Approximation of primary darken
+      background-color: $color-primary-dark;
     }
   }
 }

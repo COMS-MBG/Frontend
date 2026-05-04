@@ -6,7 +6,7 @@
         placeholder="Cari nama, NRP, atau departemen..."
         @update:model-value="$emit('update:search', $event)"
       />
-      <BaseSelect
+      <AppSelect
         :model-value="localFilter"
         :options="filterOptions"
         placeholder="Semua Role"
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import BaseSelect from '@/components/common/BaseSelect.vue'
+import AppSelect from '@/components/common/AppSelect.vue'
 import type { SelectOption } from '@/types/form'
 
 const props = defineProps<{
@@ -69,7 +69,7 @@ const filterOptions: SelectOption[] = [
       max-width: 280px;
     }
 
-    .base-select-wrapper {
+    .app-select {
       max-width: 200px;
     }
   }
@@ -84,7 +84,7 @@ const filterOptions: SelectOption[] = [
       flex-direction: column;
 
       .base-input-wrapper,
-      .base-select-wrapper {
+      .app-select {
         max-width: none;
       }
     }
