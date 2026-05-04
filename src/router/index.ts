@@ -38,6 +38,7 @@ const routes: RouteRecordRaw[] = [
 
       // ── Laporan ──
       { path: 'laporan', name: 'laporan', component: () => import('@/views/laporan/LaporanView.vue') },
+      { path: 'laporan-keuangan', name: 'laporan-keuangan', component: () => import('@/views/laporan/LaporanKeuanganView.vue') },
 
       // ── User ──
       { path: 'profile', name: 'profile', component: () => import('@/views/user/ProfileView.vue') },
