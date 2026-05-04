@@ -1,53 +1,82 @@
 <template>
-  <div class="menu-planning__toolbar">
-    <div 
-      class="custom-week-selector" 
-      :class="{ 'is-open': isOpen }"
-      tabindex="0"
-      @blur="closeSelector"
-    >
-      <div class="selector-trigger" @click="toggleSelector">
-        <div class="icon-wrapper">
-          <span v-if="menuStore.isFetching" class="material-symbols-outlined icon-calendar is-spinning">sync</span>
-          <span v-else class="material-symbols-outlined icon-calendar">calendar_month</span>
-        </div>
-        <div class="selector-content">
-          <span class="label">Periode Menu</span>
-          <span class="value">{{ currentLabel }}</span>
-        </div>
-        <span class="material-symbols-outlined icon-chevron">expand_more</span>
-      </div>
-
-      <Transition name="fade-slide">
-        <div v-if="isOpen" class="selector-menu">
-          <div class="menu-header">Pilih Minggu Perencanaan</div>
-          <div class="menu-list">
-            <div 
-              v-for="opt in weekOptions" 
-              :key="opt.value"
-              class="menu-item"
-              :class="{ 'is-active': menuStore.selectedWeek === opt.value }"
-              @click.stop="selectWeek(opt.value)"
-            >
-              <div class="item-content">
-                <span class="material-symbols-outlined icon-date">event_note</span>
-                <span class="item-label">{{ opt.label }}</span>
-              </div>
-              <span v-if="menuStore.selectedWeek === opt.value" class="material-symbols-outlined icon-check">check_circle</span>
-            </div>
+  <BaseTableToolbar
+    :show-search="false"
+    :show-filter="false"
+    :show-per-page="false"
+    :show-import="false"
+    :show-export="false"
+    :show-add="true"
+    add-label="Simpan Semua Perubahan"
+    @add="onSave"
+  >
+    <!-- CUSTOM WEEK SELECTOR -->
+    <template #right-prepend>
+      <div class="toolbar__group">
+        <div 
+          class="custom-week-selector" 
+          :class="{ 'is-open': isOpen }"
+          tabindex="0"
+          @blur="closeSelector"
+        >
+          <div class="selector-trigger" @click="toggleSelector">
+            <span v-if="menuStore.isFetching" class="material-symbols-outlined icon-calendar is-spinning">sync</span>
+            <span v-else class="material-symbols-outlined icon-calendar">event_note</span>
+            <span class="value">{{ currentLabel }}</span>
+            <span class="material-symbols-outlined icon-chevron">expand_more</span>
           </div>
+
+          <Transition name="fade-slide">
+            <div v-if="isOpen" class="selector-menu">
+              <div class="menu-header">Pilih Minggu Perencanaan</div>
+              <div class="menu-list">
+                <div 
+                  v-for="opt in weekOptions" 
+                  :key="opt.value"
+                  class="menu-item"
+                  :class="{ 'is-active': menuStore.selectedWeek === opt.value }"
+                  @click.stop="selectWeek(opt.value)"
+                >
+                  <div class="item-content">
+                    <span class="material-symbols-outlined icon-date">event_note</span>
+                    <span class="item-label">{{ opt.label }}</span>
+                  </div>
+                  <span v-if="menuStore.selectedWeek === opt.value" class="material-symbols-outlined icon-check">check_circle</span>
+                </div>
+              </div>
+            </div>
+          </Transition>
         </div>
-      </Transition>
-    </div>
-  </div>
+      </div>
+    </template>
+
+    <!-- CUSTOM COPY BUTTON -->
+    <template #actions>
+      <button 
+        class="btn-secondary btn-with-icon" 
+        @click="onCopy" 
+        :disabled="menuStore.isSaving || isCopying"
+      >
+        <span v-if="isCopying" class="material-symbols-outlined is-spinning">sync</span>
+        <span v-else class="material-symbols-outlined">content_copy</span>
+        {{ isCopying ? 'Menyalin...' : 'Salin Minggu Lalu' }}
+      </button>
+    </template>
+  </BaseTableToolbar>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useMenuPlanningStore } from '@/stores/menuPlanning.store'
+import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
+
+const emit = defineEmits<{
+  (e: 'copy'): void
+  (e: 'save'): void
+}>()
 
 const menuStore = useMenuPlanningStore()
 const isOpen = ref(false)
+const isCopying = ref(false)
 
 const weekOptions = [
   { value: 'w2-apr-2026', label: 'Minggu 2, April 2026' },
@@ -73,195 +102,183 @@ const selectWeek = (val: string) => {
   menuStore.setSelectedWeek(val)
   isOpen.value = false
 }
+
+async function onCopy() {
+  if (isCopying.value) return
+  isCopying.value = true
+  try {
+    emit('copy')
+    // Simulating copy delay for UX feedback
+    await new Promise(resolve => setTimeout(resolve, 800))
+  } finally {
+    isCopying.value = false
+  }
+}
+
+function onSave() {
+  emit('save')
+}
 </script>
 
 <style scoped lang="scss">
 @use '@/assets/styles/abstracts/variables' as *;
 
-.menu-planning__toolbar {
-  .custom-week-selector {
-    position: relative;
-    display: inline-block;
-    outline: none;
+.toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+/* ── Custom Week Selector (Dropdown) ── */
+.custom-week-selector {
+  position: relative;
+  width: 260px;
+  max-width: 100%;
+  font-family: $font-body;
+  outline: none; /* remove focus outline for div */
+
+  .selector-trigger {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: 0 $space-4;
+    height: 2.5rem; /* h-10 */
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition-fast;
     user-select: none;
 
-    .selector-trigger {
+    &:hover {
+      border-color: $color-primary;
+    }
+
+    .icon-calendar {
+      color: $color-primary;
+      font-size: 1.15rem;
+    }
+
+    .value {
+      flex: 1;
+      font-size: $text-sm;
+      font-weight: 500;
+      color: $color-text-primary;
+    }
+
+    .icon-chevron {
+      color: $color-text-muted;
+      font-size: 1.25rem;
+      transition: transform $transition-fast;
+    }
+  }
+
+  &.is-open .selector-trigger {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px $color-primary-subtle;
+
+    .icon-chevron {
+      transform: rotate(180deg);
+    }
+  }
+
+  .selector-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: $color-bg-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-lg;
+    z-index: 100;
+    overflow: hidden;
+
+    .menu-header {
+      padding: $space-3 $space-4;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: $color-text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: $color-bg-subtle;
+      border-bottom: 1px solid $color-border;
+    }
+
+    .menu-list {
+      max-height: 250px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .menu-item {
       display: flex;
       align-items: center;
-      gap: $space-3;
-      padding: $space-2 $space-4;
-      background-color: $color-bg-surface;
-      border: 1px solid $color-border;
-      border-radius: $radius-lg;
+      justify-content: space-between;
+      padding: $space-3 $space-4;
       cursor: pointer;
-      transition: all 0.2s ease;
-      min-width: 250px;
+      transition: background $transition-fast;
 
       &:hover {
-        border-color: $color-primary;
-        box-shadow: 0 4px 12px rgba($color-primary, 0.05);
+        background: $color-bg-subtle;
+      }
 
-        .icon-wrapper {
-          background-color: rgba($color-primary, 0.1);
+      &.is-active {
+        background: $color-primary-subtle;
+        
+        .item-label {
+          color: $color-primary;
+          font-weight: 600;
+        }
+
+        .icon-date {
           color: $color-primary;
         }
       }
 
-      .icon-wrapper {
+      .item-content {
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: $radius-md;
-        background-color: $color-bg-subtle;
+        gap: $space-2;
+      }
+
+      .icon-date {
+        font-size: 1.15rem;
         color: $color-text-muted;
-        transition: all 0.2s ease;
-
-        .icon-calendar {
-          font-size: 1.2rem;
-        }
-
-        .is-spinning {
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
       }
 
-      .selector-content {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-
-        .label {
-          font-size: 0.7rem;
-          color: $color-text-muted;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          font-weight: 600;
-          margin-bottom: 2px;
-        }
-
-        .value {
-          font-size: $text-sm;
-          color: $color-text-primary;
-          font-weight: 600;
-        }
+      .item-label {
+        font-size: $text-sm;
+        color: $color-text-primary;
       }
 
-      .icon-chevron {
-        color: $color-text-muted;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      .icon-check {
+        font-size: 1.15rem;
+        color: $color-primary;
       }
     }
+  }
+}
 
-    &.is-open {
-      .selector-trigger {
-        border-color: $color-primary;
-        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+/* Transitions */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
 
-        .icon-wrapper {
-          background-color: $color-primary;
-          color: white;
-        }
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 
-        .icon-chevron {
-          transform: rotate(180deg);
-        }
-      }
-    }
+.is-spinning {
+  animation: spin 1s linear infinite;
+}
 
-    .selector-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: 100%;
-      min-width: 280px;
-      background-color: $color-bg-surface;
-      border: 1px solid $color-border;
-      border-radius: $radius-lg;
-      box-shadow: $shadow-lg;
-      z-index: 50;
-      overflow: hidden;
-
-      .menu-header {
-        padding: $space-3 $space-4;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: $color-text-muted;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid $color-border;
-        background-color: $color-bg-subtle;
-      }
-
-      .menu-list {
-        padding: $space-2;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-
-        .menu-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: $space-3;
-          border-radius: $radius-md;
-          cursor: pointer;
-          transition: all 0.2s ease;
-
-          &:hover {
-            background-color: $color-bg-subtle;
-          }
-
-          &.is-active {
-            background-color: rgba($color-primary, 0.05);
-            color: $color-primary;
-
-            .item-content {
-              font-weight: 600;
-              
-              .icon-date {
-                color: $color-primary;
-              }
-            }
-          }
-
-          .item-content {
-            display: flex;
-            align-items: center;
-            gap: $space-3;
-            color: $color-text-primary;
-            font-size: $text-sm;
-
-            .icon-date {
-              font-size: 1.1rem;
-              color: $color-text-muted;
-            }
-          }
-
-          .icon-check {
-            font-size: 1.1rem;
-            color: $color-primary;
-          }
-        }
-      }
-    }
-
-    .fade-slide-enter-active,
-    .fade-slide-leave-active {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .fade-slide-enter-from,
-    .fade-slide-leave-to {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>

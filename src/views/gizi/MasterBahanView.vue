@@ -19,43 +19,29 @@
           <span class="material-symbols-outlined">picture_as_pdf</span>
           Ekspor PDF
         </button>
-        <button
-          class="btn-primary btn-with-icon"
-          aria-label="Tambah Bahan"
-          title="Tambah Bahan Baru"
-          @click="onTambah"
-        >
-          <span class="material-symbols-outlined">add</span>
-          Tambah Bahan
-        </button>
       </template>
     </PageHeader>
 
     <!-- ═══════════════════════════════════════
-         2. STAT CARD
+         2. SUMMARY STAT CARDS
     ════════════════════════════════════════ -->
-    <div class="master-bahan__stat">
+    <div class="summary-row">
       <StatCard
-        label="TOTAL KATALOG"
-        icon="inventory_2"
-        :value="`${filteredItems.length} Bahan`"
+        v-for="stat in summaryStats"
+        :key="stat.label"
+        :label="stat.label"
+        :icon="stat.icon"
+        :value="stat.value"
         variant="horizontal"
-        icon-variant="blue"
+        :icon-variant="stat.iconVariant"
       />
     </div>
 
     <!-- ═══════════════════════════════════════
-         3. TOOLBAR (Search / Filter / Import / Export)
+         3. TOOLBAR (Search / Show Per Page / Add)
     ════════════════════════════════════════ -->
     <div class="master-bahan__toolbar">
-      <BahanToolbar
-        :search="search"
-        :filter="filter"
-        @update:search="onSearchUpdate"
-        @update:filter="filter = $event"
-        @import="onImport"
-        @export="onExport"
-      />
+      <BahanToolbar @add="onTambah" />
     </div>
 
     <!-- ═══════════════════════════════════════
@@ -72,7 +58,7 @@
          5. EMPTY STATE
     ════════════════════════════════════════ -->
     <BaseEmptyState
-      v-else-if="filteredItems.length === 0"
+      v-else-if="bahanStore.filteredItems.length === 0"
       icon="inventory_2"
       title="Belum ada data bahan"
       description="Mulai tambahkan bahan baku untuk membangun katalog nutrisi Anda."
@@ -95,10 +81,10 @@
 
         <template #pagination>
           <BasePagination
-            v-if="filteredItems.length > perPage"
+            v-if="bahanStore.filteredItems.length > 0"
             v-model="page"
-            :total="filteredItems.length"
-            :per-page="perPage"
+            :total="bahanStore.filteredItems.length"
+            :per-page="bahanStore.rowsPerPage"
             item-label="bahan"
           />
         </template>
@@ -109,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { computed, watch, onMounted, toRef } from 'vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 import StatCard from '@/components/common/StatCard.vue'
@@ -158,38 +144,19 @@ onMounted(() => {
   }
 })
 
-// ── UI State (view-local only) ───────────────────────────────
-const search = ref('')
-const filter  = ref('all')
-
-// ── Derived: Filter + Search (read from store) ───────────────
-const filteredItems = computed(() => {
-  let result = bahanStore.items
-
-  if (filter.value !== 'all') {
-    result = result.filter(b => b.kategori === filter.value)
-  }
-
-  if (search.value.trim()) {
-    const q = search.value.toLowerCase()
-    result = result.filter(b => b.nama.toLowerCase().includes(q))
-  }
-
-  return result
-})
-
-// Reset page when filter/search changes
-watch([search, filter], () => {
-  page.value = 1
-})
+// ── Summary Stats ───────────────────────────────────────────
+const summaryStats = computed(() => [
+  { label: 'TOTAL BAHAN',       value: bahanStore.items.length.toString(), icon: 'inventory_2',           iconVariant: 'blue' as const },
+  { label: 'KATEGORI AKTIF',    value: '5',                                icon: 'category',              iconVariant: 'purple' as const },
+  { label: 'RATA-RATA KALORI',  value: '120 kcal',                         icon: 'local_fire_department', iconVariant: 'orange' as const },
+  { label: 'STOK TERSEDIA',     value: '95%',                              icon: 'check_circle',          iconVariant: 'green' as const },
+])
 
 // ── Pagination (extracted composable) ────────────────────────
-const { page, perPage, paginatedItems } = usePagination(filteredItems, 10)
-
-// ── Handlers ────────────────────────────────────────────────
-function onSearchUpdate(val: string | number | null): void {
-  search.value = String(val ?? '')
-}
+const { page, paginatedItems } = usePagination(
+  computed(() => bahanStore.filteredItems),
+  toRef(bahanStore, 'rowsPerPage')
+)
 
 function onEksporPdf(): void {
   // TODO: integrate with PDF export service
@@ -197,14 +164,6 @@ function onEksporPdf(): void {
 
 function onTambah(): void {
   // TODO: open add modal (call bahanStore.addItem on submit)
-}
-
-function onImport(): void {
-  // TODO: open CSV import flow, then bahanStore.setItems(parsed)
-}
-
-function onExport(): void {
-  // TODO: trigger CSV export
 }
 
 function onEdit(item: BahanItem): void {
@@ -218,6 +177,30 @@ function onDelete(item: BahanItem): void {
 </script>
 
 <style scoped lang="scss">
-// Page layout covered by _master-bahan.scss (global)
-// Scoped overrides only
+.master-bahan {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  font-family: $font-body;
+}
+
+// ── Summary row ──
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-4;
+}
+
+// ── Responsive ──
+@include tablet {
+  .summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@include mobile {
+  .summary-row {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
 </style>

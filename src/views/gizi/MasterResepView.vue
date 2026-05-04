@@ -17,14 +17,6 @@
           <span class="material-symbols-outlined">picture_as_pdf</span>
           Ekspor PDF
         </button>
-        <button
-          class="btn-primary btn-with-icon"
-          @click="onTambah"
-          aria-label="Tambah Resep"
-          title="Tambah Resep Baru">
-          <span class="material-symbols-outlined">add</span>
-          Tambah Resep Baru
-        </button>
       </template>
     </PageHeader>
 
@@ -44,7 +36,14 @@
     </div>
 
     <!-- ═══════════════════════════════════════
-         3. DATA TABLE & PAGINATION
+         3. TOOLBAR (Search / Show Per Page / Add)
+    ════════════════════════════════════════ -->
+    <div class="master-resep__toolbar">
+      <ResepToolbar @add="onTambah" />
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         4. DATA TABLE & PAGINATION
     ════════════════════════════════════════ -->
     <ResepTable
       :items="paginatedItems"
@@ -53,10 +52,10 @@
     >
       <template #pagination>
         <BasePagination
-          v-if="totalItems > perPage"
+          v-if="resepStore.filteredRecipes.length > 0"
           v-model="page"
-          :total="totalItems"
-          :per-page="perPage"
+          :total="resepStore.filteredRecipes.length"
+          :per-page="resepStore.rowsPerPage"
           item-label="resep"
         />
       </template>
@@ -66,10 +65,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import PageHeader from '@/components/common/PageHeader.vue'
 import StatCard from '@/components/common/StatCard.vue'
+import ResepToolbar from '@/components/gizi/master-resep/ResepToolbar.vue'
 import ResepTable from '@/components/gizi/master-resep/ResepTable.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 import { useResepStore } from '@/stores/resep.store'
@@ -99,9 +99,9 @@ const summaryStats = [
 ]
 
 // ── Pagination (extracted composable) ────────────────────────
-const { page, perPage, totalItems, paginatedItems } = usePagination(
-  computed(() => resepStore.items),
-  5
+const { page, paginatedItems } = usePagination(
+  computed(() => resepStore.filteredRecipes),
+  toRef(resepStore, 'rowsPerPage')
 )
 
 // ── Handlers ────────────────────────────────────────────────

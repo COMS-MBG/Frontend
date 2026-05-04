@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { useFinanceStore } from '@/stores/finance.store'
-import BaseInput from '@/components/common/BaseInput.vue'
-import AppSelect from '@/components/common/AppSelect.vue'
+import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
 import BaseFilterDate from '@/components/common/BaseFilterDate.vue'
 import type { SelectOption } from '@/types/form'
 
@@ -42,57 +41,57 @@ watch([localStartDate, localEndDate], ([start, end]) => {
 onBeforeUnmount(() => {
   if (timeoutId) clearTimeout(timeoutId)
 })
+
+function onSearchInput(val: string) {
+  localQuery.value = val
+}
+
+function onFilterChange(val: string | number | null) {
+  localKategori.value = String(val ?? '')
+}
 </script>
 
 <template>
-  <div class="finance-toolbar">
-    <div class="finance-toolbar__controls">
-      <div class="filter-box">
-        <BaseFilterDate v-model="localStartDate" placeholder="Mulai Tanggal" />
+  <BaseTableToolbar
+    :search-value="localQuery"
+    @update:search-value="onSearchInput"
+    :filter-value="localKategori"
+    :filter-options="kategoriOptions"
+    filter-placeholder="Filter kategori"
+    @update:filter-value="onFilterChange"
+    :show-search="true"
+    :show-filter="true"
+    :show-per-page="false"
+    :show-add="false"
+    :show-import="false"
+    :show-export="false"
+    search-placeholder="Cari deskripsi atau kategori..."
+  >
+    <template #left-append>
+      <div class="finance-filters">
+        <div class="filter-box">
+          <BaseFilterDate v-model="localStartDate" placeholder="Mulai Tanggal" />
+        </div>
+        <div class="filter-box">
+          <BaseFilterDate v-model="localEndDate" placeholder="Sampai Tanggal" />
+        </div>
       </div>
-      <div class="filter-box">
-        <BaseFilterDate v-model="localEndDate" placeholder="Sampai Tanggal" />
-      </div>
-      <div class="filter-box">
-        <AppSelect
-          v-model="localKategori"
-          :options="kategoriOptions"
-          placeholder="Filter kategori"
-          aria-label="Filter kategori"
-        />
-      </div>
-      <div class="search-box">
-        <BaseInput
-          v-model="localQuery"
-          placeholder="Cari deskripsi atau kategori..."
-          aria-label="Cari transaksi"
-        />
-      </div>
-    </div>
-  </div>
+    </template>
+  </BaseTableToolbar>
 </template>
 
 <style scoped lang="scss">
-.finance-toolbar {
+@use '@/assets/styles/abstracts/variables' as *;
+
+.finance-filters {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  gap: $space-3;
+  margin-left: $space-3;
+  flex-wrap: wrap;
 
-  &__controls {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-
-    .filter-box {
-      width: 180px;
-    }
-
-    .search-box {
-      width: 260px;
-      max-width: 100%;
-    }
+  .filter-box {
+    width: 160px;
   }
 }
 </style>

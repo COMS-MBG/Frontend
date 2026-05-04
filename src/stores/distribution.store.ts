@@ -1,64 +1,92 @@
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import Fuse from 'fuse.js'
 import type { DistributionItem, DeliveryStatus } from '@/types/distribution'
 
-export const useDistributionStore = defineStore('distribution', {
-  state: () => ({
-    items: [] as DistributionItem[],
-    query: '' as string,
-    date: '' as string, // ISO string for filter
-    isLoading: false,
-    page: 1,
-    limit: 10,
-  }),
+export const useDistributionStore = defineStore('distribution', () => {
+  // ── State ───────────────────────────────────────────────
+  const items = ref<DistributionItem[]>([])
+  const searchQuery = ref<string>('')
+  const selectedDateFilter = ref<string>('')
+  const isLoading = ref<boolean>(false)
+  const page = ref<number>(1)
+  const limit = ref<number>(10)
 
-  getters: {
-    filtered: (s) => {
-      const q = s.query.toLowerCase()
-      return s.items.filter(i =>
-        !q || i.sekolah.toLowerCase().includes(q) || i.kurir.toLowerCase().includes(q)
-      )
-    },
-    paginated: (s): DistributionItem[] => {
-      const allFiltered = s.items.filter(i => {
-        const q = s.query.toLowerCase()
-        return !q || i.sekolah.toLowerCase().includes(q) || i.kurir.toLowerCase().includes(q)
-      })
-      const start = (s.page - 1) * s.limit
-      return allFiltered.slice(start, start + s.limit)
-    },
-    totalPages(s): number {
-      const allFiltered = s.items.filter(i => {
-        const q = s.query.toLowerCase()
-        return !q || i.sekolah.toLowerCase().includes(q) || i.kurir.toLowerCase().includes(q)
-      })
-      return Math.ceil(allFiltered.length / s.limit)
-    },
-    totalToday: (s) => s.items.length,
-    inProgressCount: (s) => s.items.filter(i => i.status === 'in_progress').length,
-    onTimeRate: () => 94.2, // static for now (UI only)
-  },
+  // ── Fuzzy Search Setup ──────────────────────────────────
+  const fuseInstance = computed(() => {
+    return new Fuse(items.value, {
+      keys: ['sekolah', 'kurir', 'kendaraan', 'status'],
+      threshold: 0.3,
+      distance: 100,
+      ignoreLocation: true
+    })
+  })
 
-  actions: {
-    setQuery(newQuery: string) {
-      this.query = newQuery
-      this.page = 1 // reset to first page on search
-    },
-    setPage(page: number) {
-      this.page = page
-    },
-    setItems(data: DistributionItem[]) {
-      this.items = data
-    },
-    updateStatus(id: number, status: DeliveryStatus) {
-      const item = this.items.find(i => i.id === id)
-      if (item) item.status = status
-    },
-    async startDelivery(id: number) {
-      this.isLoading = true
-      // mock API delay
-      await new Promise(res => setTimeout(res, 500))
-      this.updateStatus(id, 'in_progress')
-      this.isLoading = false
+  // ── Getters ─────────────────────────────────────────────
+  const filtered = computed(() => {
+    if (!searchQuery.value.trim()) {
+      return items.value
     }
+    return fuseInstance.value.search(searchQuery.value).map(result => result.item)
+  })
+
+  const paginated = computed(() => {
+    const allFiltered = filtered.value
+    const start = (page.value - 1) * limit.value
+    return allFiltered.slice(start, start + limit.value)
+  })
+
+  const totalPages = computed(() => {
+    const allFiltered = filtered.value
+    return Math.ceil(allFiltered.length / limit.value)
+  })
+
+  const totalToday = computed(() => items.value.length)
+  const inProgressCount = computed(() => items.value.filter(i => i.status === 'in_progress').length)
+  const onTimeRate = computed(() => 94.2) // static for now
+
+  // ── Actions ─────────────────────────────────────────────
+  function setSearchQuery(newQuery: string) {
+    searchQuery.value = newQuery
+    page.value = 1
+  }
+
+  function setDateFilter(newDate: string) {
+    selectedDateFilter.value = newDate
+    page.value = 1
+  }
+
+  function setPage(newPage: number) {
+    page.value = newPage
+  }
+
+  function setLimit(newLimit: number) {
+    limit.value = newLimit
+    page.value = 1
+  }
+
+  function setItems(data: DistributionItem[]) {
+    items.value = data
+  }
+
+  function updateStatus(id: number, status: DeliveryStatus) {
+    const item = items.value.find(i => i.id === id)
+    if (item) item.status = status
+  }
+
+  async function startDelivery(id: number) {
+    isLoading.value = true
+    await new Promise(res => setTimeout(res, 500))
+    updateStatus(id, 'in_progress')
+    isLoading.value = false
+  }
+
+  return {
+    // state
+    items, searchQuery, selectedDateFilter, isLoading, page, limit,
+    // getters
+    filtered, paginated, totalPages, totalToday, inProgressCount, onTimeRate,
+    // actions
+    setSearchQuery, setDateFilter, setPage, setLimit, setItems, updateStatus, startDelivery
   }
 })

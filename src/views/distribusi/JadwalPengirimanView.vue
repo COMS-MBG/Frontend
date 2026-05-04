@@ -56,13 +56,7 @@ onMounted(() => {
       subtitle="Tracking Pengiriman Makanan"
       :breadcrumb="['Distribusi', 'Jadwal Pengiriman']"
     >
-      <template #actions>
-        <div class="header-actions">
-          <BaseButton variant="primary" aria-label="Unggah CSV Sekolah">
-            <span class="material-symbols-outlined">upload_file</span> Unggah CSV
-          </BaseButton>
-        </div>
-      </template>
+      <!-- Actions moved to DistributionToolbar -->
     </PageHeader>
 
     <DistributionStatCard />

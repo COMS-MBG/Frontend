@@ -1,93 +1,103 @@
 <template>
-  <div class="employee-toolbar">
-    <div class="employee-toolbar__left">
-      <BaseInput
-        v-model="localSearch"
-        placeholder="Cari nama, NRP, atau departemen..."
-        @update:model-value="$emit('update:search', $event)"
-      />
-      <AppSelect
-        :model-value="localFilter"
-        :options="filterOptions"
-        placeholder="Semua Role"
-        @update:model-value="onFilterChange"
-      />
-    </div>
-  </div>
+  <BaseTableToolbar
+    :search-value="localSearch"
+    @update:search-value="onSearchInput"
+    :show-search="true"
+    :show-filter="false"
+    :show-per-page="true"
+    :per-page-value="store.rowsPerPage"
+    :per-page-options="perPageOptions"
+    @update:per-page-value="onPerPageChange"
+    :show-add="store.canAdd"
+    :show-import="false"
+    :show-export="false"
+    add-label="Tambah Karyawan"
+    search-placeholder="Cari nama, NRP, atau departemen..."
+    @add="$emit('add')"
+  >
+    <!-- Role Filter on the left side, right after the search input -->
+    <template #left-append>
+      <div class="filter-group">
+        <AppSelect
+          :model-value="store.selectedRole"
+          :options="filterOptions"
+          placeholder="Semua Role"
+          @update:model-value="onFilterChange"
+        />
+      </div>
+    </template>
+  </BaseTableToolbar>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import BaseInput from '@/components/common/BaseInput.vue'
+import { useEmployeeStore } from '@/stores/employee.store'
+import { useDebounce } from '@/composables/useDebounce'
+import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
 import AppSelect from '@/components/common/AppSelect.vue'
 import type { SelectOption } from '@/types/form'
 
-const props = defineProps<{
-  search: string
-  filter: string
-}>()
-
 const emit = defineEmits<{
-  (e: 'update:search', value: string | number | null): void
-  (e: 'update:filter', value: string): void
+  (e: 'add'): void
 }>()
 
-const localSearch = ref(props.search)
-const localFilter = ref<string | number | null>(props.filter)
+const store = useEmployeeStore()
 
-watch(() => props.search, (v) => { localSearch.value = v })
-watch(() => props.filter, (v) => { localFilter.value = v })
+// ── Search State & Debounce ───────────────────────────
+const localSearch = ref(store.searchQuery)
+const debouncedSearch = useDebounce(localSearch, 300)
 
-function onFilterChange(val: string | number | null) {
-  localFilter.value = val
-  emit('update:filter', String(val ?? 'all'))
+watch(debouncedSearch, (newVal) => store.setSearchQuery(newVal))
+watch(() => store.searchQuery, (val) => localSearch.value = val)
+
+function onSearchInput(val: string) {
+  localSearch.value = val
 }
 
+// ── Role Filter ───────────────────────────────────────
 const filterOptions: SelectOption[] = [
   { label: 'Semua Role', value: 'all' },
   { label: 'Admin', value: 'Admin' },
   { label: 'Operator', value: 'Operator' },
   { label: 'Viewer', value: 'Viewer' },
 ]
+
+function onFilterChange(val: string | number | null) {
+  store.setRoleFilter(String(val ?? 'all'))
+}
+
+// ── Show Entries Filter ───────────────────────────────
+const perPageOptions: SelectOption[] = [
+  { label: '5', value: 5 },
+  { label: '10', value: 10 },
+  { label: '25', value: 25 },
+  { label: '50', value: 50 },
+]
+
+function onPerPageChange(val: number) {
+  store.setRowsPerPage(val)
+}
 </script>
 
 <style scoped lang="scss">
-.employee-toolbar {
+@use '@/assets/styles/abstracts/variables' as *;
+
+.filter-group {
   display: flex;
   align-items: center;
-  gap: $space-3;
-  flex-wrap: wrap;
+  gap: $space-2;
+  margin-left: $space-3;
 
-  &__left {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    flex: 1;
-    min-width: 0;
-
-    .base-input-wrapper {
-      max-width: 280px;
-    }
-
-    .app-select {
-      max-width: 200px;
-    }
+  .filter-label {
+    font-size: $text-sm;
+    color: $color-text-secondary;
+    font-weight: 500;
+    white-space: nowrap;
   }
-}
 
-@include tablet {
-  .employee-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-
-    &__left {
-      flex-direction: column;
-
-      .base-input-wrapper,
-      .app-select {
-        max-width: none;
-      }
-    }
+  /* Fixed width to ensure dropdowns don't grow unpredictably */
+  :deep(.app-select) {
+    min-width: 120px;
   }
 }
 </style>
