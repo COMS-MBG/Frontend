@@ -18,7 +18,7 @@
           <span class="material-symbols-outlined icon">calendar_month</span>
           
           <div class="date-display">
-            <span v-if="!modelValue" class="placeholder">Filter Tanggal</span>
+            <span v-if="!modelValue" class="placeholder">{{ placeholder }}</span>
             <span v-else class="value">{{ formattedDate }}</span>
           </div>
           
@@ -34,9 +34,12 @@ import { computed } from 'vue'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: string
-}>()
+  placeholder?: string
+}>(), {
+  placeholder: 'Filter Tanggal'
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void

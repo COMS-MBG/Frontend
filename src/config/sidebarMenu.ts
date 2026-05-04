@@ -61,7 +61,20 @@ export const sidebarMenu: MenuItem[] = [
     id: 'laporan',
     title: 'Laporan',
     icon: 'bar_chart',
-    routeName: 'laporan',
+    children: [
+      {
+        id: 'laporan-operasional',
+        title: 'Operasional',
+        icon: 'analytics',
+        routeName: 'laporan',
+      },
+      {
+        id: 'laporan-keuangan',
+        title: 'Keuangan',
+        icon: 'account_balance_wallet',
+        routeName: 'laporan-keuangan',
+      },
+    ],
   },
   {
     id: 'hr',
