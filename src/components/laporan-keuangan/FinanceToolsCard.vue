@@ -84,12 +84,12 @@ const emit = defineEmits<{
   border-radius: $radius-md;
   background-color: $color-bg-subtle;
   border: 1px solid transparent;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $transition-smooth;
 
   &:hover {
     background-color: $color-bg-surface;
     border-color: $color-border-light;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: $shadow-sm;
     transform: translateY(-2px);
 
     .tool-icon {

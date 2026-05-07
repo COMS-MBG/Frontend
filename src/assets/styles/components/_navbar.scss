@@ -84,7 +84,7 @@
   align-items: center;
   gap: $space-2;
   padding: $space-1 $space-2 $space-1 $space-1;
-  border-radius: 10px;
+  border-radius: $radius-lg;
   cursor: pointer;
   transition: background-color $transition-fast;
   user-select: none;
@@ -145,7 +145,7 @@
   min-width: 200px;
   background: $color-bg-surface;
   border: 1px solid $color-border;
-  border-radius: 14px;
+  border-radius: $radius-xl;
   box-shadow: $shadow-lg;
   padding: $space-2;
   z-index: $z-dropdown;
@@ -155,7 +155,7 @@
 
 .dropdown-email {
   font-family: $font-body;
-  font-size: 0.6875rem;
+  font-size: $text-xs;
   color: $color-text-faint;
   word-break: break-all;
 }

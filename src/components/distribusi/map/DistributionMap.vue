@@ -174,7 +174,7 @@ function renderMapFeatures() {
       .pulse-dot {
         width: 6px;
         height: 6px;
-        background-color: white;
+  background-color: $color-bg-surface;
         border-radius: 50%;
         animation: blink 1.5s infinite;
       }

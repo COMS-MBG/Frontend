@@ -42,7 +42,7 @@ defineProps<{
   &__kurir {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: $space-3;
 
     .avatar {
       width: 32px;

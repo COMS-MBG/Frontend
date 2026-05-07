@@ -94,7 +94,7 @@ const handleDelete = async () => {
     box-shadow: $shadow-sm;
 
     span {
-      font-size: 36px;
+      font-size: $text-hero;
     }
   }
 

@@ -14,22 +14,22 @@
   table-layout: fixed;
 
   th, td {
-    padding: 16px 20px;
+    padding: $space-4 $space-5;
     text-align: left;
     border-bottom: 1px solid $color-border;
-    font-size: 0.875rem;
+    font-size: $text-base;
   }
 
   th {
     background: $color-bg-subtle;
-    font-size: 0.75rem;
+    font-size: $text-sm;
     font-weight: 600;
     color: $color-text-muted;
     letter-spacing: 0.5px;
   }
 
   tbody tr {
-    transition: background-color 0.2s ease;
+    transition: background-color $transition-fast;
     
     &:hover {
       background: $color-bg-subtle;

@@ -68,17 +68,17 @@ const toggleSearch = () => {
 
 .spatial-toolbar {
   position: absolute;
-  top: 20px;
+  top: $space-5;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.95);
+  gap: $space-2;
+  background: $color-bg-overlay;
   backdrop-filter: blur(8px);
-  padding: 8px 16px;
-  border-radius: 999px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  padding: $space-2 $space-4;
+  border-radius: $radius-pill;
+  box-shadow: $shadow-md;
   z-index: 1000;
   width: max-content;
 }
@@ -94,13 +94,13 @@ const toggleSearch = () => {
   display: flex;
   align-items: center;
   background: transparent;
-  border-radius: 999px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: $radius-pill;
+  transition: all $transition-smooth;
   overflow: hidden;
 
   &.expanded {
     background: $color-bg-subtle;
-    padding-right: 12px;
+    padding-right: $space-3;
   }
 
   input {
@@ -108,16 +108,16 @@ const toggleSearch = () => {
     border: none;
     background: transparent;
     outline: none;
-    font-size: 0.875rem;
+    font-size: $text-base;
     font-family: inherit;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width $transition-smooth;
     padding: 0;
     opacity: 0;
   }
 
   &.expanded input {
     width: 180px;
-    padding-left: 8px;
+    padding-left: $space-2;
     opacity: 1;
   }
 }
@@ -133,7 +133,7 @@ const toggleSearch = () => {
   justify-content: center;
   cursor: pointer;
   color: $color-text-secondary;
-  transition: all 0.2s;
+  transition: all $transition-fast;
   flex-shrink: 0;
 
   &:hover {
@@ -150,7 +150,7 @@ const toggleSearch = () => {
 .toggle-switch {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: $space-3;
   cursor: pointer;
   padding-right: 4px;
 
@@ -160,7 +160,7 @@ const toggleSearch = () => {
   }
 
   .label {
-    font-size: 0.875rem;
+    font-size: $text-base;
     font-weight: 600;
     color: $color-text-secondary;
   }
@@ -177,7 +177,7 @@ const toggleSearch = () => {
     display: inline-block;
     width: 44px;
     height: 24px;
-    background-color: #cbd5e1;
+    background-color: $color-border;
     border-radius: 24px;
     transition: .4s;
 
@@ -188,7 +188,7 @@ const toggleSearch = () => {
       width: 18px;
       left: 3px;
       bottom: 3px;
-      background-color: white;
+      background-color: $color-bg-surface;
       border-radius: 50%;
       transition: .4s;
     }

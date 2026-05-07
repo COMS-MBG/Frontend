@@ -87,13 +87,13 @@ const skeletonColumns: SkeletonColumn[] = [
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: $space-4;
+  padding: $space-4;
   border-top: 1px solid $color-border-light;
-  background-color: white;
+  background-color: $color-bg-surface;
 
   .page-info {
-    font-size: 0.875rem;
+    font-size: $text-base;
     font-weight: 500;
     color: $color-text-secondary;
   }

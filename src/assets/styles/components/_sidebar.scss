@@ -36,7 +36,7 @@
   height: 24px;
   background-color: $color-bg-surface;
   border: 1px solid $color-border-light;
-  border-radius: 6px;
+  border-radius: $radius-sm;
   box-shadow: $shadow-sm;
   align-items: center;
   justify-content: center;
@@ -150,7 +150,7 @@
   justify-content: center;
   flex-shrink: 0;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all $transition-smooth;
 
   .brand-img {
     width: 100%;
@@ -318,7 +318,7 @@
 // ── Slide Transition untuk Submenu ──
 .slide-enter-active,
 .slide-leave-active {
-  transition: height 0.3s ease, opacity 0.3s ease;
+  transition: height $transition-smooth, opacity $transition-smooth;
   overflow: hidden;
 }
 

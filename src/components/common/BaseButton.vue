@@ -33,7 +33,7 @@ defineProps<{
   font-size: $text-sm;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all $transition-fast;
   border: 1px solid transparent;
 
   &.is-fullwidth {
@@ -42,7 +42,7 @@ defineProps<{
 
   &.btn-sm {
     padding: $space-2 $space-3;
-    font-size: 0.75rem;
+    font-size: $text-sm;
     border-radius: $radius-sm;
 
     .btn-icon {

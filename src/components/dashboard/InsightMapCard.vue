@@ -45,25 +45,39 @@ defineEmits<{ (e: 'detail'): void }>()
 </script>
 
 <style scoped lang="scss">
+// ── Dark-card scoped design tokens ──
+// These isolate the dark-themed card's white-overlay values
+// into reusable local custom properties.
+$_text-high:    rgba(255, 255, 255, 0.9);
+$_text-mid:     rgba(255, 255, 255, 0.65);
+$_text-low:     rgba(255, 255, 255, 0.45);
+$_text-cat:     rgba(255, 255, 255, 0.7);
+$_surface:      rgba(255, 255, 255, 0.05);
+$_border:       rgba(255, 255, 255, 0.09);
+$_border-btn:   rgba(255, 255, 255, 0.4);
+$_hover-bg:     rgba(255, 255, 255, 0.08);
+$_hover-border: rgba(255, 255, 255, 0.6);
+$_grid-line:    rgba(0, 210, 185, 0.04);
+
 // ── Wrapper ──
 .insight-card {
   position: relative;
   border-radius: $radius-xl;
   overflow: hidden;
-  min-height: 300px;
+  min-height: 260px;
   background:
-    radial-gradient(ellipse at 65% 35%, rgba(0, 200, 170, 0.18) 0%, transparent 55%),
-    radial-gradient(ellipse at 25% 75%, rgba(0, 100, 220, 0.22) 0%, transparent 50%),
-    linear-gradient(135deg, #0d1f3c 0%, #0a2a4a 40%, #0d3d63 70%, #0f2744 100%);
+    radial-gradient(ellipse at 65% 35%, rgba(0, 160, 140, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 25% 75%, rgba(0, 80, 180, 0.14) 0%, transparent 50%),
+    linear-gradient(145deg, #0e1f38 0%, #0d2847 45%, #0e3556 80%, #0c2240 100%);
   font-family: $font-body;
 
-  // Grid texture overlay
+  // Grid texture overlay — subtle depth layer
   &__overlay {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(0, 230, 200, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 230, 200, 0.06) 1px, transparent 1px);
+      linear-gradient($_grid-line 1px, transparent 1px),
+      linear-gradient(90deg, $_grid-line 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
   }
@@ -72,11 +86,11 @@ defineEmits<{ (e: 'detail'): void }>()
   &__content {
     position: relative;
     z-index: 1;
-    padding: 1.75rem 2rem;
+    padding: $space-8;
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
-    min-height: 300px;
+    gap: $space-4;
+    min-height: 260px;
   }
 
   // ── Tags ──
@@ -88,19 +102,20 @@ defineEmits<{ (e: 'detail'): void }>()
 
   // ── Text ──
   &__title {
-    font-size: $text-2xl;
+    font-size: $text-xl;
     font-weight: 700;
     color: $color-text-inverse;
     margin: 0;
-    line-height: 1.3;
+    line-height: 1.35;
+    max-width: 520px;
   }
 
   &__desc {
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.72);
+    font-size: $text-base;
+    color: $_text-mid;
     margin: 0;
-    line-height: 1.6;
-    max-width: 540px;
+    line-height: 1.65;
+    max-width: 500px;
   }
 
   // ── Footer ──
@@ -109,20 +124,20 @@ defineEmits<{ (e: 'detail'): void }>()
     align-items: center;
     gap: $space-4;
     margin-top: auto;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
-    padding: 0.875rem $space-4;
+    background: $_surface;
+    border: 1px solid $_border;
+    border-radius: $radius-lg;
+    padding: $space-4 $space-5;
   }
 }
 
 // ── Tags ──
 .tag {
-  font-size: 0.65rem;
+  font-size: $text-xs;
   font-weight: 800;
   letter-spacing: 0.08em;
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
   text-transform: uppercase;
 
   &--severity {
@@ -131,9 +146,9 @@ defineEmits<{ (e: 'detail'): void }>()
   }
 
   &--category {
-    color: rgba(255, 255, 255, 0.7);
+    color: $_text-cat;
     font-weight: 600;
-    font-size: 0.72rem;
+    font-size: $text-sm;
     padding: 0;
     background: transparent;
     letter-spacing: 0.06em;
@@ -145,12 +160,12 @@ defineEmits<{ (e: 'detail'): void }>()
   flex: 1;
 
   &__label {
-    font-size: 0.62rem;
+    font-size: $text-xs;
     font-weight: 700;
     letter-spacing: 0.1em;
-    color: rgba(255, 255, 255, 0.5);
+    color: $_text-low;
     text-transform: uppercase;
-    margin: 0 0 0.2rem 0;
+    margin: 0 0 $space-1 0;
   }
 
   &__text {
@@ -166,20 +181,21 @@ defineEmits<{ (e: 'detail'): void }>()
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.6rem 1.1rem;
+  padding: $space-2 $space-5;
   border-radius: $radius-md;
-  font-size: $text-base;
+  font-size: $text-sm;
   font-weight: 600;
   font-family: $font-body;
   cursor: pointer;
   background: transparent;
-  color: $color-text-inverse;
-  border: 2px solid rgba(255, 255, 255, 0.65);
+  color: $_text-high;
+  border: 1.5px solid $_border-btn;
   white-space: nowrap;
-  transition: background $transition-fast, transform 0.1s;
+  transition: background $transition-fast, border-color $transition-fast, transform $transition-fast;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: $_hover-bg;
+    border-color: $_hover-border;
     transform: translateY(-1px);
   }
   &:active { transform: translateY(0); }
@@ -190,10 +206,10 @@ defineEmits<{ (e: 'detail'): void }>()
   .insight-card {
     &__content {
       padding: $space-5;
-      min-height: 260px;
+      min-height: 220px;
     }
 
-    &__title { font-size: $text-xl; }
+    &__title { font-size: $text-lg; }
 
     &__footer {
       flex-direction: column;

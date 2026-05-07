@@ -89,7 +89,7 @@ defineEmits<{
 
     th {
       padding: $space-3 $space-5;
-      font-size: 0.7rem;
+      font-size: $text-xs;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;

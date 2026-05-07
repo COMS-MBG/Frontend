@@ -17,9 +17,9 @@ const props = withDefaults(defineProps<{
 .base-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.7rem;
+  padding: $space-1 $space-2;
+  border-radius: $radius-sm;
+  font-size: $text-xs;
   font-weight: 700;
   font-family: $font-body;
   letter-spacing: 0.02em;

@@ -83,7 +83,7 @@ withDefaults(defineProps<{
 
     th {
       padding: $space-3 $space-5;
-      font-size: 0.7rem;
+      font-size: $text-xs;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -121,7 +121,7 @@ withDefaults(defineProps<{
 
   &--name { width: 100%; max-width: 140px; height: 14px; }
   &--sub { width: 60%; max-width: 80px; height: 10px; margin-top: 4px; }
-  &--badge { width: 48px; height: 22px; border-radius: 6px; }
+  &--badge { width: 48px; height: 22px; border-radius: $radius-sm; }
 }
 
 .skeleton-circle {

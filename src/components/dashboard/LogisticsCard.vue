@@ -48,11 +48,23 @@ defineEmits<{ (e: 'action'): void }>()
 </script>
 
 <style scoped lang="scss">
+// ── Dark-card scoped design tokens ──
+$_text-high:    rgba(255, 255, 255, 0.8);
+$_text-mid:     rgba(255, 255, 255, 0.5);
+$_text-low:     rgba(255, 255, 255, 0.45);
+$_icon-faint:   rgba(255, 255, 255, 0.3);
+$_surface:      rgba(255, 255, 255, 0.04);
+$_border:       rgba(255, 255, 255, 0.07);
+$_btn-border:   rgba(255, 255, 255, 0.25);
+$_hover-bg:     rgba(255, 255, 255, 0.07);
+$_hover-border: rgba(255, 255, 255, 0.45);
+
 .logistics-card {
-  background: $color-primary;
+  background-color: $color-text-secondary;
+  background: linear-gradient(155deg, #1a2a4a 0%, #1e3460 50%, #16284a 100%);
   border-radius: $radius-xl;
-  border: 1px solid $color-primary;
-  box-shadow: $shadow-primary;
+  border: 1px solid $_border;
+  box-shadow: $shadow-md;
   padding: $space-6;
   display: flex;
   flex-direction: column;
@@ -69,20 +81,20 @@ defineEmits<{ (e: 'action'): void }>()
   }
 
   &__label {
-    @include label-uppercase(0.7rem, rgba(255, 255, 255, 0.65));
-    margin: 0 0 0.25rem 0;
+    @include label-uppercase($text-xs, $_text-low);
+    margin: 0 0 $space-1 0;
   }
 
   &__title {
-    font-size: $text-xl;
+    font-size: $text-lg;
     font-weight: 700;
     color: $color-text-inverse;
     margin: 0;
   }
 
   &__icon {
-    font-size: 1.75rem;
-    color: rgba(255, 255, 255, 0.55);
+    font-size: $text-3xl;
+    color: $_icon-faint;
   }
 
   // ── Stats row ──
@@ -92,6 +104,10 @@ defineEmits<{ (e: 'action'): void }>()
     gap: $space-2;
     flex: 1;
     align-items: center;
+    background: $_surface;
+    border-radius: $radius-lg;
+    border: 1px solid $_border;
+    padding: $space-4 $space-3;
   }
 }
 
@@ -102,14 +118,14 @@ defineEmits<{ (e: 'action'): void }>()
   gap: $space-1;
 
   &__value {
-    font-size: $text-hero;
+    font-size: $text-3xl;
     font-weight: 800;
     color: $color-text-inverse;
     line-height: 1;
   }
 
   &__label {
-    @include label-uppercase(0.65rem, rgba(255, 255, 255, 0.6));
+    @include label-uppercase($text-xs, $_text-mid);
   }
 }
 
@@ -119,19 +135,20 @@ defineEmits<{ (e: 'action'): void }>()
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 0.65rem $space-5;
+  padding: $space-3 $space-5;
   border-radius: $radius-md;
-  font-size: $text-base;
+  font-size: $text-sm;
   font-weight: 600;
   font-family: $font-body;
   cursor: pointer;
   background: transparent;
-  color: $color-text-inverse;
-  border: 2px solid rgba(255, 255, 255, 0.55);
-  transition: background $transition-fast, transform 0.1s;
+  color: $_text-high;
+  border: 1.5px solid $_btn-border;
+  transition: background $transition-fast, border-color $transition-fast, transform $transition-fast;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: $_hover-bg;
+    border-color: $_hover-border;
     transform: translateY(-1px);
   }
   &:active { transform: translateY(0); }
