@@ -12,6 +12,7 @@ const store = useLaporanStore()
       icon="local_shipping"
       :value="store.stats.totalDistribusi"
       subtitle="Pengiriman"
+      variant="horizontal"
       iconVariant="blue"
     />
     <StatCard
@@ -19,6 +20,7 @@ const store = useLaporanStore()
       icon="school"
       :value="store.stats.totalSekolah"
       subtitle="Institusi"
+      variant="horizontal"
       iconVariant="green"
     />
     <StatCard
@@ -26,6 +28,7 @@ const store = useLaporanStore()
       icon="warning"
       :value="store.stats.keterlambatan"
       subtitle="Pengiriman terlambat"
+      variant="horizontal"
       iconVariant="orange"
     />
     <StatCard
@@ -33,6 +36,7 @@ const store = useLaporanStore()
       icon="speed"
       :value="store.stats.efisiensi + '%'"
       subtitle="Sangat Baik"
+      variant="horizontal"
       iconVariant="purple"
     />
   </div>

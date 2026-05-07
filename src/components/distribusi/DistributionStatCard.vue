@@ -12,6 +12,7 @@ const { totalToday, inProgressCount, onTimeRate } = useDistributionSummary()
       icon="local_shipping"
       :value="totalToday"
       subtitle="Sekolah"
+      variant="horizontal"
       iconVariant="blue"
     />
     <StatCard
@@ -19,6 +20,7 @@ const { totalToday, inProgressCount, onTimeRate } = useDistributionSummary()
       icon="route"
       :value="inProgressCount"
       subtitle="Unit"
+      variant="horizontal"
       iconVariant="orange"
     />
     <StatCard
@@ -26,6 +28,7 @@ const { totalToday, inProgressCount, onTimeRate } = useDistributionSummary()
       icon="timer"
       :value="onTimeRate + '%'"
       subtitle="Sangat Baik"
+      variant="horizontal"
       iconVariant="green"
     />
   </div>
