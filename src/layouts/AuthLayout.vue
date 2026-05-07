@@ -38,9 +38,9 @@
   max-width: 900px;
   min-height: 580px;
   background-color: $color-bg-surface;
-  border-radius: 20px;
+  border-radius: $radius-2xl;
   overflow: hidden;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: $shadow-lg;
 }
 
 // ── Kolom Kiri (55%) — diisi slot dari view ──
@@ -55,7 +55,7 @@
 .auth-image-col {
   width: 45%;
   background-color: #1f1f86;
-  border-radius: 0 16px 16px 0;
+  border-radius: 0 $radius-2xl $radius-2xl 0;
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
@@ -65,7 +65,7 @@
 @include auth-mobile {
   .auth-card {
     flex-direction: column;
-    border-radius: 16px;
+    border-radius: $radius-2xl;
     min-height: auto;
   }
 

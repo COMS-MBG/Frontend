@@ -57,7 +57,7 @@
 }
 
 .btn-download {
-  background-color: white;
+  background-color: $color-bg-surface;
   color: #064e3b;
   border: none;
   border-radius: $radius-md;

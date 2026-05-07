@@ -9,22 +9,51 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: $space-6;
+  gap: $space-8;
   font-family: $font-body;
   color: $color-text-primary;
 }
 
-// ── Row 1: Stats ──
+// ── Section Structure ──
+.dashboard__section {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.dashboard__section-header {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $color-border-light;
+  }
+}
+
+.dashboard__section-label {
+  font-size: $text-xs;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: $color-text-faint;
+  white-space: nowrap;
+}
+
+// ── Row 1: KPI Stats (4-column) ──
 .stats-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
   gap: $space-4;
 }
 
 // ── Row 2: Main Grid ──
 .main-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 300px;
   gap: $space-4;
   align-items: stretch;
 }
@@ -32,7 +61,7 @@
 // ── Row 3: Bottom Grid ──
 .bottom-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 280px;
   gap: $space-4;
   align-items: start;
 }
@@ -44,7 +73,12 @@
   gap: $space-4;
 }
 
+// ── Responsive — Tablet ──
 @include tablet {
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .main-grid,
   .bottom-grid {
     grid-template-columns: 1fr;
@@ -56,8 +90,9 @@
   }
 }
 
+// ── Responsive — Mobile ──
 @include mobile {
-  .dashboard   { gap: $space-4; }
+  .dashboard   { gap: $space-6; }
   .stats-row   { grid-template-columns: 1fr; }
   .info-stack  { grid-template-columns: 1fr; }
 }

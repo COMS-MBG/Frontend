@@ -139,10 +139,10 @@ function formatInternalDate(date: Date | Date[] | string | null): string {
   }
 
   :deep(.custom-menu) {
-    border-radius: 12px !important;
-    padding: 8px;
+    border-radius: $radius-lg !important;
+    padding: $space-2;
     border: none !important;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    box-shadow: $shadow-lg !important;
     font-family: #{$font-body};
   }
 
@@ -152,7 +152,7 @@ function formatInternalDate(date: Date | Date[] | string | null): string {
     border-radius: 50% !important; /* Circle hover effect */
     margin: 2px auto;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all $transition-fast;
   }
 
   :deep(.dp__active_date) {
@@ -165,7 +165,7 @@ function formatInternalDate(date: Date | Date[] | string | null): string {
   :deep(.dp__calendar_header_item) {
     font-weight: 600;
     color: $color-text-muted;
-    font-size: 0.75rem;
+    font-size: $text-sm;
   }
 
   :deep(.dp__today) {
@@ -173,18 +173,18 @@ function formatInternalDate(date: Date | Date[] | string | null): string {
   }
 
   :deep(.dp__month_year_row) {
-    margin-bottom: 12px;
+    margin-bottom: $space-3;
   }
 
   :deep(.dp__inner_nav) {
     border: 1px solid $color-border;
-    border-radius: 8px;
+    border-radius: $radius-md;
     width: 32px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all $transition-fast;
 
     &:hover {
       background: $color-bg-subtle;
@@ -199,7 +199,7 @@ function formatInternalDate(date: Date | Date[] | string | null): string {
   border: 1px solid $color-border;
   border-radius: $radius-md;
   padding: $space-2 $space-3;
-  transition: all 0.2s ease;
+  transition: all $transition-fast;
   cursor: pointer;
   position: relative;
   height: 40px;

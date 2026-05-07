@@ -92,7 +92,7 @@ defineEmits<{ (e: 'update-stok'): void }>()
 
   &__label {
     @include label-uppercase;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 $space-1 0;
   }
 
   &__title {
@@ -105,8 +105,8 @@ defineEmits<{ (e: 'update-stok'): void }>()
   &__badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.35rem 0.75rem;
+    gap: $space-1;
+    padding: $space-1 $space-2;
     border-radius: $radius-pill;
     font-size: $text-sm;
     font-weight: 600;
@@ -124,19 +124,19 @@ defineEmits<{ (e: 'update-stok'): void }>()
   }
 }
 
-.badge__icon { font-size: 0.85rem; }
+.badge__icon { font-size: $text-base; }
 
 // ── Menu Box ──
 .menu-box {
   background: $color-bg-muted;
-  border-radius: 10px;
+  border-radius: $radius-lg;
   padding: $space-4 $space-5;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: $space-1;
 
   &__label {
-    @include label-uppercase(0.65rem);
+    @include label-uppercase($text-xs);
     margin: 0;
   }
 
@@ -148,7 +148,7 @@ defineEmits<{ (e: 'update-stok'): void }>()
   }
 
   &__calorie {
-    font-size: 0.78rem;
+    font-size: $text-sm;
     color: $color-text-muted;
     margin: 0;
   }
@@ -161,7 +161,7 @@ defineEmits<{ (e: 'update-stok'): void }>()
   gap: $space-3;
 
   &__label {
-    @include label-uppercase(0.65rem);
+    @include label-uppercase($text-xs);
     margin: 0;
   }
 }
@@ -170,16 +170,16 @@ defineEmits<{ (e: 'update-stok'): void }>()
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto 6px;
-  gap: 0.2rem 0.5rem;
+  gap: $space-1 $space-2;
   align-items: center;
 
   &__name {
-    font-size: 0.82rem;
+    font-size: $text-base;
     color: $color-text-secondary;
   }
 
   &__qty {
-    font-size: 0.82rem;
+    font-size: $text-base;
     font-weight: 700;
     color: $color-primary;
   }
@@ -202,9 +202,25 @@ defineEmits<{ (e: 'update-stok'): void }>()
 
 // ── Button ──
 .btn-primary {
-  @include btn-base($color-primary, $color-text-inverse);
-  padding: 0.65rem $space-5;
+  display: inline-flex;
+  align-items: center;
+  padding: $space-2 $space-5;
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  font-weight: 600;
+  font-family: $font-body;
+  cursor: pointer;
+  background: $color-primary;
+  color: $color-text-inverse;
+  border: 1.5px solid transparent;
+  transition: background $transition-fast, border-color $transition-fast, transform $transition-fast;
   align-self: flex-start;
+
+  &:hover {
+    background: $color-primary-dark;
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
 }
 
 // ── Responsive ──

@@ -54,7 +54,7 @@
 
     th {
       padding: $space-4 $space-5; // Increased vertical padding
-      font-size: 0.7rem;
+      font-size: $text-xs;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;

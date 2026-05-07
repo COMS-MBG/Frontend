@@ -45,17 +45,17 @@ const store = useSpatialStore()
 
 .simulation-panel {
   position: absolute;
-  bottom: 20px;
+  bottom: $space-5;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   max-width: 700px;
-  background: rgba(255, 255, 255, 0.98);
+  background: $color-bg-overlay;
   backdrop-filter: blur(8px);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  border-radius: $radius-2xl;
+  box-shadow: $shadow-lg;
   z-index: 1000;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid $color-border-light;
   overflow: hidden;
 }
 
@@ -63,14 +63,14 @@ const store = useSpatialStore()
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: $space-4 $space-6;
   background: $color-bg-subtle;
   border-bottom: 1px solid $color-border-light;
 
   .title-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: $space-3;
 
     .icon-sim {
       color: $color-primary;
@@ -78,7 +78,7 @@ const store = useSpatialStore()
 
     h2 {
       margin: 0;
-      font-size: 1.125rem;
+      font-size: $text-lg;
       color: $color-text-primary;
     }
   }
@@ -97,28 +97,28 @@ const store = useSpatialStore()
 }
 
 .panel-content {
-  padding: 24px;
+  padding: $space-6;
 }
 
 .metrics-row {
   display: flex;
-  gap: 20px;
-  margin-bottom: 24px;
+  gap: $space-5;
+  margin-bottom: $space-6;
 
   .sim-metric {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 16px;
+    padding: $space-4;
     background: $color-bg-subtle;
-    border-radius: 12px;
+    border-radius: $radius-lg;
     text-align: center;
 
     small {
       color: $color-text-muted;
-      font-size: 0.875rem;
-      margin-bottom: 8px;
+      font-size: $text-base;
+      margin-bottom: $space-2;
     }
 
     strong {
@@ -134,6 +134,6 @@ const store = useSpatialStore()
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
+  gap: $space-4;
 }
 </style>

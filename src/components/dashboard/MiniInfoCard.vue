@@ -52,7 +52,7 @@ defineProps<{
   padding: $space-5 $space-6;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: $space-1;
   font-family: $font-body;
   transition: box-shadow $transition-base, transform $transition-base;
 
@@ -63,23 +63,23 @@ defineProps<{
 
   // Modifier: warning variant
   &--warning {
-    border-top: 3px solid $color-danger;
+    border-top: 2px solid $color-warning;
   }
 
   // ── Icon ──
   &__icon-wrap { margin-bottom: $space-1; }
 
   &__icon {
-    font-size: 1.4rem;
-    color: $color-text-muted;
+    font-size: $text-2xl;
+    color: $color-text-faint;
 
-    &--red { color: $color-danger; }
+    &--red { color: $color-warning; }
   }
 
   // ── Label ──
   &__label {
-    font-size: 0.8rem;
-    color: $color-text-secondary;
+    font-size: $text-sm;
+    color: $color-text-muted;
     margin: 0;
   }
 
@@ -91,16 +91,16 @@ defineProps<{
   }
 
   &__value {
-    font-size: $text-hero;
+    font-size: $text-2xl;
     font-weight: 800;
     color: $color-text-primary;
     line-height: 1;
 
-    &--red { color: $color-danger; }
+    &--red { color: $color-warning; }
   }
 
   &__unit {
-    font-size: 0.8rem;
+    font-size: $text-sm;
     color: $color-text-muted;
   }
 
@@ -108,14 +108,14 @@ defineProps<{
   &__badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: $space-1;
     font-size: $text-sm;
     font-weight: 600;
     color: $color-success;
     margin-top: $space-1;
   }
 
-  &__badge-icon { font-size: 0.85rem; }
+  &__badge-icon { font-size: $text-base; }
 
   // ── Deadline (warning) ──
   &__deadline {

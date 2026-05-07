@@ -83,15 +83,18 @@ const emit = defineEmits<{
   padding: $space-4;
   border-radius: $radius-md;
   background-color: $color-bg-subtle;
-  transition: background-color $transition-base, box-shadow $transition-base;
+  border: 1px solid transparent;
+  transition: all $transition-smooth;
 
   &:hover {
-    background-color: $color-bg-muted;
-    box-shadow: $shadow-xs;
+    background-color: $color-bg-surface;
+    border-color: $color-border-light;
+    box-shadow: $shadow-sm;
+    transform: translateY(-2px);
 
     .tool-icon {
       color: $color-primary;
-      transform: scale(1.15);
+      transform: scale(1.15) rotate(-5deg);
     }
   }
 }
