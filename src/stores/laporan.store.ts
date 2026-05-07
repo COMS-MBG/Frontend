@@ -57,6 +57,11 @@ export const useLaporanStore = defineStore('laporan', {
       this.page = page
     },
 
+    setLimit(limit: number) {
+      this.limit = limit
+      this.page = 1
+    },
+
     async fetchReports() {
       this.loading = true
       // Mock API delay

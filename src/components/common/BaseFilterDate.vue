@@ -12,13 +12,14 @@
       calendar-cell-class-name="custom-cell"
       menu-class-name="custom-menu"
       :auto-apply="true"
+      :range="range"
     >
       <template #trigger>
-        <div class="base-filter-date__inner" :class="{ 'is-active': modelValue }">
+        <div class="base-filter-date__inner" :class="{ 'is-active': modelValue && (!Array.isArray(modelValue) || modelValue.length > 0) }">
           <span class="material-symbols-outlined icon">calendar_month</span>
           
           <div class="date-display">
-            <span v-if="!modelValue" class="placeholder">{{ placeholder }}</span>
+            <span v-if="!formattedDate" class="placeholder">{{ placeholder }}</span>
             <span v-else class="value">{{ formattedDate }}</span>
           </div>
           
@@ -35,31 +36,54 @@ import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 
 const props = withDefaults(defineProps<{
-  modelValue: string
+  modelValue: string | string[]
   placeholder?: string
+  range?: boolean
 }>(), {
-  placeholder: 'Filter Tanggal'
+  placeholder: 'Filter Tanggal',
+  range: false
 })
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
+  (e: 'update:modelValue', value: any): void
 }>()
 
-const onUpdate = (date: Date | null) => {
+const onUpdate = (date: Date | Date[] | null) => {
   if (!date) {
-    emit('update:modelValue', '')
+    emit('update:modelValue', props.range ? [] : '')
     return
   }
-  const yyyy = date.getFullYear()
-  const mm = String(date.getMonth() + 1).padStart(2, '0')
-  const dd = String(date.getDate()).padStart(2, '0')
-  emit('update:modelValue', `${yyyy}-${mm}-${dd}`)
+  
+  if (Array.isArray(date)) {
+    const dates = date.map(d => {
+      if (!d) return ''
+      const yyyy = d.getFullYear()
+      const mm = String(d.getMonth() + 1).padStart(2, '0')
+      const dd = String(d.getDate()).padStart(2, '0')
+      return `${yyyy}-${mm}-${dd}`
+    })
+    emit('update:modelValue', dates)
+  } else {
+    const yyyy = date.getFullYear()
+    const mm = String(date.getMonth() + 1).padStart(2, '0')
+    const dd = String(date.getDate()).padStart(2, '0')
+    emit('update:modelValue', `${yyyy}-${mm}-${dd}`)
+  }
 }
 
 const formattedDate = computed(() => {
-  if (!props.modelValue) return ''
+  if (!props.modelValue || (Array.isArray(props.modelValue) && props.modelValue.length === 0)) return ''
+  
+  if (Array.isArray(props.modelValue)) {
+    const start = props.modelValue[0] ? new Date(props.modelValue[0]).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+    const end = props.modelValue[1] ? new Date(props.modelValue[1]).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+    if (start && end) return `${start} - ${end}`
+    if (start) return `${start} - ...`
+    return ''
+  }
+  
   const d = new Date(props.modelValue)
-  if (isNaN(d.getTime())) return props.modelValue
+  if (isNaN(d.getTime())) return props.modelValue as string
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
 })
 
@@ -80,6 +104,7 @@ function formatInternalDate(date: Date | Date[] | string | null): string {
 .base-filter-date-wrapper {
   display: inline-block;
   min-width: 180px;
+  width: 100%;
 
   /* Style override for VueDatePicker to match our theme */
   :deep(.dp__theme_light) {
