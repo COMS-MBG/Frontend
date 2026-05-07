@@ -5,11 +5,11 @@
         <tr>
           <th class="th-nama">NAMA BAHAN</th>
           <th class="th-center">SATUAN</th>
-          <th class="th-center">STOK</th>
           <th class="th-num">KALORI/100G</th>
           <th class="th-num">PROTEIN/100G</th>
           <th class="th-num">KARBO/100G</th>
           <th class="th-num">LEMAK/100G</th>
+          <th class="th-center">STATUS</th>
           <th class="th-aksi">AKSI</th>
         </tr>
       </thead>
