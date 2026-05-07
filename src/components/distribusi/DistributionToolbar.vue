@@ -3,7 +3,6 @@ import { ref, watch } from 'vue'
 import { useDistributionStore } from '@/stores/distribution.store'
 import { useDebounce } from '@/composables/useDebounce'
 import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
-import BaseFilterDate from '@/components/common/BaseFilterDate.vue'
 import type { SelectOption } from '@/types/form'
 
 const store = useDistributionStore()
@@ -62,16 +61,6 @@ const onUploadCsv = async () => {
     :show-export="false"
     search-placeholder="Cari sekolah atau kurir..."
   >
-    <!-- Filter Date on the left side, right after the search input -->
-    <template #left-append>
-      <div class="filter-box">
-        <BaseFilterDate 
-          v-model="store.selectedDateFilter" 
-          aria-label="Filter Tanggal"
-        />
-      </div>
-    </template>
-
     <!-- Custom Primary Upload Button -->
     <template #right-append>
       <button 
@@ -87,12 +76,3 @@ const onUploadCsv = async () => {
   </BaseTableToolbar>
 </template>
 
-<style scoped lang="scss">
-@use '@/assets/styles/abstracts/variables' as *;
-
-.filter-box {
-  display: flex;
-  align-items: center;
-  margin-left: $space-3;
-}
-</style>

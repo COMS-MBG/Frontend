@@ -91,6 +91,11 @@ export const useFinanceStore = defineStore('finance', {
       this.page = page
     },
 
+    setLimit(limit: number) {
+      this.limit = limit
+      this.page = 1
+    },
+
     async fetchReports() {
       this.loading = true
       this.error = null

@@ -8,8 +8,7 @@ import type { SelectOption } from '@/types/form'
 const store = useFinanceStore()
 const localQuery = ref(store.filters.search)
 const localKategori = ref(store.filters.kategori)
-const localStartDate = ref(store.filters.dateRange?.[0] ?? '')
-const localEndDate = ref(store.filters.dateRange?.[1] ?? '')
+const localDateRange = ref<string[]>(store.filters.dateRange ? [...store.filters.dateRange] : [])
 let timeoutId: number | null = null
 
 const kategoriOptions: SelectOption[] = [
@@ -30,10 +29,10 @@ watch(localKategori, (val) => {
   store.setFilter({ kategori: val ?? '' })
 })
 
-watch([localStartDate, localEndDate], ([start, end]) => {
-  if (start && end) {
-    store.setFilter({ dateRange: [start, end] })
-  } else if (!start && !end) {
+watch(localDateRange, (val) => {
+  if (val && val.length === 2 && val[0] && val[1]) {
+    store.setFilter({ dateRange: [val[0], val[1]] })
+  } else {
     store.setFilter({ dateRange: null })
   }
 })
@@ -49,6 +48,17 @@ function onSearchInput(val: string) {
 function onFilterChange(val: string | number | null) {
   localKategori.value = String(val ?? '')
 }
+
+const perPageOptions: SelectOption[] = [
+  { label: '5', value: 5 },
+  { label: '10', value: 10 },
+  { label: '25', value: 25 },
+  { label: '50', value: 50 },
+]
+
+function onPerPageChange(val: number) {
+  store.setLimit(val)
+}
 </script>
 
 <template>
@@ -61,21 +71,22 @@ function onFilterChange(val: string | number | null) {
     @update:filter-value="onFilterChange"
     :show-search="true"
     :show-filter="true"
-    :show-per-page="false"
+    :show-per-page="true"
+    :per-page-value="store.limit"
+    :per-page-options="perPageOptions"
+    @update:per-page-value="onPerPageChange"
     :show-add="false"
     :show-import="false"
     :show-export="false"
     search-placeholder="Cari deskripsi atau kategori..."
   >
-    <template #left-append>
-      <div class="finance-filters">
-        <div class="filter-box">
-          <BaseFilterDate v-model="localStartDate" placeholder="Mulai Tanggal" />
-        </div>
-        <div class="filter-box">
-          <BaseFilterDate v-model="localEndDate" placeholder="Sampai Tanggal" />
-        </div>
-      </div>
+    <template #right-prepend>
+      <BaseFilterDate 
+        v-model="localDateRange" 
+        :range="true"
+        placeholder="Rentang Tanggal" 
+        class="finance-date-filter"
+      />
     </template>
   </BaseTableToolbar>
 </template>
@@ -83,15 +94,7 @@ function onFilterChange(val: string | number | null) {
 <style scoped lang="scss">
 @use '@/assets/styles/abstracts/variables' as *;
 
-.finance-filters {
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  margin-left: $space-3;
-  flex-wrap: wrap;
-
-  .filter-box {
-    width: 160px;
-  }
+.finance-date-filter {
+  width: 250px;
 }
 </style>

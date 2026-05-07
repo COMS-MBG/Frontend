@@ -38,9 +38,9 @@ function onGeneratePDF() { /* placeholder for API integration */ }
          ERROR ALERT
     ════════════════════════════════════════ -->
     <BaseAlert
-      v-if="store.error"
-      type="danger"
-      :message="store.error"
+      :show="!!store.error"
+      variant="error"
+      :message="store.error || ''"
     />
 
     <!-- ═══════════════════════════════════════
