@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useFinanceStore } from '@/stores/finance.store'
-import { formatRupiah } from '@/utils/format'
+import { formatCompactCurrency } from '@/utils/format'
 import StatCard from '@/components/common/StatCard.vue'
 
 const store = useFinanceStore()
@@ -10,12 +10,11 @@ const store = useFinanceStore()
   <div class="laporan__stats">
     <template v-if="store.loading">
       <div v-for="i in 4" :key="i" class="skeleton-stat-card">
-        <div class="skeleton-top">
+        <div class="skeleton-icon-circle"></div>
+        <div class="skeleton-info">
           <div class="skeleton-label"></div>
-          <div class="skeleton-icon"></div>
+          <div class="skeleton-value"></div>
         </div>
-        <div class="skeleton-value"></div>
-        <div class="skeleton-sub"></div>
       </div>
     </template>
     
@@ -23,22 +22,25 @@ const store = useFinanceStore()
       <StatCard
         label="TOTAL ANGGARAN"
         icon="account_balance"
-        :value="formatRupiah(store.stats.totalAnggaran)"
+        :value="formatCompactCurrency(store.stats.totalAnggaran)"
         subtitle="Budget bulanan"
+        variant="financial"
         iconVariant="blue"
       />
       <StatCard
         label="TOTAL REALISASI"
         icon="payments"
-        :value="formatRupiah(store.stats.totalRealisasi)"
+        :value="formatCompactCurrency(store.stats.totalRealisasi)"
         subtitle="Pengeluaran aktual"
+        variant="financial"
         iconVariant="green"
       />
       <StatCard
         label="SISA ANGGARAN"
         icon="savings"
-        :value="formatRupiah(store.stats.sisa)"
+        :value="formatCompactCurrency(store.stats.sisa)"
         subtitle="Dana tersedia"
+        variant="financial"
         iconVariant="orange"
       />
       <StatCard
@@ -46,6 +48,7 @@ const store = useFinanceStore()
         icon="speed"
         :value="store.stats.efisiensi + '%'"
         subtitle="Tingkat penyerapan"
+        variant="financial"
         iconVariant="purple"
       />
     </template>
@@ -65,42 +68,41 @@ const store = useFinanceStore()
 }
 
 .skeleton-stat-card {
-  @include card-base($radius-lg, $shadow-xs);
+  background-color: $color-bg-surface;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-xs;
   padding: $space-5 $space-6;
-  border-left: 4px solid $color-border-light;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
 
-  .skeleton-top {
+  .skeleton-icon-circle {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: $radius-lg;
+    flex-shrink: 0;
+    @include shimmer-bg;
+  }
+
+  .skeleton-info {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
-    margin-bottom: $space-3;
+    flex-direction: column;
+    gap: $space-2;
   }
 
   .skeleton-label {
     width: 60%;
-    height: 12px;
-    border-radius: 4px;
-    @include shimmer-bg;
-  }
-
-  .skeleton-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+    height: 10px;
+    border-radius: $radius-sm;
     @include shimmer-bg;
   }
 
   .skeleton-value {
     width: 80%;
-    height: 32px;
-    border-radius: 6px;
-    margin-bottom: $space-2;
-    @include shimmer-bg;
-  }
-
-  .skeleton-sub {
-    width: 40%;
-    height: 10px;
-    border-radius: 4px;
+    height: 24px;
+    border-radius: $radius-sm;
     @include shimmer-bg;
   }
 }

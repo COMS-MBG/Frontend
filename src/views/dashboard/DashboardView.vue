@@ -18,12 +18,16 @@
         icon="restaurant"
         value="45.820"
         subtitle="Porsi siap didistribusikan"
+        variant="horizontal"
+        iconVariant="blue"
       />
       <StatCard
         label="ARMADA AKTIF"
         icon="local_shipping"
         value="86 / 90"
         subtitle="Unit dalam perjalanan"
+        variant="horizontal"
+        iconVariant="green"
       />
     </div>
 

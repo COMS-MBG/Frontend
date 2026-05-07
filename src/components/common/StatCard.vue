@@ -1,48 +1,56 @@
 <template>
-  <div
+  <BaseCard
     class="stat-card"
     :class="[variant ? `stat-card--${variant}` : '']"
+    variant="default"
+    padding="none"
+    hoverable
     role="group"
     :aria-label="label"
   >
-    <!-- ── Horizontal variant (page summary) ── -->
-    <template v-if="variant === 'horizontal'">
-      <div
-        class="stat-card__icon-circle"
-        :class="`stat-card__icon-circle--${iconVariant}`"
-      >
-        <slot name="icon">
-          <span class="material-symbols-outlined">{{ icon }}</span>
-        </slot>
-      </div>
-      <div class="stat-card__info">
-        <span class="stat-card__label">{{ label }}</span>
-        <div class="stat-card__value">{{ formatValue(value) }}</div>
-      </div>
-    </template>
+    <div class="stat-card__inner">
+      <!-- ── Horizontal & Financial variants (page summary) ── -->
+      <template v-if="variant === 'horizontal' || variant === 'financial'">
+        <div
+          class="stat-card__icon-circle"
+          :class="`stat-card__icon-circle--${iconVariant}`"
+        >
+          <slot name="icon">
+            <span class="material-symbols-outlined">{{ icon }}</span>
+          </slot>
+        </div>
+        <div class="stat-card__info">
+          <span class="stat-card__label">{{ label }}</span>
+          <div class="stat-card__value" :title="String(value)">{{ formatValue(value) }}</div>
+          <div v-if="subtitle" class="stat-card__sub">{{ subtitle }}</div>
+        </div>
+      </template>
 
-    <!-- ── Default variant (dashboard) ── -->
-    <template v-else>
-      <div class="stat-card__top">
-        <span class="stat-card__label">{{ label }}</span>
-        <span class="material-symbols-outlined stat-card__icon">{{
-          icon
-        }}</span>
-      </div>
-      <div class="stat-card__value">{{ formatValue(value) }}</div>
-      <div v-if="subtitle" class="stat-card__sub">{{ subtitle }}</div>
-    </template>
-  </div>
+      <!-- ── Default variant (dashboard) ── -->
+      <template v-else>
+        <div class="stat-card__top">
+          <span class="stat-card__label">{{ label }}</span>
+          <span class="material-symbols-outlined stat-card__icon">{{
+            icon
+          }}</span>
+        </div>
+        <div class="stat-card__value">{{ formatValue(value) }}</div>
+        <div v-if="subtitle" class="stat-card__sub">{{ subtitle }}</div>
+      </template>
+    </div>
+  </BaseCard>
 </template>
 
 <script setup lang="ts">
+import BaseCard from "./BaseCard.vue";
+
 const props = withDefaults(
   defineProps<{
     label: string;
     icon: string;
     value: string | number;
     subtitle?: string;
-    variant?: "default" | "horizontal";
+    variant?: "default" | "horizontal" | "financial";
     iconVariant?: "blue" | "green" | "orange" | "purple";
   }>(),
   {
@@ -60,21 +68,19 @@ function formatValue(val: string | number) {
 </script>
 
 <style scoped lang="scss">
-// ── Default variant ──
 .stat-card {
-  @include card-base($radius-lg, $shadow-xs);
-  padding: $space-5 $space-6;
-  border-left: 4px solid $color-primary;
   font-family: $font-body;
-  transition:
-    box-shadow $transition-base,
-    transform $transition-base;
 
-  &:hover {
-    box-shadow: 0 4px 16px $color-primary-muted;
-    transform: translateY(-2px);
+  // Ensure border-left overrides BaseCard's variant-default border
+  &.stat-card--default {
+    border-left: 4px solid $color-primary !important;
   }
 
+  &__inner {
+    padding: $space-5 $space-6;
+  }
+
+  // ── Default variant layout ──
   &__top {
     display: flex;
     justify-content: space-between;
@@ -100,27 +106,39 @@ function formatValue(val: string | number) {
   }
 
   &__sub {
-    font-size: 0.8rem;
+    font-size: $text-xs;
     color: $color-text-muted;
   }
 }
 
-// ── Horizontal variant ──
-.stat-card--horizontal {
-  display: flex;
-  align-items: center;
-  gap: $space-4;
-  border-left: none;
-  padding: $space-5 $space-6;
+// ── Horizontal & Financial variant ──
+.stat-card--horizontal, .stat-card--financial {
+  .stat-card__inner {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+  }
 
   .stat-card__info {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
+    min-width: 0; // Essential for text-overflow to work in flex
   }
 
   .stat-card__value {
     margin-bottom: 0;
+  }
+}
+
+// ── Financial specific overrides ──
+.stat-card--financial {
+  .stat-card__value {
+    font-size: clamp(1.8rem, 2vw, 2.6rem);
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 

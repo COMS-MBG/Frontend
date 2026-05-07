@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<{
   background-color: $color-bg-surface;
   border-radius: $radius-lg;
   overflow: hidden;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: box-shadow $transition-base, transform $transition-base;
 
   /* Variant: default */
   &.variant-default {
