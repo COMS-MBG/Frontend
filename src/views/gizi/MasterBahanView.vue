@@ -91,6 +91,9 @@
       </BahanTable>
     </div>
 
+    <!-- Modals -->
+    <BahanFormModal />
+    <BahanDeleteModal />
   </div>
 </template>
 
@@ -105,6 +108,8 @@ import type { SkeletonColumn, SkeletonHeader } from '@/components/common/BaseTab
 import BahanToolbar from '@/components/gizi/master-bahan/BahanToolbar.vue'
 import BahanTable from '@/components/gizi/master-bahan/BahanTable.vue'
 import BahanRow from '@/components/gizi/master-bahan/BahanRow.vue'
+import BahanFormModal from '@/components/master-bahan/BahanFormModal.vue'
+import BahanDeleteModal from '@/components/master-bahan/BahanDeleteModal.vue'
 import { useBahanStore } from '@/stores/bahan.store'
 import { bahanDummy } from '@/data/bahan.dummy'
 import { usePagination } from '@/composables/usePagination'
@@ -117,22 +122,22 @@ const bahanStore = useBahanStore()
 const skeletonHeaders: SkeletonHeader[] = [
   { label: 'NAMA BAHAN', align: 'left' },
   { label: 'SATUAN', align: 'center' },
-  { label: 'STOK', align: 'center' },
   { label: 'KALORI/100G', align: 'center' },
   { label: 'PROTEIN/100G', align: 'center' },
   { label: 'KARBO/100G', align: 'center' },
   { label: 'LEMAK/100G', align: 'center' },
+  { label: 'STATUS', align: 'center' },
   { label: 'AKSI', align: 'center' },
 ]
 
 const skeletonColumns: SkeletonColumn[] = [
   { type: 'avatar-text' },
   { type: 'badge' },
-  { type: 'text', width: '56px' },
   { type: 'text', width: '64px' },
   { type: 'text', width: '64px' },
   { type: 'text', width: '64px' },
   { type: 'text', width: '64px' },
+  { type: 'badge' },
   { type: 'actions' },
 ]
 
@@ -145,12 +150,20 @@ onMounted(() => {
 })
 
 // ── Summary Stats ───────────────────────────────────────────
-const summaryStats = computed(() => [
-  { label: 'TOTAL BAHAN',       value: bahanStore.items.length.toString(), icon: 'inventory_2',           iconVariant: 'blue' as const },
-  { label: 'KATEGORI AKTIF',    value: '5',                                icon: 'category',              iconVariant: 'purple' as const },
-  { label: 'RATA-RATA KALORI',  value: '120 kcal',                         icon: 'local_fire_department', iconVariant: 'orange' as const },
-  { label: 'STOK TERSEDIA',     value: '95%',                              icon: 'check_circle',          iconVariant: 'green' as const },
-])
+const summaryStats = computed(() => {
+  const items = bahanStore.items
+  const count = items.length || 1
+  const avgKalori = Math.round(items.reduce((s, i) => s + i.kalori, 0) / count)
+  const avgProtein = (items.reduce((s, i) => s + i.protein, 0) / count).toFixed(1)
+  const aktifCount = items.filter(i => i.status === 'aktif').length
+
+  return [
+    { label: 'TOTAL BAHAN',       value: items.length.toString(),             icon: 'inventory_2',           iconVariant: 'blue' as const },
+    { label: 'RATA-RATA KALORI',  value: `${avgKalori} kcal`,                 icon: 'local_fire_department', iconVariant: 'orange' as const },
+    { label: 'RATA-RATA PROTEIN', value: `${avgProtein} g`,                   icon: 'fitness_center',        iconVariant: 'purple' as const },
+    { label: 'BAHAN AKTIF',       value: `${aktifCount} / ${items.length}`,   icon: 'check_circle',          iconVariant: 'green' as const },
+  ]
+})
 
 // ── Pagination (extracted composable) ────────────────────────
 const { page, paginatedItems } = usePagination(
@@ -163,16 +176,15 @@ function onEksporPdf(): void {
 }
 
 function onTambah(): void {
-  // TODO: open add modal (call bahanStore.addItem on submit)
+  bahanStore.openCreateModal()
 }
 
 function onEdit(item: BahanItem): void {
-  // TODO: open edit modal, then bahanStore.updateItem(updated)
-  void item
+  bahanStore.openEditModal(item)
 }
 
 function onDelete(item: BahanItem): void {
-  bahanStore.deleteItem(item.id)
+  bahanStore.openDeleteModal(item)
 }
 </script>
 

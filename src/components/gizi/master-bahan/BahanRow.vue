@@ -1,6 +1,6 @@
 <template>
   <tr class="bahan-row" role="row">
-    <!-- 1) Nama + Thumbnail + Kategori -->
+    <!-- 1) Nama + Thumbnail -->
     <td class="bahan-row__nama">
       <div class="bahan-row__nama-inner">
         <div class="bahan-row__thumb">
@@ -14,34 +14,34 @@
         </div>
         <div class="bahan-row__text">
           <span class="bahan-row__name">{{ item.nama }}</span>
-          <span class="bahan-row__kategori">{{ kategoriLabel }}</span>
         </div>
       </div>
     </td>
 
     <!-- 2) Satuan Badge -->
     <td class="bahan-row__center">
-      <BaseBadge :text="item.satuan.toUpperCase()" variant="default" />
+      <BaseBadge :text="item.satuan.toUpperCase()" :variant="getSatuanVariant(item.satuan)" />
     </td>
 
-    <!-- 3) Stok -->
-    <td class="bahan-row__center">
-      <span class="bahan-row__stok" :class="stokClass">
-        {{ item.stok }} {{ item.satuan }}
-      </span>
-    </td>
-
-    <!-- 4) Kalori -->
+    <!-- 3) Kalori -->
     <td class="bahan-row__num">{{ formatNum(item.kalori) }} kcal</td>
 
-    <!-- 5) Protein -->
+    <!-- 4) Protein -->
     <td class="bahan-row__num">{{ formatDec(item.protein) }} g</td>
 
-    <!-- 6) Karbohidrat -->
+    <!-- 5) Karbohidrat -->
     <td class="bahan-row__num">{{ formatDec(item.karbohidrat) }} g</td>
 
-    <!-- 7) Lemak -->
+    <!-- 6) Lemak -->
     <td class="bahan-row__num">{{ formatDec(item.lemak) }} g</td>
+
+    <!-- 7) Status -->
+    <td class="bahan-row__center">
+      <BaseBadge
+        :text="item.status === 'aktif' ? 'Aktif' : 'Nonaktif'"
+        :variant="item.status === 'aktif' ? 'success' : 'danger'"
+      />
+    </td>
 
     <!-- 8) Aksi -->
     <td class="bahan-row__aksi">
@@ -66,12 +66,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import BaseBadge from '@/components/common/BaseBadge.vue'
-import type { BahanItem, BahanKategori } from '@/types/gizi'
+import type { BahanItem } from '@/types/gizi'
 import { formatNum, formatDec } from '@/utils/format'
 
-const props = defineProps<{
+defineProps<{
   item: BahanItem
 }>()
 
@@ -80,21 +79,14 @@ defineEmits<{
   (e: 'delete', item: BahanItem): void
 }>()
 
-const kategoriMap: Record<BahanKategori, string> = {
-  protein: 'Protein',
-  karbo: 'Karbohidrat',
-  lemak: 'Lemak',
-  serat: 'Serat',
-  lainnya: 'Lainnya',
+const getSatuanVariant = (satuan: string) => {
+  switch (satuan.toLowerCase()) {
+    case 'kg': return 'info'
+    case 'liter': return 'success'
+    case 'pcs': return 'warning'
+    default: return 'default'
+  }
 }
-
-const kategoriLabel = computed(() => kategoriMap[props.item.kategori])
-
-const stokClass = computed(() => {
-  if (props.item.stok === 0) return 'stok--danger'
-  if (props.item.stok <= 5) return 'stok--warning'
-  return ''
-})
 </script>
 
 <style scoped lang="scss">
@@ -111,7 +103,7 @@ const stokClass = computed(() => {
   }
 
   td {
-    padding: $space-5 $space-4; // Increased padding for less cramped rows
+    padding: $space-5 $space-4;
     vertical-align: middle;
   }
 
@@ -127,7 +119,7 @@ const stokClass = computed(() => {
   }
 
   &__thumb {
-    width: 44px; // Slightly larger thumbnail for spacious row
+    width: 44px;
     height: 44px;
     border-radius: 50%;
     overflow: hidden;
@@ -146,14 +138,14 @@ const stokClass = computed(() => {
   }
 
   &__thumb-icon {
-    font-size: 1.25rem;
+    font-size: $text-xl;
     color: $color-text-faint;
   }
 
   &__text {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: $space-1;
   }
 
   &__name {
@@ -162,28 +154,14 @@ const stokClass = computed(() => {
     color: $color-text-primary;
   }
 
-  &__kategori {
-    font-size: $text-xs;
-    color: $color-text-muted;
-    text-transform: capitalize;
-  }
-
   // ── Center-aligned cells ──
   &__center {
     text-align: center;
   }
 
-  // ── Stok ──
-  &__stok {
-    font-size: $text-base;
-    font-weight: 600;
-    color: $color-text-secondary;
-    font-variant-numeric: tabular-nums;
-  }
-
   // ── Numeric cells ──
   &__num {
-    text-align: center; // Changed from right to center
+    text-align: center;
     font-size: $text-base;
     font-weight: 500;
     color: $color-text-secondary;
@@ -196,15 +174,4 @@ const stokClass = computed(() => {
     white-space: nowrap;
   }
 }
-
-// ── Stok color variants ──
-.stok--warning {
-  color: $color-warning;
-}
-
-.stok--danger {
-  color: $color-danger;
-  font-weight: 700;
-}
-
 </style>

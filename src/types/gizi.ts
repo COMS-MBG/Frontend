@@ -49,19 +49,18 @@ export interface NutritionResult {
 
 // ── Master Bahan Domain Types ──────────────────────────────
 
-/** Kategori bahan baku */
-export type BahanKategori = 'protein' | 'karbo' | 'lemak' | 'serat' | 'lainnya'
+/** Status bahan baku */
+export type BahanStatus = 'aktif' | 'nonaktif'
 
 /** Single ingredient master data item */
 export interface BahanItem {
   id: number
   nama: string
-  kategori: BahanKategori
   satuan: 'kg' | 'liter' | 'pcs'
-  stok: number
   kalori: number
   protein: number
   karbohidrat: number
   lemak: number
+  status: BahanStatus
   image?: string
 }

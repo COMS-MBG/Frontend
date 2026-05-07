@@ -32,6 +32,7 @@ import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
 import { useBahanStore } from '@/stores/bahan.store'
 import { useDebounce } from '@/composables/useDebounce'
 
+
 // Only emits if we have other actions, but currently none.
 // We can remove defineEmits if we don't have custom emits from this wrapper anymore.
 

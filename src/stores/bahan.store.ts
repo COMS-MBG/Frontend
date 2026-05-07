@@ -37,10 +37,59 @@ export const useBahanStore = defineStore('bahan', () => {
   const searchQuery = ref('')
   const rowsPerPage = ref(10)
 
+  // ── Modal State ───────────────────────────────────────────
+  const isFormModalOpen = ref(false)
+  const isDeleteModalOpen = ref(false)
+  const modalMode = ref<'create' | 'edit'>('create')
+  const selectedIngredient = ref<BahanItem | null>(null)
+
+  function openCreateModal() {
+    modalMode.value = 'create'
+    selectedIngredient.value = null
+    isFormModalOpen.value = true
+  }
+
+  function openEditModal(item: BahanItem) {
+    modalMode.value = 'edit'
+    selectedIngredient.value = { ...item }
+    isFormModalOpen.value = true
+  }
+
+  function openDeleteModal(item: BahanItem) {
+    selectedIngredient.value = { ...item }
+    isDeleteModalOpen.value = true
+  }
+
+  function closeModal() {
+    isFormModalOpen.value = false
+    isDeleteModalOpen.value = false
+    selectedIngredient.value = null
+  }
+
+  // ── CRUD Wrappers (to match prompt requirements) ──────────
+  async function createIngredient(item: Omit<BahanItem, 'id'>) {
+    const newItem = { ...item, id: Date.now() } as BahanItem
+    await crud.addItem(newItem)
+    closeModal()
+  }
+
+  async function updateIngredient(id: number, item: Partial<BahanItem>) {
+    await crud.updateItem({ ...item, id } as BahanItem)
+    closeModal()
+  }
+
+  async function deleteIngredient() {
+    if (selectedIngredient.value) {
+      await crud.deleteItem(selectedIngredient.value.id)
+      closeModal()
+    }
+  }
+
   /** Update search query from toolbar */
   function setSearchQuery(value: string): void {
     searchQuery.value = value
   }
+
 
   /** Update rows per page from toolbar */
   function setRowsPerPage(value: number): void {
@@ -57,17 +106,20 @@ export const useBahanStore = defineStore('bahan', () => {
   // Memoized Fuse instance, only rebuilds when crud.items change.
   const fuseInstance = computed(() => {
     return new Fuse(crud.items, {
-      keys: ['nama'], // Fuzzy search on 'nama'
+      keys: ['nama', 'satuan'],
       threshold: 0.3,
     })
   })
 
   // ── Filtered Data Getter ───────────────────────────────────
   const filteredItems = computed(() => {
-    if (!searchQuery.value.trim()) {
-      return crud.items
+    let result = crud.items
+
+    if (searchQuery.value.trim()) {
+      result = fuseInstance.value.search(searchQuery.value).map(res => res.item)
     }
-    return fuseInstance.value.search(searchQuery.value).map(result => result.item)
+
+    return result
   })
 
   return {
@@ -90,5 +142,19 @@ export const useBahanStore = defineStore('bahan', () => {
     setRowsPerPage,
     filteredItems,
     resetToolbar,
+
+    // ── Modal state & actions ──
+    isFormModalOpen,
+    isDeleteModalOpen,
+    modalMode,
+    selectedIngredient,
+    openCreateModal,
+    openEditModal,
+    openDeleteModal,
+    closeModal,
+    createIngredient,
+    updateIngredient,
+    deleteIngredient,
+    loading: computed(() => crud.isLoading),
   }
 })
