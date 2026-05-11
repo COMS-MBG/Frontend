@@ -37,3 +37,12 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+#contract API
+api_auth_contract.md
+standard.md

@@ -1,15 +1,7 @@
-/**
- * stores/employee.store.ts — Employee Management (Pinia)
- *
- * Single source of truth for employee data + access control.
- * Built on the Composition-API store style (consistent with auth.ts).
- *
- * Data flow:  View  →  store action  →  (future: API service layer)
- */
 import { defineStore } from 'pinia'
 import { ref, computed, type Ref } from 'vue'
 import Fuse from 'fuse.js'  
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.store'
 import type { Employee, EmployeeRole } from '@/types/employee'
 
 export const useEmployeeStore = defineStore('employee', () => {
@@ -65,18 +57,17 @@ export const useEmployeeStore = defineStore('employee', () => {
     return result
   })
 
-  // ── Access Logic (derived from auth store) ─────────────────
+  // ── Access Logic (derived from auth store, using RBAC permissions) ──
   const canAdd = computed(() => {
-    return auth.userRole?.toLowerCase() === 'admin'
+    return auth.hasPermission('employee.create')
   })
 
   const canEdit = computed(() => {
-    const role = auth.userRole?.toLowerCase()
-    return role === 'admin' || role === 'operator'
+    return auth.hasPermission('employee.edit')
   })
 
   const canDelete = computed(() => {
-    return auth.userRole?.toLowerCase() === 'admin'
+    return auth.hasPermission('employee.delete')
   })
 
   // ── Actions (Toolbar) ──────────────────────────────────────
@@ -94,7 +85,7 @@ export const useEmployeeStore = defineStore('employee', () => {
 
   // ── Actions (Data) ─────────────────────────────────────────
 
-  /** Bulk-load data (used with dummy / imported data). */
+  /** Bulk-load data */
   function setItems(data: Employee[]): void {
     items.value = data
   }
@@ -133,8 +124,6 @@ export const useEmployeeStore = defineStore('employee', () => {
     error.value     = null
 
     try {
-      // Future: const { data } = await api.get('/employees')
-      // items.value = data
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Gagal memuat data karyawan.'
     } finally {

@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import type { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import type { RouteRecordRaw } from 'vue-router'
+import { setupAuthGuard } from '@/router/guards'
+
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
-import LoginView          from '@/views/auth/LoginView.vue'
-import DashboardView      from '@/views/dashboard/DashboardView.vue'
-import type { RouteRecordRaw } from 'vue-router'
+import LoginView      from '@/views/auth/LoginView.vue'
+import DashboardView  from '@/views/dashboard/DashboardView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -60,38 +60,7 @@ const router = createRouter({
   routes,
 })
 
-// ── Route Guard (Navigation Guard Global) ────────────────────────────────────
-let isInitialized = false
-
-router.beforeEach(
-  async (
-    to: RouteLocationNormalized,
-    _from: RouteLocationNormalized,
-    next: NavigationGuardNext
-  ) => {
-    const authStore = useAuthStore()
-
-    // Hydrate store hanya sekali saat app pertama load
-    if (!isInitialized) {
-      await authStore.initialize()
-      isInitialized = true
-    }
-
-    const isAuth = authStore.isAuthenticated
-
-    // Route butuh auth → redirect ke login jika belum login
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-    const guestOnly = to.matched.some(record => record.meta.guestOnly)
-
-    if (requiresAuth && !isAuth) {
-      return next({ name: 'login', query: { redirect: to.fullPath } })
-    }
-
-    if (guestOnly && isAuth) {
-      return next({ name: 'dashboard' })
-    }
-    next()
-  }
-)
+// ── Register auth guard ───────────────────────────────────────────────────────
+setupAuthGuard(router)
 
 export default router
