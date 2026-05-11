@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, type Ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth.store'
 import type { FeatureAccess, RoleKey, PermissionAction, FeaturePermission } from '@/types/access'
 export const useAccessStore = defineStore('access', () => {
   // ── State ──────────────────────────────────────────────────
@@ -15,11 +15,6 @@ export const useAccessStore = defineStore('access', () => {
 
   // ── Getters ────────────────────────────────────────────────
 
-  /**
-   * Permissions for the currently selected role.
-   * Returns structured objects preserving the FeaturePermission shape
-   * so components can iterate actions via PERMISSION_ACTIONS constant.
-   */
   const currentPermissions = computed<{
     id: string
     name: string
@@ -42,27 +37,21 @@ export const useAccessStore = defineStore('access', () => {
     }, 0)
   )
 
-  /** Total possible permissions (features × 4 actions). */
+  /** Total possible permissions */
   const totalPermissions = computed(() => features.value.length * 4)
 
   /** Whether the current user can edit permissions. */
   const canEditPermissions = computed(() => {
-    return auth.userRole?.toLowerCase() === 'admin'
+    return auth.hasRole('super_admin', 'pemilik')
   })
 
   // ── Actions ────────────────────────────────────────────────
 
-  /**
-   * Initialize store with data.
-   * Currently seeds from dummy data; swap to fetchPermissions() when API is ready.
-   */
   async function initialize(): Promise<void> {
     if (features.value.length > 0) return
 
     isLoading.value = true
     try {
-      // API_PLACEHOLDER: Replace with actual API call
-      // const { data } = await accessService.getPermissions()
       const { featureAccessDummy, availableRoles } = await import('@/data/access.dummy')
       features.value = featureAccessDummy
       roles.value = availableRoles

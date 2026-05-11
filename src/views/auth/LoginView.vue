@@ -3,7 +3,7 @@
 
     <!-- ── Loading Overlay ── -->
     <BaseLoadingOverlay
-      :show="authStore.isLoading"
+      :show="isLoading"
       text="Sedang masuk…"
     />
 
@@ -21,11 +21,11 @@
 
     <!-- ── Error Banner ── -->
     <BaseAlert
-      :show="!!authStore.error"
-      variant="error"
-      :message="authStore.error || ''"
+      :show="!!error"
+      :variant="errorVariant"
+      :message="error || ''"
       dismissible
-      @close="authStore.clearError()"
+      @close="clearError()"
       style="margin-bottom: 1rem;"
     />
 
@@ -43,8 +43,8 @@
             type="email"
             placeholder="nama@perusahaan.com"
             autocomplete="email"
-            :disabled="authStore.isLoading"
-            @input="authStore.clearError(); v.email = ''"
+            :disabled="isLoading"
+            @input="clearError(); v.email = ''"
           />
         </div>
         <span v-if="v.email" class="field-error-msg">{{ v.email }}</span>
@@ -61,8 +61,8 @@
             :type="showPassword ? 'text' : 'password'"
             placeholder="••••••••"
             autocomplete="current-password"
-            :disabled="authStore.isLoading"
-            @input="authStore.clearError(); v.password = ''"
+            :disabled="isLoading"
+            @input="clearError(); v.password = ''"
           />
           <!-- Toggle show/hide password -->
           <button
@@ -82,7 +82,7 @@
       <!-- Remember Me -->
       <div class="options-row">
         <label class="remember">
-          <input v-model="form.remember" type="checkbox" :disabled="authStore.isLoading" />
+          <input type="checkbox" v-model="rememberMe" :disabled="isLoading" />
           <span>Ingat Saya</span>
         </label>
         <a href="#" class="forgot">Lupa Kata Sandi?</a>
@@ -92,10 +92,10 @@
       <button
         class="btn-masuk"
         type="submit"
-        :disabled="authStore.isLoading"
-        :class="{ 'btn-masuk--loading': authStore.isLoading }"
+        :disabled="isLoading"
+        :class="{ 'btn-masuk--loading': isLoading }"
       >
-        <span v-if="!authStore.isLoading">Masuk</span>
+        <span v-if="!isLoading">Masuk</span>
         <span v-else class="btn-spinner">
           <span></span><span></span><span></span>
         </span>
@@ -108,7 +108,7 @@
     </div>
 
     <!-- ── Google SSO (placeholder, belum fungsional) ── -->
-    <button class="btn-google" type="button" :disabled="authStore.isLoading">
+    <button class="btn-google" type="button" :disabled="isLoading">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.07 5.07 0 01-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -121,7 +121,7 @@
     <!-- ── Hint akun dev ── -->
     <div class="dev-hint">
       <span class="material-symbols-outlined">info</span>
-      <span>Dev: <strong>admin@mbgbandung.id</strong> / <strong>password</strong></span>
+      <span>Dev: <strong>superadmin@sppg.test</strong> / <strong>password123</strong></span>
     </div>
 
     <!-- ── Footer Links ── -->
@@ -133,27 +133,43 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import type { LoginCredentials } from '@/types/auth'
+import { useAuth } from '@/composables/useAuth'
+import { storageService } from '@/services/storageService'
+import type { LoginRequest } from '@/types/auth'
 import BaseAlert from '@/components/common/BaseAlert.vue'
 import BaseLoadingOverlay from '@/components/common/BaseLoadingOverlay.vue'
 
-const router    = useRouter()
-const route     = useRoute()
-const authStore = useAuthStore()
+const router = useRouter()
+const route  = useRoute()
+const { isLoading, error, login, clearError } = useAuth()
 
 const showPassword = ref(false)
+const rememberMe   = ref(false)
 
-const form = reactive<LoginCredentials>({
+const form = reactive<LoginRequest>({
   email:    '',
-  password: '', 
-  remember: false,
+  password: '',
 })
 
-// Validasi sederhana (client-side)
+// Pre-fill email from localStorage if user previously checked "Remember Me"
+onMounted(() => {
+  const savedEmail = storageService.getRememberedEmail()
+  if (savedEmail) {
+    form.email = savedEmail
+    rememberMe.value = true
+  }
+})
+
+// Client-side validation
 const v = reactive({ email: '', password: '' })
+
+// 403 (account deactivated) //
+const errorVariant = computed(() => {
+  if (error.value?.includes('dinonaktifkan')) return 'warning'
+  return 'error'
+})
 
 function validate(): boolean {
   v.email    = ''
@@ -183,19 +199,23 @@ async function handleLogin() {
   if (!validate()) return
 
   try {
-    await authStore.login({
+    await login({
       email:    form.email,
       password: form.password,
-      remember: form.remember,
+      remember: rememberMe.value,
     })
 
-    // Redirect ke halaman asal (jika ada query ?redirect=) atau dashboard
+    // Handle Frontend UX Persistence for "Remember Me"
+    if (rememberMe.value) {
+      storageService.setRememberedEmail(form.email)
+    } else {
+      storageService.clearRememberedEmail()
+    }
+
     const redirectTo = (route.query.redirect as string) || '/dashboard'
     router.push(redirectTo)
   } catch {
-    // Error sudah dihandle di store → authStore.error sudah terisi
+    
   }
 }
 </script>
-
-

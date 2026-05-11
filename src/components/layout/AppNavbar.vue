@@ -26,8 +26,8 @@
 
         <!-- Teks nama + role -->
         <div class="user-text">
-          <span class="user-name">{{ authStore.fullName || 'Pengguna' }}</span>
-          <span class="user-role">{{ authStore.userRole || '—' }}</span>
+          <span class="user-name">{{ userName || 'Pengguna' }}</span>
+          <span class="user-role">{{ userRole || '—' }}</span>
         </div>
 
         <!-- Chevron -->
@@ -41,7 +41,7 @@
       <Transition name="dropdown">
         <div v-if="dropdownOpen" class="dropdown" ref="dropdownRef">
           <div class="dropdown-header">
-            <span class="dropdown-email">{{ authStore.user?.email ?? '' }}</span>
+            <span class="dropdown-email">{{ user?.email ?? '' }}</span>
           </div>
           <hr class="dropdown-divider" />
           <button class="dropdown-item" @click="goProfile">
@@ -53,9 +53,9 @@
             <span>Pengaturan</span>
           </button>
           <hr class="dropdown-divider" />
-          <button class="dropdown-item dropdown-item--danger" :disabled="authStore.isLoading" @click="handleLogout">
+          <button class="dropdown-item dropdown-item--danger" :disabled="isLoading" @click="handleLogout">
             <span class="material-symbols-outlined">logout</span>
-            <span>{{ authStore.isLoading ? 'Sedang keluar…' : 'Keluar' }}</span>
+            <span>{{ isLoading ? 'Sedang keluar…' : 'Keluar' }}</span>
           </button>
         </div>
       </Transition>
@@ -67,10 +67,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useAuth } from '@/composables/useAuth'
 
-const authStore = useAuthStore()
-const router    = useRouter()
+const { user, userName, userRole, isLoading, logout } = useAuth()
+const router = useRouter()
 
 // ── Dropdown state ─────────────────────────────────────────────────────────
 const dropdownOpen = ref(false)
@@ -98,7 +98,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 // ── Actions ────────────────────────────────────────────────────────────────
 async function handleLogout() {
   dropdownOpen.value = false
-  await authStore.logout()
+  await logout()
   router.push({ name: 'login' })
 }
 
