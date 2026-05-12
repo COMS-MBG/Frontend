@@ -49,6 +49,9 @@ const routes: RouteRecordRaw[] = [
       // ── HR (Karyawan) ──
       { path: 'karyawan', name: 'karyawan', component: () => import('@/views/hr/EmployeeView.vue') },
       { path: 'hak-akses', name: 'hak-akses', component: () => import('@/views/hr/EmployeeAccessView.vue') },
+
+      // ── Partner Management ──
+      { path: 'sekolah-mitra', name: 'sekolah-mitra', component: () => import('@/views/partner/PartnerView.vue') },
     ],
   },
 
