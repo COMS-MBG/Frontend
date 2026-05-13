@@ -58,6 +58,12 @@ export const sidebarMenu: MenuItem[] = [
     ],
   },
   {
+    id: 'sekolah-mitra',
+    title: 'Sekolah Mitra',
+    icon: 'school',
+    routeName: 'sekolah-mitra',
+  },
+  {
     id: 'laporan',
     title: 'Laporan',
     icon: 'bar_chart',
