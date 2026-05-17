@@ -4,29 +4,30 @@ export type RoleName =
   | 'super_admin'
   | 'pemilik'
   | 'manajer'
-  | 'ahli_gizi'
-  | 'admin_logistik'
+  | 'ahli-gizi'
+  | 'admin-logistik'
   | 'kurir'
+  | 'admin-sppg'
   | 'karyawan_operasional'
 
-// ── Permission ─────────────────────────────────────────────────────────────────
+// ── SPPG ───────────────────────────────────────────────────────────────────────
 
-export interface Permission {
+export interface UserSppg {
   id: number
   name: string
-}
-
-// ── Role ───────────────────────────────────────────────────────────────────────
-
-export interface Role {
-  id: number
-  name: RoleName
-  permissions: Permission[]
+  status: string
 }
 
 // ── User ───────────────────────────────────────────────────────────────────────
 
-/** Full user profile returned by the API */
+/**
+ * User profile as returned by AuthUserResource.
+ *
+ * RBAC shape (flat — NOT Spatie):
+ *  - role_type : 'super_admin' | 'sppg_user'
+ *  - role_name : display label from employee.role.name
+ *  - permissions: flat string[] slugs  e.g. ["partner.read", "employee.create"]
+ */
 export interface User {
   id: number
   name: string
@@ -34,16 +35,14 @@ export interface User {
   phone: string | null
   profile_picture: string | null
   is_active: boolean
-  sppg_id: number | null
-  email_verified_at: string | null
-  created_at: string
-  updated_at: string
-  roles: Role[]
+  role_type: string
+  role_name: string
+  sppg: UserSppg | null
+  permissions: string[]
 }
 
 // ── Auth Request Payloads ──────────────────────────────────────────────────────
 
-/** Payload sent on login */
 export interface LoginRequest {
   email: string
   password: string
@@ -51,34 +50,28 @@ export interface LoginRequest {
 }
 
 // ── Auth Response Shapes ───────────────────────────────────────────────────────
-// Cookie-based auth: NO token in responses. Session cookie is httpOnly.
 
-/** Successful login response */
 export interface LoginResponse {
   success: true
   message: string
   user: User
 }
 
-/** Failed login response (invalid credentials) */
 export interface LoginErrorResponse {
   success: false
   message: string
 }
 
-/** Successful logout response */
 export interface LogoutResponse {
   success: true
   message: string
 }
 
-/** Authenticated user response */
 export interface UserResponse {
   success: true
   user: User
 }
 
-/** Laravel validation error response (422) */
 export interface ValidationErrorResponse {
   message: string
   errors: Record<string, string[]>
@@ -86,14 +79,13 @@ export interface ValidationErrorResponse {
 
 // ── Auth State ─────────────────────────────────────────────────────────────────
 
-/** Shape of the Pinia auth store state */
 export interface AuthState {
   user: User | null
   loading: boolean
   initialized: boolean
 }
 
-// ── Backward Compatibility Aliases ─────────────────────────────────────────────
+// ── Backward Compatibility ─────────────────────────────────────────────────────
 
 /** @deprecated Use LoginRequest instead */
 export type LoginPayload = LoginRequest

@@ -23,22 +23,72 @@ const routes: RouteRecordRaw[] = [
     component: MainLayout,
     meta: { requiresAuth: true },
     children: [
-      { path: '', name: 'dashboard', component: DashboardView },
-      
+      {
+        path: '',
+        name: 'dashboard',
+        component: DashboardView,
+        meta: { requiredPermission: 'dashboard.read' },
+      },
+
       // ── Manajemen Gizi ──
-      { path: 'master-resep', name: 'master-resep', component: () => import('@/views/gizi/MasterResepView.vue') },
-      { path: 'master-bahan', name: 'master-bahan', component: () => import('@/views/gizi/MasterBahanView.vue') },
-      { path: 'perencanaan-menu', name: 'perencanaan-menu', component: () => import('@/views/gizi/MenuPlanningView.vue') },
-      { path: 'kalkulator-gizi/:id?', name: 'kalkulator-gizi', component: () => import('@/views/gizi/KalkulatorGiziView.vue'), meta: { activeMenu: 'master-resep' } },
+      {
+        path: 'master-resep',
+        name: 'master-resep',
+        component: () => import('@/views/gizi/MasterResepView.vue'),
+        meta: { requiredPermission: 'recipes.read' },
+      },
+      {
+        path: 'master-bahan',
+        name: 'master-bahan',
+        component: () => import('@/views/gizi/MasterBahanView.vue'),
+        meta: { requiredPermission: 'ingredients.read' },
+      },
+      {
+        path: 'perencanaan-menu',
+        name: 'perencanaan-menu',
+        component: () => import('@/views/gizi/MenuPlanningView.vue'),
+        meta: { requiredPermission: 'menus.read' },
+      },
+      {
+        path: 'kalkulator-gizi/:id?',
+        name: 'kalkulator-gizi',
+        component: () => import('@/views/gizi/KalkulatorGiziView.vue'),
+        meta: { activeMenu: 'master-resep', requiredPermission: 'recipes.read' },
+      },
 
       // ── Distribusi ──
-      { path: 'distribusi', name: 'distribusi', component: () => import('@/views/distribusi/DistribusiView.vue') },
-      { path: 'jadwal-pengiriman', name: 'jadwal-pengiriman', component: () => import('@/views/distribusi/JadwalPengirimanView.vue') },
-      { path: 'peta-spasial', name: 'peta-spasial', component: () => import('@/views/distribusi/PetaSpasialView.vue') },
+      {
+        path: 'distribusi',
+        name: 'distribusi',
+        component: () => import('@/views/distribusi/DistribusiView.vue'),
+        meta: { requiredPermission: 'distribution.read' },
+      },
+      {
+        path: 'jadwal-pengiriman',
+        name: 'jadwal-pengiriman',
+        component: () => import('@/views/distribusi/JadwalPengirimanView.vue'),
+        meta: { requiredPermission: 'distribution.read' },
+      },
+      {
+        path: 'peta-spasial',
+        name: 'peta-spasial',
+        component: () => import('@/views/distribusi/PetaSpasialView.vue'),
+        meta: { requiredPermission: 'distribution.read' },
+      },
 
       // ── Laporan ──
-      { path: 'laporan', name: 'laporan', component: () => import('@/views/laporan/LaporanView.vue') },
-      { path: 'laporan-keuangan', name: 'laporan-keuangan', component: () => import('@/views/laporan/LaporanKeuanganView.vue') },
+      {
+        path: 'laporan',
+        name: 'laporan',
+        component: () => import('@/views/laporan/LaporanView.vue'),
+        meta: { requiredPermission: 'report.read' },
+      },
+      {
+        path: 'laporan-keuangan',
+        name: 'laporan-keuangan',
+        component: () => import('@/views/laporan/LaporanKeuanganView.vue'),
+        meta: { requiredPermission: 'finance.read' },
+      },
 
       // ── User ──
       { path: 'profile', name: 'profile', component: () => import('@/views/user/ProfileView.vue') },
@@ -47,11 +97,33 @@ const routes: RouteRecordRaw[] = [
       { path: 'settings', name: 'settings', component: () => import('@/views/settings/SettingsView.vue') },
 
       // ── HR (Karyawan) ──
-      { path: 'karyawan', name: 'karyawan', component: () => import('@/views/hr/EmployeeView.vue') },
-      { path: 'hak-akses', name: 'hak-akses', component: () => import('@/views/hr/EmployeeAccessView.vue') },
+      {
+        path: 'karyawan',
+        name: 'karyawan',
+        component: () => import('@/views/hr/EmployeeView.vue'),
+        meta: { requiredPermission: 'employee.read' },
+      },
+      {
+        path: 'hak-akses',
+        name: 'hak-akses',
+        component: () => import('@/views/hr/EmployeeAccessView.vue'),
+        meta: { requiredPermission: 'employee.update' },
+      },
 
       // ── Partner Management ──
-      { path: 'sekolah-mitra', name: 'sekolah-mitra', component: () => import('@/views/partner/PartnerView.vue') },
+      {
+        path: 'sekolah-mitra',
+        name: 'sekolah-mitra',
+        component: () => import('@/views/partner/PartnerView.vue'),
+        meta: { requiredPermission: 'partner.read' },
+      },
+
+      // ── Unauthorized ──
+      {
+        path: 'unauthorized',
+        name: 'unauthorized',
+        component: () => import('@/views/UnauthorizedView.vue'),
+      },
     ],
   },
 

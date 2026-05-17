@@ -47,25 +47,27 @@ export function useAuth() {
     return store.hasAnyPermission(permissions)
   }
 
-  // ── Convenience Computed for common permission patterns ─────────────────────
+  // ── Convenience Computed ────────────────────────────────────────────────────
 
-  /** Can user manage employees? */
   const canManageEmployees = computed(() =>
-    store.hasPermission('employee.create') || store.hasPermission('employee.edit'),
+    store.hasPermission('employee.create') || store.hasPermission('employee.update'),
   )
 
-  /** Can user view finance? */
-  const canViewFinance = computed(() => store.hasPermission('finance.view'))
+  const canViewFinance = computed(() => store.hasPermission('finance.read'))
 
-  /** Can user manage nutrition? */
   const canManageNutrition = computed(() =>
-    store.hasPermission('nutrition.create') || store.hasPermission('nutrition.edit'),
+    store.hasPermission('ingredients.create') || store.hasPermission('ingredients.update'),
   )
 
-  /** Can user manage distribution? */
   const canManageDistribution = computed(() =>
-    store.hasPermission('distribution.create') || store.hasPermission('distribution.edit'),
+    store.hasPermission('distribution.create') || store.hasPermission('distribution.update'),
   )
+
+  const canManagePartner = computed(() =>
+    store.hasPermission('partner.create') || store.hasPermission('partner.update'),
+  )
+
+  const canViewReport = computed(() => store.hasPermission('report.read'))
 
   // ── Public API ──────────────────────────────────────────────────────────────
 
@@ -93,5 +95,7 @@ export function useAuth() {
     canViewFinance,
     canManageNutrition,
     canManageDistribution,
+    canManagePartner,
+    canViewReport,
   }
 }

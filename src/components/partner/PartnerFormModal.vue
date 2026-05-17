@@ -49,27 +49,27 @@
       </div>
 
       <div class="form-row">
-        <BaseFormGroup label="Bentuk Sekolah" id="bentuk" required :error="errors.bentuk">
-          <BaseSelect
-            id="bentuk"
-            :model-value="formData.bentuk"
-            :options="bentukOptions"
-            placeholder="Pilih bentuk"
-            :error="!!errors.bentuk"
-            :disabled="isSubmitting"
-            @update:model-value="formData.bentuk = String($event ?? '')"
-          />
+        <BaseFormGroup label="Bentuk Sekolah" id="bentuk" required>
+          <template #default>
+            <AppSelect
+              :model-value="formData.bentuk"
+              :options="bentukOptions"
+              placeholder="Pilih bentuk"
+              :error="errors.bentuk"
+              @update:model-value="formData.bentuk = String($event ?? '')"
+            />
+          </template>
         </BaseFormGroup>
-        <BaseFormGroup label="Status" id="status" required :error="errors.status">
-          <BaseSelect
-            id="status"
-            :model-value="formData.status"
-            :options="statusOptions"
-            placeholder="Pilih status"
-            :error="!!errors.status"
-            :disabled="isSubmitting"
-            @update:model-value="formData.status = String($event ?? '')"
-          />
+        <BaseFormGroup label="Status" id="status" required>
+          <template #default>
+            <AppSelect
+              :model-value="formData.status"
+              :options="statusOptions"
+              placeholder="Pilih status"
+              :error="errors.status"
+              @update:model-value="formData.status = String($event ?? '')"
+            />
+          </template>
         </BaseFormGroup>
       </div>
 
@@ -107,8 +107,6 @@
       <!-- ── Location Coordinates ── -->
       <div class="form-section">
         <p class="form-section__title">
-          <span class="material-symbols-outlined">location_on</span>
-          Informasi Lokasi
           <span class="form-section__badge">Opsional</span>
         </p>
         <div class="form-row">
@@ -155,7 +153,7 @@ import BaseModal from '@/components/common/BaseModal.vue'
 import BaseAlert from '@/components/common/BaseAlert.vue'
 import BaseFormGroup from '@/components/common/BaseFormGroup.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import BaseSelect from '@/components/common/BaseSelect.vue'
+import AppSelect from '@/components/common/AppSelect.vue'
 import type { Partner } from '@/types/partner'
 import type { SelectOption } from '@/types/form'
 import { partnerSchema } from '@/validation/partner.schema'
