@@ -24,7 +24,7 @@
 
     <!-- ── Menu Utama ── -->
     <nav class="sidebar-nav">
-      <template v-for="item in sidebarMenu" :key="item.id">
+      <template v-for="item in visibleMenus" :key="item.id">
 
         <!-- Jika Menu Tidak Punya Children -->
         <template v-if="!item.children">
@@ -58,7 +58,7 @@
           <Transition name="slide" @enter="onEnter" @leave="onLeave" @before-enter="onBeforeEnter">
             <div class="sub-menu" v-show="openMenus[item.id]">
               <RouterLink
-                v-for="child in item.children"
+                v-for="child in getVisibleChildren(item)"
                 :key="child.id"
                 :to="{ name: child.routeName }"
                 class="sub-item"
@@ -79,9 +79,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { sidebarMenu, type MenuItem } from '@/config/sidebarMenu'
+import { useAuth } from '@/composables/useAuth'
 
 const props = defineProps<{
   isOpen: boolean
@@ -93,8 +94,26 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+const { checkPermission } = useAuth()
 
-// State untuk multiple open menus
+// ── Permission-based menu filtering ───────────────────────────────────────────
+
+const visibleMenus = computed(() =>
+  sidebarMenu.filter(menu => {
+    if (!menu.permission) return true
+    return checkPermission(menu.permission)
+  })
+)
+
+function getVisibleChildren(menu: MenuItem): MenuItem[] {
+  return menu.children?.filter(child => {
+    if (!child.permission) return true
+    return checkPermission(child.permission)
+  }) ?? []
+}
+
+// ── Menu state ────────────────────────────────────────────────────────────────
+
 const openMenus = ref<Record<string, boolean>>({})
 
 function toggleMenu(id: string) {
@@ -151,17 +170,14 @@ function onEnter(el: Element) {
   const htmlEl = el as HTMLElement
   htmlEl.style.height = htmlEl.scrollHeight + 'px'
   htmlEl.style.opacity = '1'
-  // Bersihkan height setelah transisi agar tidak fix
   setTimeout(() => {
     htmlEl.style.height = 'auto'
-  }, 300) // Waktu sesuai durasi CSS transisi
+  }, 300)
 }
 
 function onLeave(el: Element) {
   const htmlEl = el as HTMLElement
-  // Set height explicit sebelum animasinya dimulai
   htmlEl.style.height = htmlEl.scrollHeight + 'px'
-  // Trick browser flow
   htmlEl.offsetHeight 
   htmlEl.style.height = '0'
   htmlEl.style.opacity = '0'

@@ -14,37 +14,26 @@ export const useAuthStore = defineStore('auth', () => {
 
   // ── Getters ─────────────────────────────────────────────────────────────────
 
-  /** Derived from user existence — the server session is the real auth */
   const isAuthenticated = computed(() => !!user.value)
-
-  /** User display name */
   const userName = computed(() => user.value?.name ?? '')
 
   /** @deprecated Use userName instead */
   const fullName = computed(() => user.value?.name ?? '')
 
-  /** Primary role name (first role) */
-  const userRole = computed<RoleName | null>(() => {
-    return (user.value?.roles?.[0]?.name as RoleName) ?? null
+  /** Display role label for navbar — reads flat role_name from API */
+  const userRole = computed<string | null>(() => user.value?.role_name ?? null)
+
+  /** Flat permission slugs — reads user.permissions from API */
+  const userPermissions = computed<string[]>(() => user.value?.permissions ?? [])
+
+  /** Role identifiers list (kept for backward compat) */
+  const userRoles = computed<string[]>(() => {
+    if (!user.value) return []
+    return user.value.role_type ? [user.value.role_type] : []
   })
 
-  /** All permission names the user has (flattened) */
-  const userPermissions = computed<string[]>(() => {
-    if (!user.value?.roles) return []
-    return user.value.roles
-      .flatMap(role => role.permissions)
-      .map(p => p.name)
-  })
-
-  /** All role names the user has */
-  const userRoles = computed<string[]>(() =>
-    user.value?.roles?.map(r => r.name) ?? [],
-  )
-
-  /** Whether the user has the super_admin role */
-  const isSuperAdmin = computed(() =>
-    user.value?.roles?.some(r => r.name === 'super_admin') ?? false,
-  )
+  /** Whether the user is super_admin (bypasses all RBAC) */
+  const isSuperAdmin = computed(() => user.value?.role_type === 'super_admin')
 
   /** Alias for backward compatibility */
   const loading = computed(() => isLoading.value)
@@ -52,21 +41,23 @@ export const useAuthStore = defineStore('auth', () => {
   // ── RBAC Helper Functions ───────────────────────────────────────────────────
 
   function hasPermission(permission: string): boolean {
+    if (isSuperAdmin.value) return true
     return userPermissions.value.includes(permission)
   }
 
   function hasAnyPermission(permissions: string[]): boolean {
+    if (isSuperAdmin.value) return true
     return permissions.some(p => userPermissions.value.includes(p))
   }
 
   function hasRole(...roles: RoleName[]): boolean {
-    if (!user.value?.roles) return false
-    return user.value.roles.some(r => roles.includes(r.name as RoleName))
+    if (!user.value) return false
+    if (isSuperAdmin.value && roles.includes('super_admin' as RoleName)) return true
+    return roles.some(r => r === user.value?.role_type)
   }
 
   function hasAnyRole(roles: RoleName[]): boolean {
-    if (!user.value?.roles) return false
-    return user.value.roles.some(r => roles.includes(r.name as RoleName))
+    return hasRole(...roles)
   }
 
   // ── Actions ─────────────────────────────────────────────────────────────────
@@ -76,11 +67,9 @@ export const useAuthStore = defineStore('auth', () => {
       isLoading.value = true
       error.value     = null
 
-      // Step 1: Obtain CSRF token cookie
       try {
         await authApi.getCsrfCookie()
       } catch (csrfErr: unknown) {
-        // ERR_CONNECTION_REFUSED or network error → backend is down
         const msg = _isAxiosError(csrfErr) && !csrfErr.response
           ? 'Tidak dapat terhubung ke server. Pastikan backend Laravel sudah berjalan (php artisan serve).'
           : 'Gagal mengambil CSRF token. Silakan coba lagi.'
@@ -88,16 +77,13 @@ export const useAuthStore = defineStore('auth', () => {
         throw csrfErr
       }
 
-      // Step 2: Authenticate — server sets session cookie
       const response = await authApi.login(payload)
 
-      // Step 3: Populate state
       user.value = response.user
       storageService.setLoggedIn(true)
       storageService.setUser(response.user)
       initialized.value = true
     } catch (err: unknown) {
-      // Only handle if error wasn't already set by CSRF catch block
       if (!error.value) {
         clearAuth()
         _handleError(err)
@@ -118,24 +104,20 @@ export const useAuthStore = defineStore('auth', () => {
   async function restoreSession(): Promise<void> {
     if (initialized.value) return
 
-    // No session hint → skip network call
     if (!storageService.isLoggedIn()) {
       initialized.value = true
       return
     }
 
-    // Pre-populate from cache for instant UI rendering
     const cached = storageService.getUser<User>()
     if (cached) {
       user.value = cached
     }
 
-    // Validate session against server
     try {
       isLoading.value = true
       await fetchUser()
     } catch {
-      // Session expired or invalid — clean up
       clearAuth()
     } finally {
       isLoading.value   = false
@@ -143,7 +125,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /** Logout flow. */
   async function logout(): Promise<void> {
     try {
       isLoading.value = true
@@ -156,14 +137,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /** Removes all auth data from state AND browser storage. */
   function clearAuth(): void {
     user.value  = null
     error.value = null
     storageService.clearAuth()
   }
 
-  /** Clear the error message */
   function clearError(): void {
     error.value = null
   }
@@ -172,7 +151,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   function _handleError(err: unknown): void {
     if (_isAxiosError(err)) {
-      // Network error — no response received at all.
       if (!err.response) {
         error.value = 'Tidak dapat terhubung ke server. Pastikan backend Laravel sudah berjalan.'
         return

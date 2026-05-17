@@ -44,6 +44,14 @@ export function setupAuthGuard(router: Router): void {
       }
     }
 
+    // ── Permission-based route guard ────────────────────────────────
+    if (to.meta.requiredPermission && authStore.isAuthenticated) {
+      const hasPermission = authStore.hasPermission(to.meta.requiredPermission as string)
+      if (!hasPermission) {
+        return next({ name: 'unauthorized' })
+      }
+    }
+
     next()
   })
 }
