@@ -6,101 +6,46 @@
     @close="onClose"
   >
     <form @submit.prevent="onSubmit" class="employee-form">
-        <BaseFormGroup
-          label="Nama Lengkap"
-          id="nama"
-          required
-          :error="errors.nama"
-        >
-          <BaseInput
-            id="nama"
-            v-model="formData.nama"
-            placeholder="Masukkan nama lengkap"
-            :error="errors.nama || undefined"
-          />
+      <!-- Nama Lengkap -->
+      <BaseFormGroup label="Nama Lengkap" id="emp-name" required :error="errors.name">
+        <BaseInput id="emp-name" v-model="formData.name" placeholder="Masukkan nama lengkap" :error="errors.name || undefined" />
+      </BaseFormGroup>
+
+      <div class="form-row">
+        <!-- NIK -->
+        <BaseFormGroup label="NIK" id="emp-nik" :error="errors.nik">
+          <BaseInput id="emp-nik" v-model="formData.nik" placeholder="16 digit NIK" :error="errors.nik || undefined" />
         </BaseFormGroup>
 
-        <div class="form-row">
-          <BaseFormGroup
-            label="NRP / NIDN"
-            id="nrp"
-            required
-            :error="errors.nrp"
-          >
-            <BaseInput
-              id="nrp"
-              v-model="formData.nrp"
-              placeholder="Contoh: 1029381"
-              :error="errors.nrp || undefined"
-            />
-          </BaseFormGroup>
+        <!-- Phone -->
+        <BaseFormGroup label="No. Telepon" id="emp-phone" :error="errors.phone">
+          <BaseInput id="emp-phone" v-model="formData.phone" placeholder="08xxxxxxxxxx" :error="errors.phone || undefined" />
+        </BaseFormGroup>
+      </div>
 
-          <BaseFormGroup
-            label="Email"
-            id="email"
-            required
-            :error="errors.email"
-          >
-            <BaseInput
-              id="email"
-              type="email"
-              v-model="formData.email"
-              placeholder="contoh@coms.com"
-              :error="errors.email || undefined"
-            />
-          </BaseFormGroup>
-        </div>
-
-        <div class="form-row">
-          <BaseFormGroup
-            label="Jabatan"
-            id="jabatan"
-            required
-            :error="errors.jabatan"
-          >
-            <BaseInput
-              id="jabatan"
-              v-model="formData.jabatan"
-              placeholder="Masukkan jabatan"
-              :error="errors.jabatan || undefined"
-            />
-          </BaseFormGroup>
-
-          <BaseFormGroup
-            label="Departemen"
-            id="departemen"
-            required
-            :error="errors.departemen"
-          >
-            <BaseInput
-              id="departemen"
-              v-model="formData.departemen"
-              placeholder="Masukkan departemen"
-              :error="errors.departemen || undefined"
-            />
-          </BaseFormGroup>
-        </div>
-
-        <BaseFormGroup
-          label="Role Akses"
-          id="role"
-          required
-          :error="errors.role"
-        >
-          <BaseSelect
-            id="role"
-            :model-value="formData.role"
-            :options="roleOptions"
-            placeholder="Pilih role"
-            :error="!!errors.role"
-            @update:model-value="formData.role = String($event ?? '')"
+      <div class="form-row">
+        <!-- Position -->
+        <BaseFormGroup label="Posisi / Jabatan" id="emp-position" required :error="errors.position">
+          <AppSelect
+            :model-value="formData.position"
+            :options="positionOptions"
+            placeholder="Pilih posisi"
+            :error="errors.position || undefined"
+            @update:model-value="formData.position = String($event ?? '')"
           />
         </BaseFormGroup>
-      </form>
+      </div>
+
+      <!-- Address -->
+      <BaseFormGroup label="Alamat" id="emp-address">
+        <BaseInput id="emp-address" v-model="formData.address" placeholder="Alamat karyawan" />
+      </BaseFormGroup>
+    </form>
 
     <template #footer>
-      <button class="btn-secondary" @click="onClose">Batal</button>
-      <button class="btn-primary" @click="onSubmit">
+      <button class="btn-secondary" type="button" @click="onClose">Batal</button>
+      <button class="btn-primary btn-with-icon" type="button" :disabled="isSubmitting" @click="onSubmit">
+        <span v-if="isSubmitting" class="material-symbols-outlined employee-form__spinner">progress_activity</span>
         {{ isEdit ? 'Simpan Perubahan' : 'Tambah Karyawan' }}
       </button>
     </template>
@@ -109,143 +54,115 @@
 
 <script setup lang="ts">
 import { reactive, watch, computed } from 'vue'
-import { z } from 'zod'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseFormGroup from '@/components/common/BaseFormGroup.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import BaseSelect from '@/components/common/BaseSelect.vue'
-import type { Employee } from '@/types/employee'
+import AppSelect from '@/components/common/AppSelect.vue'
+import type { Employee, EmployeeCreateForm } from '@/types/employee'
 import type { SelectOption } from '@/types/form'
-import { employeeSchema as schema } from '@/validation/employee.schema'
-
-/** Typed error shape for the modal form fields. */
-interface FormErrors {
-  nama: string
-  nrp: string
-  email: string
-  jabatan: string
-  departemen: string
-  role: string
-}
-
-const emptyErrors = (): FormErrors => ({
-  nama: '',
-  nrp: '',
-  email: '',
-  jabatan: '',
-  departemen: '',
-  role: '',
-})
 
 const props = defineProps<{
   isOpen: boolean
   initialData?: Employee | null
+  isSubmitting?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
-  (e: 'submit', data: Partial<Employee>): void
+  (e: 'submit', data: EmployeeCreateForm): void
 }>()
 
 const isOpenModel = computed({
   get: () => props.isOpen,
-  set: (val) => emit('update:isOpen', val)
+  set: (val) => emit('update:isOpen', val),
 })
 
 const isEdit = computed(() => !!props.initialData)
 
 const formData = reactive({
-  nama: '',
-  nrp: '',
-  email: '',
-  jabatan: '',
-  departemen: '',
-  role: '',
+  name: '',
+  nik: '',
+  position: '',
+  phone: '',
+  address: '',
 })
 
+interface FormErrors {
+  name: string
+  nik: string
+  position: string
+  phone: string
+}
+const emptyErrors = (): FormErrors => ({ name: '', nik: '', position: '', phone: '' })
 const errors: FormErrors = reactive(emptyErrors())
 
-const roleOptions: SelectOption[] = [
-  { label: 'Admin', value: 'Admin' },
-  { label: 'Operator', value: 'Operator' },
-  { label: 'Viewer', value: 'Viewer' },
+const positionOptions: SelectOption[] = [
+  { label: 'Pemilik', value: 'pemilik' },
+  { label: 'Manajer', value: 'manajer' },
+  { label: 'Ahli Gizi', value: 'ahli_gizi' },
+  { label: 'Admin Logistik', value: 'admin_logistik' },
+  { label: 'Kurir', value: 'kurir' },
+  { label: 'Karyawan Operasional', value: 'karyawan_operasional' },
 ]
 
-// Reset and populate form
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     if (props.initialData) {
-      formData.nama = props.initialData.nama
-      formData.nrp = props.initialData.nrp
-      formData.email = props.initialData.email
-      formData.jabatan = props.initialData.jabatan
-      formData.departemen = props.initialData.departemen
-      formData.role = props.initialData.role
+      formData.name = props.initialData.name
+      formData.nik = props.initialData.nik ?? ''
+      formData.position = props.initialData.position
+      formData.phone = props.initialData.phone ?? ''
+      formData.address = props.initialData.address ?? ''
     } else {
-      formData.nama = ''
-      formData.nrp = ''
-      formData.email = ''
-      formData.jabatan = ''
-      formData.departemen = ''
-      formData.role = ''
+      formData.name = ''
+      formData.nik = ''
+      formData.position = ''
+      formData.phone = ''
+      formData.address = ''
     }
     Object.assign(errors, emptyErrors())
   }
 })
 
-const validate = (): boolean => {
+const nikRegex = /^[0-9]*$/
+
+function validate(): boolean {
   Object.assign(errors, emptyErrors())
+  let valid = true
 
-  const result = schema.safeParse(formData)
-  if (result.success) return true
-
-  for (const issue of result.error.issues) {
-    const field = issue.path[0] as keyof FormErrors | undefined
-    if (field && field in errors) {
-      errors[field] = issue.message
-    }
+  if (!formData.name.trim()) { errors.name = 'Nama wajib diisi'; valid = false }
+  if (!formData.position) { errors.position = 'Posisi wajib dipilih'; valid = false }
+  if (formData.nik && (formData.nik.length !== 16 || !nikRegex.test(formData.nik))) {
+    errors.nik = 'NIK harus 16 digit angka'; valid = false
   }
-  return false
+
+  return valid
 }
 
-const onSubmit = () => {
+function onSubmit() {
   if (validate()) {
-    emit('submit', {
-      id: props.initialData?.id,
-      nama: formData.nama,
-      nrp: formData.nrp,
-      email: formData.email,
-      jabatan: formData.jabatan,
-      departemen: formData.departemen,
-      role: formData.role as Employee['role'],
-      isActive: props.initialData?.isActive ?? true,
-    })
-    emit('update:isOpen', false)
+    const payload: Partial<EmployeeCreateForm> = {
+      name: formData.name,
+      position: formData.position,
+    }
+    // Only include optional fields if they have actual values
+    if (formData.nik) payload.nik = formData.nik
+    if (formData.phone) payload.phone = formData.phone
+    if (formData.address) payload.address = formData.address
+
+    emit('submit', payload as EmployeeCreateForm)
   }
 }
 
-const onClose = () => {
-  emit('update:isOpen', false)
-}
+function onClose() { emit('update:isOpen', false) }
 </script>
 
 <style scoped lang="scss">
 .employee-form {
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
+  display: flex; flex-direction: column; gap: $space-2;
+  &__spinner { animation: spin 1s linear infinite; font-size: 1.1rem; }
 }
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $space-4;
-}
-
-@include mobile {
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: $space-4; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@include mobile { .form-row { grid-template-columns: 1fr; gap: 0; } }
 </style>

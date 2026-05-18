@@ -1,6 +1,15 @@
 <template>
   <div class="base-table-wrapper">
-    <table class="base-table">
+    <!-- Skeleton Loader -->
+    <BaseTableSkeleton
+      v-if="isLoading"
+      :rows="8"
+      :columns="skeletonColumns"
+      :headers="skeletonHeaders"
+    />
+
+    <!-- Actual Table -->
+    <table v-else class="base-table">
       <thead>
         <tr>
           <th class="th-feature">FITUR</th>
@@ -16,19 +25,20 @@
       <tbody>
         <template v-if="features.length > 0">
           <PermissionRow
-            v-for="feature in features"
-            :key="feature.id"
-            :name="feature.name"
-            :icon="feature.icon"
-            :permissions="feature.permissions"
+            v-for="row in features"
+            :key="row.feature"
+            :label="row.label"
+            :icon="row.icon"
+            :permissions="row.permissions"
             :can-edit="canEdit"
-            @toggle="(action) => $emit('toggle', feature.id, action)"
+            :is-saving="isSaving"
+            @toggle="(action) => $emit('toggle', row.feature, action)"
           />
         </template>
 
         <tr v-else>
           <td :colspan="1 + PERMISSION_ACTIONS.length" class="empty-state">
-            Tidak ada data fitur
+            Pilih role untuk melihat hak akses
           </td>
         </tr>
       </tbody>
@@ -38,24 +48,37 @@
 
 <script setup lang="ts">
 import PermissionRow from './PermissionRow.vue'
-import type { FeaturePermission, PermissionAction } from '@/types/access'
+import BaseTableSkeleton from '@/components/common/BaseTableSkeleton.vue'
+import type { SkeletonColumn, SkeletonHeader } from '@/components/common/BaseTableSkeleton.vue'
+import type { FeatureAccessRow, PermissionAction } from '@/types/access'
 import { PERMISSION_ACTIONS } from '@/types/access'
 
-interface PermissionFeatureRow {
-  id: string
-  name: string
-  icon: string
-  permissions: FeaturePermission
-}
-
 defineProps<{
-  features: PermissionFeatureRow[]
+  features: FeatureAccessRow[]
   canEdit: boolean
+  isSaving?: boolean
+  isLoading?: boolean
 }>()
 
 defineEmits<{
-  (e: 'toggle', featureId: string, action: PermissionAction): void
+  (e: 'toggle', feature: string, action: PermissionAction): void
 }>()
+
+const skeletonHeaders: SkeletonHeader[] = [
+  { label: 'FITUR', align: 'left' },
+  { label: 'READ', align: 'center' },
+  { label: 'CREATE', align: 'center' },
+  { label: 'UPDATE', align: 'center' },
+  { label: 'DELETE', align: 'center' },
+]
+
+const skeletonColumns: SkeletonColumn[] = [
+  { type: 'avatar-text' },
+  { type: 'badge', align: 'center' },
+  { type: 'badge', align: 'center' },
+  { type: 'badge', align: 'center' },
+  { type: 'badge', align: 'center' },
+]
 </script>
 
 <style scoped lang="scss">
