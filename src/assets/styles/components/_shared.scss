@@ -65,4 +65,15 @@
       transform: translateY(-1px);
     }
   }
+
+  &--view {
+    color: $color-info;
+    background-color: $color-info-bg;
+    &:hover {
+      background-color: $color-info;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
 }

@@ -47,20 +47,4 @@ export interface NutritionResult {
   stats: NutritionStat[]
 }
 
-// ── Master Bahan Domain Types ──────────────────────────────
 
-/** Status bahan baku */
-export type BahanStatus = 'aktif' | 'nonaktif'
-
-/** Single ingredient master data item */
-export interface BahanItem {
-  id: number
-  nama: string
-  satuan: 'kg' | 'liter' | 'pcs'
-  kalori: number
-  protein: number
-  karbohidrat: number
-  lemak: number
-  status: BahanStatus
-  image?: string
-}
