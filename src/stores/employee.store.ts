@@ -1,161 +1,234 @@
 import { defineStore } from 'pinia'
-import { ref, computed, type Ref } from 'vue'
-import Fuse from 'fuse.js'  
-import { useAuthStore } from '@/stores/auth.store'
-import type { Employee, EmployeeRole } from '@/types/employee'
+import { ref, computed } from 'vue'
+import {
+  getEmployees,
+  getEmployee,
+  createEmployee as apiCreate,
+  updateEmployee as apiUpdate,
+  deleteEmployee as apiDelete,
+  getAssignRoleOptions,
+  assignRole as apiAssignRole,
+} from '@/api/employee.api'
+import type {
+  Employee,
+  EmployeeCreateForm,
+  EmployeeUpdateForm,
+  AssignRolePayload,
+  AssignRoleOption,
+} from '@/types/employee'
 
 export const useEmployeeStore = defineStore('employee', () => {
   // ── State ──────────────────────────────────────────────────
-  const items       = ref<Employee[]>([]) as Ref<Employee[]>
-  const isLoading   = ref(false)
-  const error       = ref<string | null>(null)
-
-  // ── UI State (Table Controls) ──────────────────────────────
-  const searchQuery  = ref('')
-  const selectedRole = ref('all')
-  const rowsPerPage  = ref(10)
-
-  // ── Auth (resolved once at setup) ──────────────────────────
-  const auth = useAuthStore()
-
-  // ── Fuzzy Search Setup ─────────────────────────────────────
-  const fuseInstance = computed(() => {
-    return new Fuse(items.value, {
-      keys: ['nama', 'nrp', 'departemen'],
-      threshold: 0.3,
-    })
+  const employees = ref<Employee[]>([])
+  const selectedEmployee = ref<Employee | null>(null)
+  const pagination = ref({
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 10,
+    total: 0,
   })
+  const isLoading = ref(false)
+  const isSubmitting = ref(false)
+  const error = ref<string | null>(null)
+  const filters = ref({
+    search: '',
+    role_id: '' as string,
+    page: 1,
+  })
+
+  // ── Assign Role State ──────────────────────────────────────
+  const assignRoleOptions = ref<AssignRoleOption[]>([])
 
   // ── Getters ────────────────────────────────────────────────
-  const totalItems  = computed(() => items.value.length)
-  const activeCount = computed(() => items.value.filter(e => e.isActive).length)
-  const adminCount  = computed(() => items.value.filter(e => e.role === 'Admin').length)
-
-  const getById = computed(
-    () => (id: number): Employee | undefined =>
-      items.value.find(i => i.id === id),
+  const activeCount = computed(
+    () => employees.value.filter((e) => e.status === 'active').length,
   )
 
-  const filteredItems = computed(() => {
-    let result = items.value
-
-    // 1. Role Filter
-    if (selectedRole.value !== 'all') {
-      result = result.filter(e => e.role === selectedRole.value)
-    }
-
-    // 2. Fuzzy Search
-    if (searchQuery.value.trim()) {
-      // Need to search on the filtered result if role is active
-      const localFuse = new Fuse(result, {
-        keys: ['nama', 'nrp', 'departemen'],
-        threshold: 0.3,
-      })
-      result = localFuse.search(searchQuery.value).map(res => res.item)
-    }
-
-    return result
+  const roleCount = computed(() => {
+    const roles = new Set(
+      employees.value
+        .map((e) => e.role?.name)
+        .filter((r) => r && r !== 'Tanpa Akses'),
+    )
+    return roles.size
   })
 
-  // ── Access Logic (derived from auth store, using RBAC permissions) ──
-  const canAdd = computed(() => {
-    return auth.hasPermission('employee.create')
-  })
+  // ── Actions ────────────────────────────────────────────────
 
-  const canEdit = computed(() => {
-    return auth.hasPermission('employee.edit')
-  })
-
-  const canDelete = computed(() => {
-    return auth.hasPermission('employee.delete')
-  })
-
-  // ── Actions (Toolbar) ──────────────────────────────────────
-  function setSearchQuery(query: string): void {
-    searchQuery.value = query
-  }
-
-  function setRoleFilter(filter: string): void {
-    selectedRole.value = filter
-  }
-
-  function setRowsPerPage(num: number): void {
-    rowsPerPage.value = num
-  }
-
-  // ── Actions (Data) ─────────────────────────────────────────
-
-  /** Bulk-load data */
-  function setItems(data: Employee[]): void {
-    items.value = data
-  }
-
-  /** Append a new employee. */
-  function addItem(item: Employee): void {
-    items.value.push(item)
-  }
-
-  /** Replace an existing employee matched by id. */
-  function updateItem(updated: Employee): void {
-    const index = items.value.findIndex(i => i.id === updated.id)
-    if (index !== -1) items.value[index] = updated
-  }
-
-  /** Remove an employee by id. */
-  function deleteItem(id: number): void {
-    items.value = items.value.filter(i => i.id !== id)
-  }
-
-  /** Toggle active status. */
-  function toggleStatus(id: number): void {
-    const item = items.value.find(i => i.id === id)
-    if (item) item.isActive = !item.isActive
-  }
-
-  /** Change employee role. */
-  function changeRole(id: number, role: EmployeeRole): void {
-    const item = items.value.find(i => i.id === id)
-    if (item) item.role = role
-  }
-
-  /** Fetch items from API (placeholder for future integration). */
-  async function fetchItems(): Promise<void> {
+  async function fetchEmployees(): Promise<void> {
     isLoading.value = true
-    error.value     = null
+    error.value = null
 
     try {
+      const res = await getEmployees({
+        page: filters.value.page,
+        search: filters.value.search || undefined,
+        role_id: filters.value.role_id ? Number(filters.value.role_id) : undefined,
+      })
+      employees.value = res.data
+      pagination.value = {
+        currentPage: res.current_page,
+        lastPage: res.last_page,
+        perPage: res.per_page,
+        total: res.total,
+      }
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Gagal memuat data karyawan.'
+      error.value =
+        err instanceof Error ? err.message : 'Gagal memuat data karyawan.'
     } finally {
       isLoading.value = false
     }
   }
 
-  // ── Expose ─────────────────────────────────────────────────
+  /** Silent refresh — re-fetches without triggering skeleton loader */
+  async function silentRefresh(): Promise<void> {
+    try {
+      const res = await getEmployees({
+        page: filters.value.page,
+        search: filters.value.search || undefined,
+        role_id: filters.value.role_id ? Number(filters.value.role_id) : undefined,
+      })
+      employees.value = res.data
+      pagination.value = {
+        currentPage: res.current_page,
+        lastPage: res.last_page,
+        perPage: res.per_page,
+        total: res.total,
+      }
+    } catch {
+      // Silent — don't override existing error
+    }
+  }
+
+  async function fetchEmployee(id: number): Promise<void> {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      selectedEmployee.value = await getEmployee(id)
+    } catch (err: unknown) {
+      error.value =
+        err instanceof Error ? err.message : 'Gagal memuat detail karyawan.'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function createEmployee(payload: EmployeeCreateForm): Promise<boolean> {
+    isSubmitting.value = true
+    error.value = null
+
+    try {
+      await apiCreate(payload)
+      await silentRefresh()
+      return true
+    } catch (err: unknown) {
+      error.value =
+        err instanceof Error ? err.message : 'Gagal membuat karyawan baru.'
+      return false
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  async function updateEmployee(
+    id: number,
+    payload: EmployeeUpdateForm,
+  ): Promise<boolean> {
+    isSubmitting.value = true
+    error.value = null
+
+    try {
+      const res = await apiUpdate(id, payload)
+      selectedEmployee.value = res.employee
+      await silentRefresh()
+      return true
+    } catch (err: unknown) {
+      error.value =
+        err instanceof Error ? err.message : 'Gagal mengupdate karyawan.'
+      return false
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  async function deleteEmployee(id: number): Promise<boolean> {
+    isSubmitting.value = true
+    error.value = null
+
+    try {
+      await apiDelete(id)
+      await silentRefresh()
+      return true
+    } catch (err: unknown) {
+      error.value =
+        err instanceof Error ? err.message : 'Gagal menghapus karyawan.'
+      return false
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  async function fetchAssignRoleOptions(id: number): Promise<void> {
+    error.value = null
+
+    try {
+      const res = await getAssignRoleOptions(id)
+      assignRoleOptions.value = res.roles
+    } catch (err: unknown) {
+      error.value =
+        err instanceof Error ? err.message : 'Gagal memuat opsi role.'
+    }
+  }
+
+  async function assignRole(
+    id: number,
+    payload: AssignRolePayload,
+  ): Promise<boolean> {
+    isSubmitting.value = true
+    error.value = null
+
+    try {
+      const res = await apiAssignRole(id, payload)
+      selectedEmployee.value = res.employee
+      await silentRefresh()
+      return true
+    } catch (err: unknown) {
+      error.value =
+        err instanceof Error ? err.message : 'Gagal mengassign role.'
+      return false
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  function setFilter(key: 'search' | 'role_id' | 'page', value: string | number): void {
+    if (key === 'page') {
+      filters.value.page = value as number
+    } else {
+      filters.value[key] = value as string
+      filters.value.page = 1
+    }
+    fetchEmployees()
+  }
+
+  function resetState(): void {
+    employees.value = []
+    selectedEmployee.value = null
+    pagination.value = { currentPage: 1, lastPage: 1, perPage: 10, total: 0 }
+    isLoading.value = false
+    isSubmitting.value = false
+    error.value = null
+    filters.value = { search: '', role_id: '', page: 1 }
+    assignRoleOptions.value = []
+  }
+
   return {
-    items,
-    isLoading,
-    error,
-    searchQuery,
-    selectedRole,
-    rowsPerPage,
-    totalItems,
-    activeCount,
-    adminCount,
-    getById,
-    filteredItems,
-    canAdd,
-    canEdit,
-    canDelete,
-    setSearchQuery,
-    setRoleFilter,
-    setRowsPerPage,
-    setItems,
-    addItem,
-    updateItem,
-    deleteItem,
-    toggleStatus,
-    changeRole,
-    fetchItems,
+    employees, selectedEmployee, pagination,
+    isLoading, isSubmitting, error, filters, assignRoleOptions,
+    activeCount, roleCount,
+    fetchEmployees, fetchEmployee, createEmployee, updateEmployee,
+    deleteEmployee, fetchAssignRoleOptions, assignRole,
+    setFilter, resetState,
   }
 })

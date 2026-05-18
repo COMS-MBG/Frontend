@@ -4,7 +4,7 @@
     <td class="perm-row__feature">
       <div class="perm-row__feature-inner">
         <span class="material-symbols-outlined perm-row__icon">{{ icon }}</span>
-        <span class="perm-row__name">{{ name }}</span>
+        <span class="perm-row__name">{{ label }}</span>
       </div>
     </td>
 
@@ -16,8 +16,8 @@
     >
       <PermissionToggle
         :model-value="permissions[action.key]"
-        :disabled="!canEdit"
-        :label="`${name} — ${action.label}`"
+        :disabled="!canEdit || isSaving"
+        :label="`${label} — ${action.label}`"
         @update:model-value="$emit('toggle', action.key)"
       />
     </td>
@@ -30,10 +30,11 @@ import type { FeaturePermission, PermissionAction } from '@/types/access'
 import { PERMISSION_ACTIONS } from '@/types/access'
 
 defineProps<{
-  name: string
+  label: string
   icon: string
   permissions: FeaturePermission
   canEdit: boolean
+  isSaving?: boolean
 }>()
 
 defineEmits<{

@@ -17,7 +17,7 @@
       <StatCard
         label="TOTAL FITUR"
         icon="category"
-        :value="String(accessStore.features.length)"
+        :value="String(accessStore.totalFeatures)"
         variant="horizontal"
         icon-variant="blue"
       />
@@ -31,20 +31,24 @@
       <StatCard
         label="ROLE DIPILIH"
         icon="admin_panel_settings"
-        :value="accessStore.selectedRole"
+        :value="accessStore.selectedRoleName"
         variant="horizontal"
         icon-variant="purple"
       />
     </div>
 
     <!-- ═══════════════════════════════════════
-         3. ROLE SELECTOR
+         3. ROLE FILTER (AppSelect)
     ════════════════════════════════════════ -->
-    <RoleSelector
-      :model-value="accessStore.selectedRole"
-      :roles="accessStore.roles"
-      @update:model-value="accessStore.selectRole"
-    />
+    <div class="role-filter-bar">
+      <AppSelect
+        :model-value="selectedRoleValue"
+        :options="roleOptions"
+        label="Pilih Role"
+        placeholder="Pilih role untuk dikelola..."
+        @update:model-value="onRoleSelect"
+      />
+    </div>
 
     <!-- ═══════════════════════════════════════
          4. PERMISSION TABLE
@@ -52,6 +56,8 @@
     <PermissionTable
       :features="accessStore.currentPermissions"
       :can-edit="accessStore.canEditPermissions"
+      :is-saving="accessStore.isSaving"
+      :is-loading="accessStore.isLoading"
       @toggle="onToggle"
     />
 
@@ -59,10 +65,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import StatCard from '@/components/common/StatCard.vue'
-import RoleSelector from '@/components/hr/access/RoleSelector.vue'
+import AppSelect from '@/components/common/AppSelect.vue'
 import PermissionTable from '@/components/hr/access/PermissionTable.vue'
 import { useAccessStore } from '@/stores/access.store'
 import type { PermissionAction } from '@/types/access'
@@ -75,9 +81,27 @@ onMounted(() => {
   accessStore.initialize()
 })
 
-// ── Handlers ────────────────────────────────────────────────
-function onToggle(featureId: string, action: PermissionAction): void {
-  accessStore.togglePermission(featureId, action)
+// ── Role Select ──────────────────────────────────────────────
+const roleOptions = computed(() =>
+  accessStore.roles.map((r) => ({
+    label: r.name,
+    value: String(r.id),
+  })),
+)
+
+const selectedRoleValue = computed(() =>
+  accessStore.selectedRoleId !== null ? String(accessStore.selectedRoleId) : '',
+)
+
+function onRoleSelect(val: string | number | null) {
+  if (val === null) return
+  const id = Number(val)
+  if (!isNaN(id)) accessStore.selectRole(id)
+}
+
+// ── Permission Toggle ────────────────────────────────────────
+function onToggle(feature: string, action: PermissionAction): void {
+  accessStore.togglePermission(feature, action)
 }
 </script>
 
@@ -96,6 +120,11 @@ function onToggle(featureId: string, action: PermissionAction): void {
   gap: $space-4;
 }
 
+// ── Role filter ──
+.role-filter-bar {
+  max-width: 360px;
+}
+
 // ── Responsive ──
 @include tablet {
   .summary-row {
@@ -106,6 +135,9 @@ function onToggle(featureId: string, action: PermissionAction): void {
 @include mobile {
   .summary-row {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .role-filter-bar {
+    max-width: 100%;
   }
 }
 </style>

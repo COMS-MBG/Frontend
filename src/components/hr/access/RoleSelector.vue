@@ -3,39 +3,42 @@
     <div class="role-selector__tabs">
       <button
         v-for="role in roles"
-        :key="role"
+        :key="role.id"
         class="role-selector__tab"
-        :class="{ 'role-selector__tab--active': modelValue === role }"
-        @click="$emit('update:modelValue', role)"
-        :aria-pressed="modelValue === role"
+        :class="{ 'role-selector__tab--active': modelValue === role.id }"
+        @click="$emit('update:modelValue', role.id)"
+        :aria-pressed="modelValue === role.id"
       >
         <span class="material-symbols-outlined role-selector__icon">
-          {{ roleIcon(role) }}
+          {{ roleIcon(role.slug) }}
         </span>
-        {{ role }}
+        {{ role.name }}
+        <span v-if="role.employees_count !== undefined" class="role-selector__count">
+          {{ role.employees_count }}
+        </span>
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { RoleKey } from '@/types/access'
+import type { Role } from '@/types/access'
 
 defineProps<{
-  modelValue: RoleKey
-  roles: RoleKey[]
+  modelValue: number | null
+  roles: Role[]
 }>()
 
 defineEmits<{
-  (e: 'update:modelValue', role: RoleKey): void
+  (e: 'update:modelValue', roleId: number): void
 }>()
 
-function roleIcon(role: RoleKey): string {
-  switch (role) {
-    case 'Admin':    return 'admin_panel_settings'
-    case 'Operator': return 'engineering'
-    case 'Viewer':   return 'visibility'
-    default:         return 'person'
+function roleIcon(slug: string): string {
+  switch (slug) {
+    case 'admin-sppg':        return 'admin_panel_settings'
+    case 'ahli-gizi':         return 'restaurant'
+    case 'admin-logistik':    return 'local_shipping'
+    default:                  return 'person'
   }
 }
 </script>
@@ -85,6 +88,14 @@ function roleIcon(role: RoleKey): string {
 
   &__icon {
     font-size: 1.15rem;
+  }
+
+  &__count {
+    font-size: $text-xs;
+    font-weight: 700;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 1px 6px;
+    border-radius: $radius-pill;
   }
 }
 </style>

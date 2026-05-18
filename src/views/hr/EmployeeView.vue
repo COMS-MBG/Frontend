@@ -1,224 +1,250 @@
 <template>
   <div class="master-employee">
 
-    <!-- ═══════════════════════════════════════
-         1. HEADER + ACTION BUTTONS
-    ════════════════════════════════════════ -->
+    <!-- 1. HEADER -->
     <PageHeader
       title="Data Karyawan"
       subtitle="Kelola data pegawai, jabatan, dan akses sistem."
       :breadcrumb="['Data Karyawan', 'Manajemen Karyawan']"
     />
 
-    <!-- ═══════════════════════════════════════
-         2. SUMMARY STAT CARDS
-    ════════════════════════════════════════ -->
+    <!-- 2. SUMMARY STAT CARDS -->
     <div class="summary-row">
-      <StatCard
-        label="TOTAL KARYAWAN"
-        icon="group"
-        :value="String(employeeStore.totalItems)"
-        variant="horizontal"
-        icon-variant="blue"
-      />
-      <StatCard
-        label="KARYAWAN AKTIF"
-        icon="check_circle"
-        :value="String(employeeStore.activeCount)"
-        variant="horizontal"
-        icon-variant="green"
-      />
-      <StatCard
-        label="ADMIN SISTEM"
-        icon="admin_panel_settings"
-        :value="String(employeeStore.adminCount)"
-        variant="horizontal"
-        icon-variant="purple"
-      />
+      <StatCard label="TOTAL KARYAWAN" icon="group" :value="String(pagination.total)" variant="horizontal" icon-variant="blue" />
+      <StatCard label="KARYAWAN AKTIF" icon="check_circle" :value="String(activeCount)" variant="horizontal" icon-variant="green" />
+      <StatCard label="TOTAL ROLE" icon="admin_panel_settings" :value="String(roleCount)" variant="horizontal" icon-variant="purple" />
     </div>
 
-    <!-- ═══════════════════════════════════════
-         3. TOOLBAR (Search + Filter)
-    ════════════════════════════════════════ -->
-    <EmployeeToolbar @add="onTambah" />
-
-    <!-- ═══════════════════════════════════════
-         4. LOADING STATE
-    ════════════════════════════════════════ -->
-    <BaseTableSkeleton
-      v-if="isLoading"
-      :rows="6"
-      :columns="skeletonColumns"
-      :headers="skeletonHeaders"
+    <!-- 3. TOOLBAR -->
+    <EmployeeToolbar
+      :search-value="filters.search"
+      :role-value="filters.role_id"
+      :can-create="canCreate"
+      @update:search-value="onSearchChange"
+      @update:role-value="onRoleChange"
+      @add="openCreateModal"
     />
 
-    <!-- ═══════════════════════════════════════
-         5. DATA TABLE + PAGINATION
-    ════════════════════════════════════════ -->
+    <!-- 4. DATA TABLE -->
     <EmployeeTable
-      v-else
-      :items="paginatedItems"
-      :can-edit="employeeStore.canEdit"
-      :can-delete="employeeStore.canDelete"
-      @edit="onEdit"
-      @delete="onDelete"
-      @toggle-status="onToggleStatus"
-      @add="onTambah"
-    >
-      <template #pagination>
-        <BasePagination
-          v-if="filteredItems.length > rowsPerPage"
-          v-model="page"
-          :total="filteredItems.length"
-          :per-page="rowsPerPage"
-          item-label="karyawan"
-        />
-      </template>
-    </EmployeeTable>
-
-    <!-- ═══════════════════════════════════════
-         7. FORM MODAL
-    ════════════════════════════════════════ -->
-    <EmployeeFormModal
-      :is-open="isModalOpen"
-      :initial-data="editTarget"
-      @update:is-open="isModalOpen = $event"
-      @submit="onSubmit"
+      :items="employees"
+      :is-loading="isLoading"
+      :can-edit="canUpdate"
+      :can-delete="canDelete"
+      @edit="openEditModal"
+      @delete="onDeleteRequest"
+      @assign-role="openAssignRoleModal"
+      @view-detail="openDetailModal"
+      @add="openCreateModal"
     />
 
+    <!-- 5. PAGINATION -->
+    <BasePagination
+      v-if="pagination.total > pagination.perPage"
+      :model-value="pagination.currentPage"
+      :total="pagination.total"
+      :per-page="pagination.perPage"
+      item-label="karyawan"
+      @update:model-value="onPageChange"
+    />
+
+    <!-- 6. FORM MODAL -->
+    <EmployeeFormModal
+      :is-open="isFormOpen"
+      :initial-data="editTarget"
+      :is-submitting="isSubmitting"
+      @update:is-open="isFormOpen = $event"
+      @submit="onFormSubmit"
+    />
+
+    <!-- 7. ASSIGN ROLE MODAL -->
+    <AssignRoleModal
+      v-model="isAssignRoleOpen"
+      :employee="assignRoleTarget"
+      :role-options="assignRoleOptions"
+      :is-submitting="isSubmitting"
+      @submit="onAssignRoleSubmit"
+      @cancel="closeAssignRoleModal"
+    />
+
+    <!-- 8. DELETE CONFIRMATION (Danger-styled) -->
+    <ConfirmDeleteModal
+      v-model="isDeleteOpen"
+      title="Hapus Karyawan"
+      :item-name="deleteTarget?.name ?? ''"
+      confirm-label="Hapus"
+      :is-submitting="isSubmitting"
+      @confirm="onDeleteConfirm"
+      @cancel="closeDeleteModal"
+    />
+
+    <!-- 9. RESULT MODAL (Success/Error Feedback) -->
+    <ResultModal
+      v-model="isResultOpen"
+      :headline="resultHeadline"
+      :message="resultMessage"
+      :variant="resultVariant"
+    />
+
+    <!-- 10. DETAIL MODAL -->
+    <EmployeeDetailModal
+      :is-open="isDetailOpen"
+      :employee="detailTarget"
+      :can-edit="canUpdate"
+      @update:is-open="isDetailOpen = $event"
+      @close="closeDetailModal"
+      @edit="onEditFromDetail"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import StatCard from '@/components/common/StatCard.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
-import BaseEmptyState from '@/components/common/BaseEmptyState.vue'
-import BaseTableSkeleton from '@/components/common/BaseTableSkeleton.vue'
-import type { SkeletonColumn, SkeletonHeader } from '@/components/common/BaseTableSkeleton.vue'
+import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal.vue'
+import ResultModal from '@/components/common/ResultModal.vue'
 import EmployeeToolbar from '@/components/hr/management/EmployeeToolbar.vue'
 import EmployeeTable from '@/components/hr/management/EmployeeTable.vue'
 import EmployeeFormModal from '@/components/hr/management/EmployeeFormModal.vue'
-import { useEmployeeStore } from '@/stores/employee.store'
-import { employeeDummy } from '@/data/employee.dummy'
-import { usePagination } from '@/composables/usePagination'
-import type { Employee } from '@/types/employee'
+import EmployeeDetailModal from '@/components/hr/management/EmployeeDetailModal.vue'
+import AssignRoleModal from '@/components/hr/management/AssignRoleModal.vue'
+import { useEmployee } from '@/composables/useEmployee'
+import { useToast } from '@/composables/useToast'
+import type { Employee, EmployeeCreateForm, EmployeeUpdateForm, AssignRolePayload } from '@/types/employee'
 
-import { storeToRefs } from 'pinia'
+const {
+  employees, selectedEmployee, pagination, isLoading, isSubmitting, error, filters,
+  assignRoleOptions, activeCount, roleCount,
+  canCreate, canUpdate, canDelete,
+  fetchEmployees, fetchEmployee, createEmployee, updateEmployee, deleteEmployee,
+  fetchAssignRoleOptions, assignRole, setFilter, resetState,
+} = useEmployee()
 
-// ── Store ────────────────────────────────────────────────────
-const employeeStore = useEmployeeStore()
-const { filteredItems, rowsPerPage, searchQuery, selectedRole, isLoading } = storeToRefs(employeeStore)
+const toast = useToast()
 
-// ── Skeleton Config ──────────────────────────────────────────
-const skeletonHeaders: SkeletonHeader[] = [
-  { label: 'NAMA KARYAWAN', align: 'left' },
-  { label: 'NRP / NIDN', align: 'left' },
-  { label: 'JABATAN', align: 'left' },
-  { label: 'DEPARTEMEN', align: 'left' },
-  { label: 'ROLE', align: 'center' },
-  { label: 'STATUS', align: 'center' },
-  { label: 'AKSI', align: 'center' },
-]
+// ── Toolbar ──────────────────────────────────────────────────
+function onSearchChange(val: string) { setFilter('search', val) }
+function onRoleChange(val: string) { setFilter('role_id', val) }
+function onPageChange(page: number) { setFilter('page', page) }
 
-const skeletonColumns: SkeletonColumn[] = [
-  { type: 'avatar-text' },
-  { type: 'text', width: '80px' },
-  { type: 'text', width: '100px' },
-  { type: 'text', width: '100px' },
-  { type: 'badge' },
-  { type: 'text', width: '40px' },
-  { type: 'actions' },
-]
+// ── Result Modal ─────────────────────────────────────────────
+const isResultOpen = ref(false)
+const resultHeadline = ref('')
+const resultMessage = ref('')
+const resultVariant = ref<'success' | 'error'>('success')
 
-// ── Seed store on mount ──────────────────────────────────────
-// TODO: swap to `employeeStore.fetchItems()` when API is ready.
-onMounted(() => {
-  if (employeeStore.items.length === 0) {
-    employeeStore.setItems(employeeDummy)
-  }
-})
-
-// ── UI State (view-local only) ───────────────────────────────
-const isModalOpen = ref(false)
-const editTarget  = ref<Employee | null>(null)
-
-// ── Pagination (extracted composable) ────────────────────────
-const { page, paginatedItems } = usePagination(filteredItems, rowsPerPage)
-
-// Reset page when search, filter, or per-page size changes
-watch(
-  [searchQuery, selectedRole, rowsPerPage], 
-  () => {
-    page.value = 1
-  }
-)
-
-// ── Handlers ────────────────────────────────────────────────
-
-function onTambah(): void {
-  editTarget.value = null
-  isModalOpen.value = true
+function showResult(headline: string, message: string, variant: 'success' | 'error' = 'success') {
+  resultHeadline.value = headline
+  resultMessage.value = message
+  resultVariant.value = variant
+  isResultOpen.value = true
 }
 
-function onEdit(item: Employee): void {
-  editTarget.value = item
-  isModalOpen.value = true
-}
+// ── Form Modal ───────────────────────────────────────────────
+const isFormOpen = ref(false)
+const editTarget = ref<Employee | null>(null)
 
-function onDelete(item: Employee): void {
-  employeeStore.deleteItem(item.id)
-}
+function openCreateModal() { editTarget.value = null; isFormOpen.value = true }
+function openEditModal(emp: Employee) { editTarget.value = emp; isFormOpen.value = true }
 
-function onToggleStatus(item: Employee): void {
-  employeeStore.toggleStatus(item.id)
-}
-
-function onSubmit(data: Partial<Employee>): void {
-  if (data.id) {
-    // Edit existing
-    const existing = employeeStore.getById(data.id)
-    if (existing) {
-      employeeStore.updateItem({ ...existing, ...data } as Employee)
+async function onFormSubmit(data: EmployeeCreateForm) {
+  let success = false
+  if (editTarget.value) {
+    const payload: EmployeeUpdateForm = { ...data }
+    success = await updateEmployee(editTarget.value.id, payload)
+    if (success) {
+      isFormOpen.value = false
+      showResult('Karyawan Berhasil Diperbarui', `Data karyawan "${data.name}" telah diperbarui.`)
     }
   } else {
-    // Add new — generate a temporary id
-    const maxId = Math.max(0, ...employeeStore.items.map(i => i.id))
-    employeeStore.addItem({
-      ...data,
-      id: maxId + 1,
-      isActive: true,
-    } as Employee)
+    success = await createEmployee(data)
+    if (success) {
+      isFormOpen.value = false
+      showResult('Karyawan Berhasil Ditambahkan', `Karyawan "${data.name}" telah ditambahkan ke sistem.`)
+    }
+  }
+  if (!success && error.value) toast.error(error.value)
+}
+
+// ── Delete Modal ─────────────────────────────────────────────
+const isDeleteOpen = ref(false)
+const deleteTarget = ref<Employee | null>(null)
+
+function onDeleteRequest(item: Employee) { deleteTarget.value = item; isDeleteOpen.value = true }
+function closeDeleteModal() { isDeleteOpen.value = false; deleteTarget.value = null }
+
+async function onDeleteConfirm() {
+  if (!deleteTarget.value) return
+  const name = deleteTarget.value.name
+  const success = await deleteEmployee(deleteTarget.value.id)
+  if (success) {
+    closeDeleteModal()
+    showResult('Karyawan Berhasil Dihapus', `Karyawan "${name}" telah dihapus dari sistem.`)
+  } else if (error.value) {
+    toast.error(error.value)
   }
 }
+
+// ── Assign Role Modal ────────────────────────────────────────
+const isAssignRoleOpen = ref(false)
+const assignRoleTarget = ref<Employee | null>(null)
+
+async function openAssignRoleModal(emp: Employee) {
+  assignRoleTarget.value = emp
+  await fetchAssignRoleOptions(emp.id)
+  isAssignRoleOpen.value = true
+}
+function closeAssignRoleModal() { isAssignRoleOpen.value = false; assignRoleTarget.value = null }
+async function onAssignRoleSubmit(payload: AssignRolePayload) {
+  if (!assignRoleTarget.value) return
+  const success = await assignRole(assignRoleTarget.value.id, payload)
+  if (success) {
+    closeAssignRoleModal()
+    showResult('Role Berhasil Diassign', `Role telah diassign ke "${assignRoleTarget.value.name}".`)
+  } else if (error.value) {
+    toast.error(error.value)
+  }
+}
+
+// ── Detail Modal ─────────────────────────────────────────────
+const isDetailOpen = ref(false)
+const detailTarget = ref<Employee | null>(null)
+
+async function openDetailModal(emp: Employee) {
+  detailTarget.value = null
+  isDetailOpen.value = true
+  await fetchEmployee(emp.id)
+  detailTarget.value = selectedEmployee.value
+}
+
+function closeDetailModal() {
+  isDetailOpen.value = false
+  detailTarget.value = null
+}
+
+function onEditFromDetail(emp: Employee) {
+  isDetailOpen.value = false
+  openEditModal(emp)
+}
+
+// ── Error watcher ────────────────────────────────────────────
+watch(error, (err) => {
+  if (err && err.includes('403')) toast.error('Tidak memiliki izin')
+})
+
+onMounted(() => fetchEmployees())
+onUnmounted(() => resetState())
 </script>
 
 <style scoped lang="scss">
 .master-employee {
-  display: flex;
-  flex-direction: column;
-  gap: $space-6;
-  font-family: $font-body;
+  display: flex; flex-direction: column; gap: $space-6; font-family: $font-body;
 }
-
-// ── Summary row ──
 .summary-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: $space-4;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: $space-4;
 }
-
-// ── Responsive ──
-@include tablet {
-  .summary-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@include mobile {
-  .summary-row {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  }
-}
+@include tablet { .summary-row { grid-template-columns: repeat(2, 1fr); } }
+@include mobile { .summary-row { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
 </style>
