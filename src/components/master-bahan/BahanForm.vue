@@ -6,13 +6,13 @@
     <div class="form-grid">
       <BaseFormGroup
         label="Nama Bahan"
-        id="nama"
+        id="name"
         required
-        :error="errors.nama"
+        :error="errors.name"
       >
         <template #default="{ id, describedby, invalid }">
           <input
-            v-model="formData.nama"
+            v-model="formData.name"
             :id="id"
             :aria-describedby="describedby"
             :aria-invalid="invalid"
@@ -23,31 +23,40 @@
       </BaseFormGroup>
 
       <BaseFormGroup
-        label="Satuan"
-        id="satuan"
+        label="Berat Acuan (gram)"
+        id="serving_weight"
         required
+        :error="errors.serving_weight"
       >
-        <template #default>
-          <AppSelect
-            v-model="formData.satuan"
-            :options="satuanOptions"
-            placeholder="Pilih satuan"
-            :error="errors.satuan"
+        <template #default="{ id, describedby, invalid }">
+          <input
+            v-model.number="formData.serving_weight"
+            type="number"
+            step="any"
+            :id="id"
+            :aria-describedby="describedby"
+            :aria-invalid="invalid"
+            class="form-control"
+            placeholder="100"
           />
         </template>
       </BaseFormGroup>
 
       <BaseFormGroup
-        label="Status"
-        id="status"
-        required
+        label="Deskripsi"
+        id="description"
+        class="form-grid__full"
+        :error="errors.description"
       >
-        <template #default>
-          <AppSelect
-            v-model="formData.status"
-            :options="statusOptions"
-            placeholder="Pilih status"
-            :error="errors.status"
+        <template #default="{ id, describedby, invalid }">
+          <textarea
+            v-model="formData.description"
+            :id="id"
+            :aria-describedby="describedby"
+            :aria-invalid="invalid"
+            class="form-control form-control--textarea"
+            placeholder="Deskripsi bahan (opsional)"
+            rows="2"
           />
         </template>
       </BaseFormGroup>
@@ -59,13 +68,13 @@
     <div class="form-grid">
       <BaseFormGroup
         label="Kalori (kkal)"
-        id="kalori"
+        id="calorie"
         required
-        :error="errors.kalori"
+        :error="errors.calorie"
       >
         <template #default="{ id, describedby, invalid }">
           <input
-            v-model.number="formData.kalori"
+            v-model.number="formData.calorie"
             type="number"
             step="any"
             :id="id"
@@ -99,13 +108,13 @@
 
       <BaseFormGroup
         label="Karbohidrat (g)"
-        id="karbohidrat"
+        id="carbohydrate"
         required
-        :error="errors.karbohidrat"
+        :error="errors.carbohydrate"
       >
         <template #default="{ id, describedby, invalid }">
           <input
-            v-model.number="formData.karbohidrat"
+            v-model.number="formData.carbohydrate"
             type="number"
             step="any"
             :id="id"
@@ -119,13 +128,12 @@
 
       <BaseFormGroup
         label="Lemak (g)"
-        id="lemak"
-        required
-        :error="errors.lemak"
+        id="fat"
+        :error="errors.fat"
       >
         <template #default="{ id, describedby, invalid }">
           <input
-            v-model.number="formData.lemak"
+            v-model.number="formData.fat"
             type="number"
             step="any"
             :id="id"
@@ -153,63 +161,50 @@
 import { ref, watch } from 'vue'
 import { z } from 'zod'
 import BaseFormGroup from '@/components/common/BaseFormGroup.vue'
-import AppSelect from '@/components/common/AppSelect.vue'
-import type { BahanItem } from '@/types/gizi'
-
-// ── Select Options ────────────────────────────────────────────
-const satuanOptions = [
-  { label: 'Kg', value: 'kg' },
-  { label: 'Liter', value: 'liter' },
-  { label: 'Pcs', value: 'pcs' },
-]
-
-const statusOptions = [
-  { label: 'Aktif', value: 'aktif' },
-  { label: 'Nonaktif', value: 'nonaktif' },
-]
+import type { Ingredient, IngredientForm } from '@/types/ingredient'
 
 // ── Props & Emits ─────────────────────────────────────────────
 const props = defineProps<{
-  initialData?: BahanItem | null
+  initialData?: Ingredient | null
   loading?: boolean
   submitText?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'submit', data: Omit<BahanItem, 'id'>): void
+  (e: 'submit', data: IngredientForm): void
   (e: 'cancel'): void
 }>()
 
 // ── Validation Schema ─────────────────────────────────────────
 const schema = z.object({
-  nama: z.string().min(1, 'Nama bahan wajib diisi'),
-  satuan: z.enum(['kg', 'liter', 'pcs'] as const, { message: 'Satuan wajib dipilih' }),
-  status: z.enum(['aktif', 'nonaktif'] as const, { message: 'Status wajib dipilih' }),
-  kalori: z.number({ message: 'Kalori harus berupa angka' }).min(0, 'Kalori tidak boleh negatif'),
+  name: z.string().min(1, 'Nama bahan wajib diisi'),
+  serving_weight: z.number({ message: 'Berat acuan harus berupa angka' }).min(1, 'Berat acuan minimal 1 gram'),
+  description: z.string().max(1000).optional().or(z.literal('')),
+  calorie: z.number({ message: 'Kalori harus berupa angka' }).min(0, 'Kalori tidak boleh negatif'),
   protein: z.number({ message: 'Protein harus berupa angka' }).min(0, 'Protein tidak boleh negatif'),
-  karbohidrat: z.number({ message: 'Karbohidrat harus berupa angka' }).min(0, 'Karbohidrat tidak boleh negatif'),
-  lemak: z.number({ message: 'Lemak harus berupa angka' }).min(0, 'Lemak tidak boleh negatif'),
+  carbohydrate: z.number({ message: 'Karbohidrat harus berupa angka' }).min(0, 'Karbohidrat tidak boleh negatif'),
+  fat: z.number({ message: 'Lemak harus berupa angka' }).min(0, 'Lemak tidak boleh negatif').optional().default(0),
 })
 
 // ── Form State ────────────────────────────────────────────────
 type BahanFormData = {
-  nama: string
-  satuan: string | null
-  status: string | null
-  kalori: number
+  name: string
+  serving_weight: number
+  description: string
+  calorie: number
   protein: number
-  karbohidrat: number
-  lemak: number
+  carbohydrate: number
+  fat: number
 }
 
 const getDefaultForm = (): BahanFormData => ({
-  nama: '',
-  satuan: null,
-  status: 'aktif',
-  kalori: 0,
+  name: '',
+  serving_weight: 100,
+  description: '',
+  calorie: 0,
   protein: 0,
-  karbohidrat: 0,
-  lemak: 0,
+  carbohydrate: 0,
+  fat: 0,
 })
 
 const formData = ref<BahanFormData>(getDefaultForm())
@@ -220,13 +215,13 @@ const isFormValid = ref(false)
 watch(() => props.initialData, (newData) => {
   if (newData) {
     formData.value = {
-      nama: newData.nama,
-      satuan: newData.satuan,
-      status: newData.status,
-      kalori: newData.kalori,
+      name: newData.name,
+      serving_weight: newData.serving_weight,
+      description: newData.description ?? '',
+      calorie: newData.calorie,
       protein: newData.protein,
-      karbohidrat: newData.karbohidrat,
-      lemak: newData.lemak,
+      carbohydrate: newData.carbohydrate,
+      fat: newData.fat,
     }
   } else {
     formData.value = getDefaultForm()
@@ -264,7 +259,16 @@ const validate = (): boolean => {
 // ── Submit handler ────────────────────────────────────────────
 const handleSubmit = () => {
   if (validate()) {
-    emit('submit', formData.value as Omit<BahanItem, 'id'>)
+    const payload: IngredientForm = {
+      name: formData.value.name,
+      serving_weight: formData.value.serving_weight,
+      calorie: formData.value.calorie,
+      protein: formData.value.protein,
+      carbohydrate: formData.value.carbohydrate,
+      fat: formData.value.fat,
+      description: formData.value.description || undefined,
+    }
+    emit('submit', payload)
   }
 }
 </script>
@@ -288,6 +292,10 @@ const handleSubmit = () => {
   grid-template-columns: 1fr 1fr;
   gap: $space-4;
   margin-bottom: $space-4;
+
+  &__full {
+    grid-column: 1 / -1;
+  }
 
   @include mobile {
     grid-template-columns: 1fr;
@@ -321,6 +329,11 @@ const handleSubmit = () => {
     &:focus {
       box-shadow: 0 0 0 3px $color-danger-bg;
     }
+  }
+
+  &--textarea {
+    resize: vertical;
+    min-height: 60px;
   }
 }
 

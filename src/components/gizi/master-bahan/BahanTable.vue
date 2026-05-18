@@ -4,12 +4,11 @@
       <thead>
         <tr>
           <th class="th-nama">NAMA BAHAN</th>
-          <th class="th-center">SATUAN</th>
-          <th class="th-num">KALORI/100G</th>
-          <th class="th-num">PROTEIN/100G</th>
-          <th class="th-num">KARBO/100G</th>
-          <th class="th-num">LEMAK/100G</th>
-          <th class="th-center">STATUS</th>
+          <th class="th-num">BERAT ACUAN</th>
+          <th class="th-num">KALORI</th>
+          <th class="th-num">PROTEIN</th>
+          <th class="th-num">KARBO</th>
+          <th class="th-num">LEMAK</th>
           <th class="th-aksi">AKSI</th>
         </tr>
       </thead>
@@ -53,7 +52,7 @@
     }
 
     th {
-      padding: $space-4 $space-5; // Increased vertical padding
+      padding: $space-4 $space-5;
       font-size: $text-xs;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -68,20 +67,15 @@
     text-align: left;
   }
 
-  .th-center {
-    color: $color-text-primary;
-    text-align: center;
-  }
-
   .th-num {
     color: $color-text-primary;
-    text-align: center; // Changed to center as requested
+    text-align: center;
   }
 
   .th-aksi {
     color: $color-text-primary;
     text-align: center;
-    width: 120px; // Slightly wider for action buttons with gap
+    width: 120px;
   }
 }
 

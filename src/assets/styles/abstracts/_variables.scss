@@ -32,6 +32,10 @@
   --color-purple: #7c3aed;
   --color-purple-subtle: #f3e8ff;
 
+  // COLOR — Info (Teal)
+  --color-info: #0891b2;
+  --color-info-bg: #ecfeff;
+
   // TEXT COLORS
   --color-text-primary: #111827;
   --color-text-secondary: #374151;
@@ -91,6 +95,10 @@
   // COLOR — Purple
   --color-purple: #8b5cf6;
   --color-purple-subtle: rgba(139, 92, 246, 0.15);
+
+  // COLOR — Info (Teal)
+  --color-info: #22d3ee;
+  --color-info-bg: rgba(34, 211, 238, 0.15);
 
   // TEXT COLORS
   --color-text-primary: #f9fafb;
@@ -154,6 +162,10 @@ $color-warning-subtle: var(--color-warning-subtle);
 // COLOR — Purple
 $color-purple:         var(--color-purple);
 $color-purple-subtle:  var(--color-purple-subtle);
+
+// COLOR — Info
+$color-info:           var(--color-info);
+$color-info-bg:        var(--color-info-bg);
 
 // TEXT COLORS
 $color-text-primary:   var(--color-text-primary);

@@ -4,49 +4,42 @@
     <td class="bahan-row__nama">
       <div class="bahan-row__nama-inner">
         <div class="bahan-row__thumb">
-          <img
-            v-if="item.image"
-            :src="item.image"
-            :alt="item.nama"
-            class="bahan-row__thumb-img"
-          />
-          <span v-else class="material-symbols-outlined bahan-row__thumb-icon">nutrition</span>
+          <span class="material-symbols-outlined bahan-row__thumb-icon">nutrition</span>
         </div>
         <div class="bahan-row__text">
-          <span class="bahan-row__name">{{ item.nama }}</span>
+          <span class="bahan-row__name">{{ item.name }}</span>
+          <span v-if="item.description" class="bahan-row__desc">{{ item.description }}</span>
         </div>
       </div>
     </td>
 
-    <!-- 2) Satuan Badge -->
-    <td class="bahan-row__center">
-      <BaseBadge :text="item.satuan.toUpperCase()" :variant="getSatuanVariant(item.satuan)" />
-    </td>
+    <!-- 2) Berat Acuan -->
+    <td class="bahan-row__num">{{ formatDec(item.serving_weight) }} g</td>
 
     <!-- 3) Kalori -->
-    <td class="bahan-row__num">{{ formatNum(item.kalori) }} kcal</td>
+    <td class="bahan-row__num">{{ formatNum(item.calorie) }} kcal</td>
 
     <!-- 4) Protein -->
     <td class="bahan-row__num">{{ formatDec(item.protein) }} g</td>
 
     <!-- 5) Karbohidrat -->
-    <td class="bahan-row__num">{{ formatDec(item.karbohidrat) }} g</td>
+    <td class="bahan-row__num">{{ formatDec(item.carbohydrate) }} g</td>
 
     <!-- 6) Lemak -->
-    <td class="bahan-row__num">{{ formatDec(item.lemak) }} g</td>
+    <td class="bahan-row__num">{{ formatDec(item.fat) }} g</td>
 
-    <!-- 7) Status -->
-    <td class="bahan-row__center">
-      <BaseBadge
-        :text="item.status === 'aktif' ? 'Aktif' : 'Nonaktif'"
-        :variant="item.status === 'aktif' ? 'success' : 'danger'"
-      />
-    </td>
-
-    <!-- 8) Aksi -->
+    <!-- 7) Aksi -->
     <td class="bahan-row__aksi">
       <div class="action-group">
         <button
+          class="action-btn action-btn--view"
+          aria-label="Lihat detail bahan"
+          @click="$emit('view-detail', item)"
+        >
+          <span class="material-symbols-outlined">visibility</span>
+        </button>
+        <button
+          v-if="canEdit"
           class="action-btn action-btn--edit"
           aria-label="Edit bahan"
           @click="$emit('edit', item)"
@@ -54,6 +47,7 @@
           <span class="material-symbols-outlined">edit</span>
         </button>
         <button
+          v-if="canDelete"
           class="action-btn action-btn--delete"
           aria-label="Hapus bahan"
           @click="$emit('delete', item)"
@@ -66,27 +60,20 @@
 </template>
 
 <script setup lang="ts">
-import BaseBadge from '@/components/common/BaseBadge.vue'
-import type { BahanItem } from '@/types/gizi'
+import type { Ingredient } from '@/types/ingredient'
 import { formatNum, formatDec } from '@/utils/format'
 
 defineProps<{
-  item: BahanItem
+  item: Ingredient
+  canEdit: boolean
+  canDelete: boolean
 }>()
 
 defineEmits<{
-  (e: 'edit', item: BahanItem): void
-  (e: 'delete', item: BahanItem): void
+  (e: 'edit', item: Ingredient): void
+  (e: 'delete', item: Ingredient): void
+  (e: 'view-detail', item: Ingredient): void
 }>()
-
-const getSatuanVariant = (satuan: string) => {
-  switch (satuan.toLowerCase()) {
-    case 'kg': return 'info'
-    case 'liter': return 'success'
-    case 'pcs': return 'warning'
-    default: return 'default'
-  }
-}
 </script>
 
 <style scoped lang="scss">
@@ -131,12 +118,6 @@ const getSatuanVariant = (satuan: string) => {
     border: 1px solid $color-border-light;
   }
 
-  &__thumb-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
   &__thumb-icon {
     font-size: $text-xl;
     color: $color-text-faint;
@@ -152,6 +133,15 @@ const getSatuanVariant = (satuan: string) => {
     font-size: $text-base;
     font-weight: 600;
     color: $color-text-primary;
+  }
+
+  &__desc {
+    font-size: $text-xs;
+    color: $color-text-muted;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   // ── Center-aligned cells ──
