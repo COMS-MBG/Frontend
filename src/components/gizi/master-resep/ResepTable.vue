@@ -3,51 +3,28 @@
     <table class="resep-table">
       <thead>
         <tr>
-          <th class="th-nama">NAMA MENU / RESEP</th>
-          <th class="th-num">KALORI (KCAL)</th>
-          <th class="th-num">PROTEIN (G)</th>
-          <th class="th-num">KARBOHIDRAT (G)</th>
-          <th class="th-num">LEMAK (G)</th>
+          <th class="th-nama">NAMA RESEP</th>
+          <th class="th-num">BERAT TOTAL</th>
+          <th class="th-num">KALORI</th>
+          <th class="th-num">PROTEIN</th>
+          <th class="th-num">KARBO</th>
+          <th class="th-num">LEMAK</th>
           <th class="th-aksi">AKSI</th>
         </tr>
       </thead>
       <tbody>
-  <template v-if="items.length > 0">
-    <ResepRow
-      v-for="item in items"
-      :key="item.id"
-      :item="item"
-      @edit="$emit('edit', $event)"
-      @delete="$emit('delete', $event)"
-    />
-  </template>
-
-  <tr v-else>
-    <td colspan="6" class="empty-state">
-      Tidak ada data resep
-    </td>
-  </tr>
-</tbody>
+        <slot />
+      </tbody>
     </table>
 
-    <div class="table-footer">
+    <div v-if="$slots.pagination" class="resep-table__footer">
       <slot name="pagination" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import ResepRow from './ResepRow.vue'
-import type { ResepItem } from '@/types/resep'
-
-defineProps<{
-  items: ResepItem[]
-}>()
-
-defineEmits<{
-  (e: 'edit', item: ResepItem): void
-  (e: 'delete', item: ResepItem): void
-}>()
+// Presentational wrapper — rows and pagination injected via slots.
 </script>
 
 <style scoped lang="scss">
@@ -67,13 +44,14 @@ defineEmits<{
     position: sticky;
     top: 0;
     z-index: 2;
+
     tr {
       background-color: $color-bg-subtle;
       border-bottom: 1px solid $color-border;
     }
 
     th {
-      padding: $space-3 $space-5;
+      padding: $space-4 $space-5;
       font-size: $text-xs;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -81,10 +59,7 @@ defineEmits<{
       color: $color-text-muted;
       white-space: nowrap;
     }
-    td{
-      padding: $space-3 $space-5;
   }
-}
 
   .th-nama {
     color: $color-text-primary;
@@ -99,20 +74,13 @@ defineEmits<{
   .th-aksi {
     color: $color-text-primary;
     text-align: center;
-    width: 100px;
+    width: 140px;
   }
 }
 
-.table-footer {
+.resep-table__footer {
   padding: $space-4 $space-5;
   border-top: 1px solid $color-border;
   background-color: $color-bg-surface;
-}
-
-.empty-state {
-  text-align: center;
-  padding: $space-6;
-  color: $color-text-muted;
-  font-size: $text-sm;
 }
 </style>

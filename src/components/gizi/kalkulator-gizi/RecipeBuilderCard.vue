@@ -1,9 +1,13 @@
 <template>
   <BaseCard class="recipe-builder-card" padding="none">
+    <BaseLoadingOverlay
+      :show="isLoading"
+      text="Memuat data resep..."
+    />
     <div class="rb-header">
       <div>
         <p class="subtitle">DATA INPUT</p>
-        <h2 class="title">Recipe Builder</h2>
+        <h2 class="title">Racik Resep</h2>
       </div>
       <div class="icon-wrapper">
         <span class="material-symbols-outlined">restaurant_menu</span>
@@ -55,6 +59,7 @@
           variant="dark" 
           full-width 
           icon="calculate"
+          :disabled="isSaving"
           @click="$emit('calculate')"
         >
           Hitung Analisis Gizi
@@ -62,10 +67,12 @@
         <BaseButton 
           variant="primary" 
           full-width 
-          icon="save"
+          :icon="isSaving ? 'sync' : 'save'"
+          :disabled="isSaving"
+          :class="{ 'btn--loading': isSaving }"
           @click="$emit('save')"
         >
-          Simpan Resep
+          {{ isSaving ? 'Menyimpan...' : 'Simpan Resep' }}
         </BaseButton>
       </div>
     </div>
@@ -75,6 +82,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
+import BaseLoadingOverlay from '@/components/common/BaseLoadingOverlay.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseFormGroup from '@/components/common/BaseFormGroup.vue'
@@ -87,6 +95,8 @@ const props = defineProps<{
   bahanItems: BahanItemData[]
   bahanOptions: SelectOption[]
   errors?: ResepFormErrors
+  isSaving?: boolean
+  isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -112,6 +122,8 @@ const onRemoveBahan = (index: number) => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative; /* needed for loading overlay */
+  overflow: hidden;
 }
 
 .rb-header {

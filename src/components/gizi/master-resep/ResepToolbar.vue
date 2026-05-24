@@ -2,14 +2,15 @@
   <BaseTableToolbar
     :search-value="localSearch"
     @update:search-value="onSearchInput"
-    :per-page-value="resepStore.rowsPerPage"
-    @update:per-page-value="resepStore.setRowsPerPage"
     :show-search="true"
     :show-filter="false"
     :show-import="false"
     :show-export="false"
     :show-per-page="true"
-    :show-add="true"
+    :per-page-value="perPageValue"
+    :per-page-options="perPageOptions"
+    @update:per-page-value="onPerPageChange"
+    :show-add="canCreate"
     add-label="Tambah Resep"
     search-placeholder="Cari resep..."
     @add="$emit('add')"
@@ -17,43 +18,51 @@
 </template>
 
 <script setup lang="ts">
-/**
- * ResepToolbar.vue — Thin domain wrapper around BaseTableToolbar
- *
- * Responsibilities:
- *  1. Sync search with Pinia store (debounced search via useDebounce)
- *  2. Sync rowsPerPage with Pinia store
- *  3. Emit add events to the parent view
- *
- * All layout, styling, and responsive behavior is handled
- * by the reusable BaseTableToolbar component.
- */
 import { ref, watch } from 'vue'
 import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
-import { useResepStore } from '@/stores/resep.store'
 import { useDebounce } from '@/composables/useDebounce'
+import type { SelectOption } from '@/types/form'
+
+const props = withDefaults(defineProps<{
+  searchValue?: string
+  canCreate?: boolean
+  perPageValue?: number
+}>(), {
+  searchValue: '',
+  canCreate: false,
+  perPageValue: 10,
+})
 
 const emit = defineEmits<{
+  (e: 'update:search-value', val: string): void
+  (e: 'update:per-page-value', val: number): void
   (e: 'add'): void
 }>()
 
-// ── Store ─────────────────────────────────────────────────────
-const resepStore = useResepStore()
+const localSearch = ref(props.searchValue ?? '')
 
-// ── Local state (synced → Pinia) ──────────────────────────────
-const localSearch = ref(resepStore.searchQuery)
-
-// ── Debounced search → Pinia (300ms) ──────────────────────────
 const debouncedSearch = useDebounce(localSearch, 300)
 
 watch(debouncedSearch, (newVal) => {
-  resepStore.setSearchQuery(newVal)
+  emit('update:search-value', newVal)
 })
 
-// ── Sync back from Pinia (e.g. resetToolbar) ─────────────────
-watch(() => resepStore.searchQuery, (v) => { localSearch.value = v })
+watch(() => props.searchValue, (v) => {
+  if (v !== undefined) localSearch.value = v
+})
 
 function onSearchInput(val: string) {
   localSearch.value = val
+}
+
+const perPageOptions: SelectOption[] = [
+  { label: '5', value: 5 },
+  { label: '10', value: 10 },
+  { label: '25', value: 25 },
+  { label: '50', value: 50 },
+]
+
+function onPerPageChange(val: number) {
+  emit('update:per-page-value', val)
 }
 </script>

@@ -59,9 +59,4 @@
     gap: $space-6;
   }
 
-  &__stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: $space-4;
-  }
 }

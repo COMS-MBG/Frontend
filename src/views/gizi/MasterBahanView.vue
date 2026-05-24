@@ -14,9 +14,9 @@
          2. SUMMARY STAT CARDS
     ════════════════════════════════════════ -->
     <div class="summary-row">
-      <StatCard label="TOTAL BAHAN" icon="inventory_2" :value="String(pagination.total)" variant="horizontal" icon-variant="blue" />
-      <StatCard label="RATA-RATA KALORI" icon="local_fire_department" :value="`${avgCalorie} kcal`" variant="horizontal" icon-variant="orange" />
-      <StatCard label="RATA-RATA PROTEIN" icon="fitness_center" :value="`${avgProtein} g`" variant="horizontal" icon-variant="purple" />
+      <StatCard label="TOTAL BAHAN" icon="inventory_2" :value="formatNum(pagination.total)" variant="horizontal" icon-variant="blue" />
+      <StatCard label="RATA-RATA KALORI" icon="local_fire_department" :value="`${formatNum(avgCalorie)} kcal`" variant="horizontal" icon-variant="orange" />
+      <StatCard label="RATA-RATA PROTEIN" icon="fitness_center" :value="`${formatDec(Number(avgProtein))} g`" variant="horizontal" icon-variant="purple" />
     </div>
 
     <!-- ═══════════════════════════════════════
@@ -144,13 +144,14 @@ import BahanFormModal from '@/components/master-bahan/BahanFormModal.vue'
 import { useIngredient } from '@/composables/useIngredient'
 import { useToast } from '@/composables/useToast'
 import type { Ingredient, IngredientForm } from '@/types/ingredient'
+import { formatNum, formatDec } from '@/utils/format'
 
 // ── Composable ──────────────────────────────────────────────
 const {
   ingredients, pagination, isLoading, isSubmitting, error, filters,
   avgCalorie, avgProtein,
   canCreate, canUpdate, canDelete,
-  fetchIngredients, createIngredient, updateIngredient, deleteIngredient,
+  fetchIngredients, fetchIngredientDetail, createIngredient, updateIngredient, deleteIngredient,
   setFilter, resetState,
 } = useIngredient()
 
@@ -251,13 +252,10 @@ async function openDetailModal(item: Ingredient) {
   detailTarget.value = item
   isDetailOpen.value = true
 
-  // Fetch full detail from API for fresh data
-  try {
-    const { getIngredient } = await import('@/api/ingredient.api')
-    const full = await getIngredient(item.id)
+  // Ambil detail lengkap melalui composable (bukan direct API import)
+  const full = await fetchIngredientDetail(item.id)
+  if (full) {
     detailTarget.value = full
-  } catch {
-    // Fallback: keep the list data already set
   }
 }
 

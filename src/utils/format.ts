@@ -6,9 +6,12 @@ export function formatNum(val: number): string {
   return val.toLocaleString('id-ID')
 }
 
-/** Format a decimal with fixed digits (default 1 → "27.3") */
+/** Format a decimal with fixed digits using Indonesian locale (e.g. 27,3) */
 export function formatDec(val: number, digits = 1): string {
-  return val.toFixed(digits)
+  return val.toLocaleString('id-ID', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })
 }
 
 /** Format currency IDR (e.g. "Rp 250.000.000") */

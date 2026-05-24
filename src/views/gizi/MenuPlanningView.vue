@@ -43,18 +43,15 @@ import MenuNutritionSummary from '@/components/gizi/menu-planning/MenuNutritionS
 import MenuPlanningTable from '@/components/gizi/menu-planning/MenuPlanningTable.vue'
 import MenuSelectionModal from '@/components/gizi/menu-planning/MenuSelectionModal.vue'
 import { useMenuPlanningStore } from '@/stores/menuPlanning.store'
-import { useResepStore } from '@/stores/resep.store'
+import { useRecipe } from '@/composables/useRecipe'
 import type { StatusPublikasi, MenuDayItem } from '@/types/menu-planning'
-import { resepDummy } from '@/data/resep.dummy'
 
 const menuStore = useMenuPlanningStore()
-const resepStore = useResepStore()
+const { recipeDropdown, fetchRecipeDropdown } = useRecipe()
 
-onMounted(() => {
-  // Ensure we have recipes loaded
-  if (resepStore.items.length === 0) {
-    resepStore.setItems(resepDummy)
-  }
+onMounted(async () => {
+  // Fetch semua resep untuk dropdown (non-paginated)
+  await fetchRecipeDropdown()
 
   // Set default week if none exists
   if (!menuStore.week) {
@@ -72,9 +69,9 @@ onMounted(() => {
 })
 
 const resepOptions = computed(() => {
-  return resepStore.items.map(r => ({
+  return recipeDropdown.value.map(r => ({
     value: r.id,
-    label: r.nama
+    label: r.name
   }))
 })
 
