@@ -25,26 +25,13 @@ export interface MacroNutrient {
   percent: number
 }
 
-/** Stat variant for NutritionStatCard */
-export type StatVariant = 'default' | 'success' | 'danger' | 'warning' | 'primary'
-
-/** Single nutrition stat entry */
-export interface NutritionStat {
-  label: string
-  value: number
-  unit: string
-  icon: string
-  status: string
-  variant: StatVariant
-}
-
 /** Full nutrition result from calculation */
 export interface NutritionResult {
   calories: number
   protein: MacroNutrient
   karbo: MacroNutrient
   lemak: MacroNutrient
-  stats: NutritionStat[]
 }
+
 
 

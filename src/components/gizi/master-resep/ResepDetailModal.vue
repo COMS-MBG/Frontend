@@ -1,101 +1,99 @@
 <template>
   <BaseModal
     v-model="isOpenModel"
-    title="Detail Bahan Baku"
+    title="Detail Resep"
     size="lg"
     @close="onClose"
   >
-    <div class="bahan-detail" v-if="ingredient">
+    <div class="resep-detail" v-if="recipe">
 
       <!-- ── Informasi Dasar ── -->
       <section class="detail-section">
         <h4 class="detail-section__title">
-          <span class="material-symbols-outlined">nutrition</span>
+          <span class="material-symbols-outlined">restaurant</span>
           Informasi Dasar
         </h4>
         <div class="detail-grid">
           <div class="detail-item">
-            <span class="detail-item__label">Nama Bahan</span>
-            <span class="detail-item__value">{{ ingredient.name }}</span>
+            <span class="detail-item__label">Nama Resep</span>
+            <span class="detail-item__value">{{ recipe.name }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-item__label">Berat Acuan</span>
+            <span class="detail-item__label">Total Berat</span>
             <span class="detail-item__value detail-item__value--mono">
-              {{ formatDec(ingredient.serving_weight) }} gram
+              {{ formatDec(recipe.totals.weight) }} gram
             </span>
           </div>
-          <div class="detail-item detail-item--full" v-if="ingredient.description">
+          <div class="detail-item detail-item--full" v-if="recipe.description">
             <span class="detail-item__label">Deskripsi</span>
-            <span class="detail-item__value">{{ ingredient.description }}</span>
+            <span class="detail-item__value">{{ recipe.description }}</span>
           </div>
         </div>
       </section>
 
-      <!-- ── Kandungan Nutrisi ── -->
+      <!-- ── Total Nutrisi ── -->
       <section class="detail-section">
         <h4 class="detail-section__title">
           <span class="material-symbols-outlined">monitoring</span>
-          Kandungan Nutrisi
+          Total Nutrisi
         </h4>
         <div class="detail-grid">
           <div class="detail-item">
             <span class="detail-item__label">Kalori</span>
             <span class="detail-item__value detail-item__value--hero">
-              {{ formatNum(Math.round(ingredient.calorie)) }} <small>kcal</small>
+              {{ formatNum(Math.round(recipe.totals.calorie)) }} <small>kcal</small>
             </span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">Protein</span>
             <span class="detail-item__value detail-item__value--highlight detail-item__value--protein">
-              {{ formatDec(ingredient.protein) }} g
+              {{ formatDec(recipe.totals.protein) }} g
             </span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">Karbohidrat</span>
             <span class="detail-item__value detail-item__value--highlight detail-item__value--karbo">
-              {{ formatDec(ingredient.carbohydrate) }} g
+              {{ formatDec(recipe.totals.carbohydrate) }} g
             </span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">Lemak</span>
             <span class="detail-item__value detail-item__value--highlight detail-item__value--lemak">
-              {{ formatDec(ingredient.fat) }} g
+              {{ formatDec(recipe.totals.fat) }} g
             </span>
           </div>
         </div>
       </section>
 
-      <!-- ── Nutrisi Per Gram ── -->
-      <section class="detail-section" v-if="ingredient.nutrition_per_gram">
+      <!-- ── Daftar Bahan ── -->
+      <section class="detail-section" v-if="recipe.ingredients && recipe.ingredients.length > 0">
         <h4 class="detail-section__title">
-          <span class="material-symbols-outlined">calculate</span>
-          Nutrisi Per Gram
+          <span class="material-symbols-outlined">format_list_bulleted</span>
+          Daftar Bahan ({{ recipe.ingredients.length }})
         </h4>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-item__label">Kalori / gram</span>
-            <span class="detail-item__value detail-item__value--mono">
-              {{ ingredient.nutrition_per_gram.calorie }} kcal
-            </span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-item__label">Protein / gram</span>
-            <span class="detail-item__value detail-item__value--mono">
-              {{ ingredient.nutrition_per_gram.protein }} g
-            </span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-item__label">Karbohidrat / gram</span>
-            <span class="detail-item__value detail-item__value--mono">
-              {{ ingredient.nutrition_per_gram.carbohydrate }} g
-            </span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-item__label">Lemak / gram</span>
-            <span class="detail-item__value detail-item__value--mono">
-              {{ ingredient.nutrition_per_gram.fat }} g
-            </span>
-          </div>
+        <div class="ingredient-table-wrap">
+          <table class="ingredient-table">
+            <thead>
+              <tr>
+                <th class="th-left">Bahan</th>
+                <th>Berat</th>
+                <th>Kalori</th>
+                <th>Protein</th>
+                <th>Karbo</th>
+                <th>Lemak</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="ing in recipe.ingredients" :key="ing.id">
+                <td class="td-left">{{ ing.ingredient?.name ?? '-' }}</td>
+                <td>{{ formatDec(ing.weight_used) }} g</td>
+                <td>{{ formatNum(Math.round(ing.contribution.calorie)) }}</td>
+                <td>{{ formatDec(ing.contribution.protein) }}</td>
+                <td>{{ formatDec(ing.contribution.carbohydrate) }}</td>
+                <td>{{ formatDec(ing.contribution.fat) }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -108,11 +106,11 @@
         <div class="detail-grid">
           <div class="detail-item">
             <span class="detail-item__label">Dibuat</span>
-            <span class="detail-item__value">{{ formatDate(ingredient.created_at) }}</span>
+            <span class="detail-item__value">{{ formatDate(recipe.created_at) }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">Terakhir Diperbarui</span>
-            <span class="detail-item__value">{{ formatDate(ingredient.updated_at) }}</span>
+            <span class="detail-item__value">{{ formatDate(recipe.updated_at) }}</span>
           </div>
         </div>
       </section>
@@ -122,7 +120,7 @@
     <!-- Loading state -->
     <div v-else class="detail-loading">
       <span class="material-symbols-outlined detail-loading__icon">progress_activity</span>
-      <p>Memuat data bahan baku...</p>
+      <p>Memuat data resep...</p>
     </div>
 
     <template #footer>
@@ -134,12 +132,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
-import type { Ingredient } from '@/types/ingredient'
+import type { Recipe } from '@/types/recipe'
 import { formatNum, formatDec } from '@/utils/format'
 
 const props = defineProps<{
   isOpen: boolean
-  ingredient: Ingredient | null
+  recipe: Recipe | null
 }>()
 
 const emit = defineEmits<{
@@ -168,7 +166,7 @@ function onClose() {
 </script>
 
 <style scoped lang="scss">
-.bahan-detail {
+.resep-detail {
   display: flex;
   flex-direction: column;
   gap: $space-5;
@@ -251,6 +249,54 @@ function onClose() {
     &--protein { color: $color-info; }
     &--karbo { color: $color-warning; }
     &--lemak { color: $color-danger; }
+  }
+}
+
+// ── Ingredient Table ──
+.ingredient-table-wrap {
+  overflow-x: auto;
+  border-radius: $radius-md;
+  border: 1px solid $color-border-light;
+}
+
+.ingredient-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $text-sm;
+
+  thead tr {
+    background: $color-bg-subtle;
+  }
+
+  th, td {
+    padding: $space-2 $space-3;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  th {
+    font-size: $text-xs;
+    font-weight: 700;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .th-left, .td-left {
+    text-align: left;
+  }
+
+  td {
+    color: $color-text-secondary;
+    font-variant-numeric: tabular-nums;
+  }
+
+  tbody tr {
+    border-top: 1px solid $color-border-light;
+
+    &:hover {
+      background-color: $color-bg-subtle;
+    }
   }
 }
 

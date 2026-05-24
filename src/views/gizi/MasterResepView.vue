@@ -2,125 +2,243 @@
   <div class="master-resep">
 
     <!-- ═══════════════════════════════════════
-         1. HEADER + ACTION BUTTONS
+         1. HEADER
     ════════════════════════════════════════ -->
     <PageHeader
       title="Master Data Resep"
-      subtitle="Daftar resep makanan bergizi."
+      subtitle="Daftar resep makanan dan kandungan nutrisi"
       :breadcrumb="['Manajemen Gizi', 'Master Data Resep']"
-    >
-      <template #actions>
-        <button
-          class="btn-secondary btn-with-icon" 
-          @click="onEkspor" aria-label="Ekspor PDF" 
-          title="Ekspor PDF">
-          <span class="material-symbols-outlined">picture_as_pdf</span>
-          Ekspor PDF
-        </button>
-      </template>
-    </PageHeader>
+    />
 
     <!-- ═══════════════════════════════════════
          2. SUMMARY STAT CARDS
     ════════════════════════════════════════ -->
     <div class="summary-row">
-      <StatCard
-        v-for="stat in summaryStats"
-        :key="stat.label"
-        :label="stat.label"
-        :icon="stat.icon"
-        :value="stat.value"
-        variant="horizontal"
-        :icon-variant="stat.iconVariant"
-      />
+      <StatCard label="TOTAL RESEP" icon="menu_book" :value="formatNum(pagination.total)" variant="horizontal" icon-variant="blue" />
+      <StatCard label="RATA-RATA KALORI" icon="local_fire_department" :value="`${formatNum(avgCalorie)} kcal`" variant="horizontal" icon-variant="orange" />
+      <StatCard label="RATA-RATA PROTEIN" icon="fitness_center" :value="`${formatDec(Number(avgProtein))} g`" variant="horizontal" icon-variant="purple" />
     </div>
 
     <!-- ═══════════════════════════════════════
-         3. TOOLBAR (Search / Show Per Page / Add)
+         3. TOOLBAR
     ════════════════════════════════════════ -->
-    <div class="master-resep__toolbar">
-      <ResepToolbar @add="onTambah" />
-    </div>
+    <ResepToolbar
+      :search-value="filters.search"
+      :per-page-value="pagination.perPage"
+      :can-create="canCreate"
+      @update:search-value="onSearchChange"
+      @update:per-page-value="onPerPageChange"
+      @add="onTambah"
+    />
 
     <!-- ═══════════════════════════════════════
-         4. DATA TABLE & PAGINATION
+         4. LOADING STATE
     ════════════════════════════════════════ -->
-    <ResepTable
-      :items="paginatedItems"
-      @edit="onEdit"
-      @delete="onDelete"
-    >
-      <template #pagination>
-        <BasePagination
-          v-if="resepStore.filteredRecipes.length > 0"
-          v-model="page"
-          :total="resepStore.filteredRecipes.length"
-          :per-page="resepStore.rowsPerPage"
-          item-label="resep"
+    <BaseTableSkeleton
+      v-if="isLoading"
+      :rows="6"
+      :columns="skeletonColumns"
+      :headers="skeletonHeaders"
+    />
+
+    <!-- ═══════════════════════════════════════
+         5. EMPTY STATE
+    ════════════════════════════════════════ -->
+    <BaseEmptyState
+      v-else-if="recipes.length === 0"
+      icon="menu_book"
+      title="Belum ada data resep"
+      description="Mulai tambahkan resep melalui Kalkulator Gizi untuk membangun katalog resep Anda."
+      action-label="Tambah Resep"
+      @action="onTambah"
+    />
+
+    <!-- ═══════════════════════════════════════
+         6. DATA TABLE + PAGINATION
+    ════════════════════════════════════════ -->
+    <div v-else class="master-resep__table">
+      <ResepTable>
+        <ResepRow
+          v-for="item in recipes"
+          :key="item.id"
+          :item="item"
+          :can-edit="canUpdate"
+          :can-delete="canDelete"
+          @edit="onEdit"
+          @delete="onDeleteRequest"
+          @view-detail="openDetailModal"
         />
-      </template>
-    </ResepTable>
 
+        <template #pagination>
+          <BasePagination
+            v-if="pagination.total > pagination.perPage"
+            :model-value="pagination.currentPage"
+            :total="pagination.total"
+            :per-page="pagination.perPage"
+            item-label="resep"
+            @update:model-value="onPageChange"
+          />
+        </template>
+      </ResepTable>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         7. DELETE CONFIRMATION
+    ════════════════════════════════════════ -->
+    <ConfirmDeleteModal
+      v-model="isDeleteOpen"
+      title="Hapus Resep"
+      :item-name="deleteTarget?.name ?? ''"
+      confirm-label="Hapus"
+      :is-submitting="isSubmitting"
+      @confirm="onDeleteConfirm"
+      @cancel="closeDeleteModal"
+    />
+
+    <!-- ═══════════════════════════════════════
+         8. RESULT MODAL
+    ════════════════════════════════════════ -->
+    <ResultModal
+      v-model="isResultOpen"
+      :headline="resultHeadline"
+      :message="resultMessage"
+      :variant="resultVariant"
+    />
+
+    <!-- ═══════════════════════════════════════
+         9. DETAIL MODAL
+    ════════════════════════════════════════ -->
+    <ResepDetailModal
+      :is-open="isDetailOpen"
+      :recipe="detailTarget"
+      @update:is-open="isDetailOpen = $event"
+      @close="closeDetailModal"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, toRef } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import PageHeader from '@/components/common/PageHeader.vue'
+import BasePagination from '@/components/common/BasePagination.vue'
 import StatCard from '@/components/common/StatCard.vue'
+import BaseEmptyState from '@/components/common/BaseEmptyState.vue'
+import BaseTableSkeleton from '@/components/common/BaseTableSkeleton.vue'
+import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal.vue'
+import ResultModal from '@/components/common/ResultModal.vue'
+import type { SkeletonColumn, SkeletonHeader } from '@/components/common/BaseTableSkeleton.vue'
 import ResepToolbar from '@/components/gizi/master-resep/ResepToolbar.vue'
 import ResepTable from '@/components/gizi/master-resep/ResepTable.vue'
-import BasePagination from '@/components/common/BasePagination.vue'
-import { useResepStore } from '@/stores/resep.store'
-import { resepDummy } from '@/data/resep.dummy'
-import { usePagination } from '@/composables/usePagination'
-import type { ResepItem } from '@/types/resep'
+import ResepRow from '@/components/gizi/master-resep/ResepRow.vue'
+import ResepDetailModal from '@/components/gizi/master-resep/ResepDetailModal.vue'
+import { useRecipe } from '@/composables/useRecipe'
+import { useToast } from '@/composables/useToast'
+import type { Recipe } from '@/types/recipe'
+import { formatNum, formatDec } from '@/utils/format'
 
 const router = useRouter()
 
-// ── Store ────────────────────────────────────────────────────
-const resepStore = useResepStore()
+// ── Composable ──────────────────────────────────────────────
+const {
+  recipes, selectedRecipe, pagination, isLoading, isSubmitting, error, filters,
+  avgCalorie, avgProtein,
+  canCreate, canUpdate, canDelete,
+  fetchRecipes, fetchRecipeDetail, deleteRecipe, setFilter, resetState,
+} = useRecipe()
 
-// ── Seed store on mount ──────────────────────────────────────
-// TODO: swap to `resepStore.fetchItems()` when API is ready.
-onMounted(() => {
-  if (resepStore.items.length === 0) {
-    resepStore.setItems(resepDummy)
-  }
-})
+const toast = useToast()
 
-// ── Summary Stats ───────────────────────────────────────────
-const summaryStats = [
-  { label: 'TOTAL RESEP',        value: '124',  icon: 'menu_book',     iconVariant: 'blue'   as const },
-  { label: 'SESUAI STANDAR',     value: '98%',  icon: 'check_circle',  iconVariant: 'green'  as const },
-  { label: 'PEMBARUAN TERBARU',  value: 'H-1',  icon: 'schedule',      iconVariant: 'orange' as const },
-  { label: 'KATEGORI MENU',      value: '12',   icon: 'category',      iconVariant: 'purple' as const },
+// ── Skeleton Config ──────────────────────────────────────────
+const skeletonHeaders: SkeletonHeader[] = [
+  { label: 'NAMA RESEP', align: 'left' },
+  { label: 'BERAT TOTAL', align: 'center' },
+  { label: 'KALORI', align: 'center' },
+  { label: 'PROTEIN', align: 'center' },
+  { label: 'KARBO', align: 'center' },
+  { label: 'LEMAK', align: 'center' },
+  { label: 'AKSI', align: 'center' },
 ]
 
-// ── Pagination (extracted composable) ────────────────────────
-const { page, paginatedItems } = usePagination(
-  computed(() => resepStore.filteredRecipes),
-  toRef(resepStore, 'rowsPerPage')
-)
+const skeletonColumns: SkeletonColumn[] = [
+  { type: 'avatar-text' },
+  { type: 'text', width: '64px', align: 'center' },
+  { type: 'text', width: '64px', align: 'center' },
+  { type: 'text', width: '64px', align: 'center' },
+  { type: 'text', width: '64px', align: 'center' },
+  { type: 'text', width: '64px', align: 'center' },
+  { type: 'actions' },
+]
 
-// ── Handlers ────────────────────────────────────────────────
-function onEkspor(): void {
-  // TODO: integrate with PDF export service
+// ── Toolbar ──────────────────────────────────────────────────
+function onSearchChange(val: string) { setFilter('search', val) }
+function onPageChange(page: number) { setFilter('page', page) }
+function onPerPageChange(val: number) { setFilter('per_page', val) }
+
+// ── Result Modal ─────────────────────────────────────────────
+const isResultOpen = ref(false)
+const resultHeadline = ref('')
+const resultMessage = ref('')
+const resultVariant = ref<'success' | 'error'>('success')
+
+function showResult(headline: string, message: string, variant: 'success' | 'error' = 'success') {
+  resultHeadline.value = headline
+  resultMessage.value = message
+  resultVariant.value = variant
+  isResultOpen.value = true
 }
 
-function onTambah(): void {
+// ── Navigation (Create/Edit via Kalkulator Gizi) ─────────────
+function onTambah() {
   router.push({ name: 'kalkulator-gizi' })
 }
 
-function onEdit(item: ResepItem): void {
+function onEdit(item: Recipe) {
   router.push({ name: 'kalkulator-gizi', params: { id: item.id } })
 }
 
-function onDelete(item: ResepItem): void {
-  resepStore.deleteItem(item.id)
+// ── Delete Modal ─────────────────────────────────────────────
+const isDeleteOpen = ref(false)
+const deleteTarget = ref<Recipe | null>(null)
+
+function onDeleteRequest(item: Recipe) { deleteTarget.value = item; isDeleteOpen.value = true }
+function closeDeleteModal() { isDeleteOpen.value = false; deleteTarget.value = null }
+
+async function onDeleteConfirm() {
+  if (!deleteTarget.value) return
+  const name = deleteTarget.value.name
+  const success = await deleteRecipe(deleteTarget.value.id)
+  if (success) {
+    closeDeleteModal()
+    showResult('Resep Berhasil Dihapus', `Resep "${name}" telah dihapus dari sistem.`)
+  } else if (error.value) {
+    toast.error(error.value)
+  }
 }
 
+// ── Detail Modal ─────────────────────────────────────────────
+const isDetailOpen = ref(false)
+const detailTarget = ref<Recipe | null>(null)
+
+async function openDetailModal(item: Recipe) {
+  detailTarget.value = item
+  isDetailOpen.value = true
+
+  // Ambil detail lengkap melalui composable (bukan direct API import)
+  const full = await fetchRecipeDetail(item.id)
+  if (full) {
+    detailTarget.value = full
+  }
+}
+
+function closeDetailModal() {
+  isDetailOpen.value = false
+  detailTarget.value = null
+}
+
+// ── Lifecycle ────────────────────────────────────────────────
+onMounted(() => fetchRecipes())
+onUnmounted(() => resetState())
 </script>
 
 <style scoped lang="scss">
@@ -134,7 +252,7 @@ function onDelete(item: ResepItem): void {
 // ── Summary row ──
 .summary-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: $space-4;
 }
 

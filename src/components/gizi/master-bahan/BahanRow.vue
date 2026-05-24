@@ -17,7 +17,7 @@
     <td class="bahan-row__num">{{ formatDec(item.serving_weight) }} g</td>
 
     <!-- 3) Kalori -->
-    <td class="bahan-row__num">{{ formatNum(item.calorie) }} kcal</td>
+    <td class="bahan-row__num">{{ formatNum(Math.round(item.calorie)) }} kcal</td>
 
     <!-- 4) Protein -->
     <td class="bahan-row__num">{{ formatDec(item.protein) }} g</td>

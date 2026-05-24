@@ -27,6 +27,7 @@ export function useIngredient() {
   const canDelete = computed(() => checkPermission('ingredients.delete'))
 
   function fetchIngredients() { return store.fetchIngredients() }
+  function fetchIngredientDetail(id: number) { return store.fetchIngredientDetail(id) }
   function createIngredient(payload: IngredientForm) { return store.createIngredient(payload) }
   function updateIngredient(id: number, payload: IngredientForm) { return store.updateIngredient(id, payload) }
   function deleteIngredient(id: number) { return store.deleteIngredient(id) }
@@ -38,7 +39,7 @@ export function useIngredient() {
     isLoading, isSubmitting, error, filters,
     totalIngredients, avgCalorie, avgProtein,
     canCreate, canUpdate, canDelete,
-    fetchIngredients, createIngredient, updateIngredient,
+    fetchIngredients, fetchIngredientDetail, createIngredient, updateIngredient,
     deleteIngredient, setFilter, resetState,
   }
 }

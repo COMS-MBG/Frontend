@@ -1,10 +1,10 @@
 import { computed } from 'vue'
 import { useMenuPlanningStore } from '@/stores/menuPlanning.store'
-import { useResepStore } from '@/stores/resep.store'
+import { useRecipeStore } from '@/stores/recipe.store'
 
 export function useNutritionSummary() {
   const menuStore = useMenuPlanningStore()
-  const resepStore = useResepStore()
+  const recipeStore = useRecipeStore()
 
   const summary = computed(() => {
     let totalKalori = 0
@@ -15,12 +15,12 @@ export function useNutritionSummary() {
     const days = menuStore.days
     days.forEach(day => {
       if (day.menuId !== null) {
-        const recipe = resepStore.getById(day.menuId)
+        const recipe = recipeStore.recipes.find(r => r.id === day.menuId)
         if (recipe) {
-          totalKalori += recipe.kalori
-          totalProtein += recipe.protein
-          totalKarbo += recipe.karbohidrat
-          totalLemak += recipe.lemak
+          totalKalori += recipe.totals.calorie
+          totalProtein += recipe.totals.protein
+          totalKarbo += recipe.totals.carbohydrate
+          totalLemak += recipe.totals.fat
         }
       }
     })

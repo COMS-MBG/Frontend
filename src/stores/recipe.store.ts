@@ -1,24 +1,25 @@
 /**
- * stores/ingredient.store.ts — Master Bahan Baku (Pinia)
+ * stores/recipe.store.ts — Master Data Resep (Pinia)
  *
- * Server-side paginated store following the employee.store.ts pattern.
- * Replaces the old bahan.store.ts (client-side dummy data).
+ * Server-side paginated store following the ingredient.store.ts pattern.
+ * Replaces the old resep.store.ts (client-side dummy data).
  */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import {
-  getIngredients as apiGetAll,
-  getIngredient as apiGetOne,
-  createIngredient as apiCreate,
-  updateIngredient as apiUpdate,
-  deleteIngredient as apiDelete,
-} from '@/api/ingredient.api'
-import type { Ingredient, IngredientForm } from '@/types/ingredient'
+  getRecipes as apiGetAll,
+  getRecipe as apiGetOne,
+  createRecipe as apiCreate,
+  updateRecipe as apiUpdate,
+  deleteRecipe as apiDelete,
+  getRecipeDropdown as apiGetDropdown,
+} from '@/api/recipe.api'
+import type { Recipe, RecipeForm, RecipeDropdownItem } from '@/types/recipe'
 
-export const useIngredientStore = defineStore('ingredient', () => {
+export const useRecipeStore = defineStore('recipe', () => {
   // ── State ──────────────────────────────────────────────────
-  const ingredients = ref<Ingredient[]>([])
-  const selectedIngredient = ref<Ingredient | null>(null)
+  const recipes = ref<Recipe[]>([])
+  const selectedRecipe = ref<Recipe | null>(null)
   const isLoading = ref(false)
   const isSubmitting = ref(false)
   const error = ref<string | null>(null)
@@ -36,26 +37,30 @@ export const useIngredientStore = defineStore('ingredient', () => {
     total: 0,
   })
 
+  // Dropdown state (non-paginated, untuk MenuPlanningView)
+  const recipeDropdown = ref<RecipeDropdownItem[]>([])
+  const isLoadingDropdown = ref(false)
+
   // ── Getters ────────────────────────────────────────────────
-  const totalIngredients = computed(() => pagination.value.total)
+  const totalRecipes = computed(() => pagination.value.total)
 
   const avgCalorie = computed(() => {
-    if (ingredients.value.length === 0) return 0
+    if (recipes.value.length === 0) return 0
     return Math.round(
-      ingredients.value.reduce((s, i) => s + i.calorie, 0) / ingredients.value.length,
+      recipes.value.reduce((s, r) => s + r.totals.calorie, 0) / recipes.value.length,
     )
   })
 
   const avgProtein = computed(() => {
-    if (ingredients.value.length === 0) return '0.0'
+    if (recipes.value.length === 0) return '0.0'
     return (
-      ingredients.value.reduce((s, i) => s + i.protein, 0) / ingredients.value.length
+      recipes.value.reduce((s, r) => s + r.totals.protein, 0) / recipes.value.length
     ).toFixed(1)
   })
 
   // ── Actions ────────────────────────────────────────────────
 
-  async function fetchIngredients(): Promise<void> {
+  async function fetchRecipes(): Promise<void> {
     isLoading.value = true
     error.value = null
 
@@ -65,7 +70,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
         per_page: filters.value.per_page,
         search: filters.value.search || undefined,
       })
-      ingredients.value = res.data
+      recipes.value = res.data
       pagination.value = {
         currentPage: res.meta.current_page,
         lastPage: res.meta.last_page,
@@ -74,7 +79,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
       }
     } catch (err: unknown) {
       error.value =
-        err instanceof Error ? err.message : 'Gagal memuat data bahan baku.'
+        err instanceof Error ? err.message : 'Gagal memuat data resep.'
     } finally {
       isLoading.value = false
     }
@@ -88,7 +93,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
         per_page: filters.value.per_page,
         search: filters.value.search || undefined,
       })
-      ingredients.value = res.data
+      recipes.value = res.data
       pagination.value = {
         currentPage: res.meta.current_page,
         lastPage: res.meta.last_page,
@@ -100,17 +105,30 @@ export const useIngredientStore = defineStore('ingredient', () => {
     }
   }
 
-  async function fetchIngredientDetail(id: number): Promise<Ingredient | null> {
+  async function fetchRecipeDetail(id: number): Promise<Recipe | null> {
     try {
-      const ingredient = await apiGetOne(id)
-      selectedIngredient.value = ingredient
-      return ingredient
+      const recipe = await apiGetOne(id)
+      selectedRecipe.value = recipe
+      return recipe
     } catch {
       return null
     }
   }
 
-  async function createIngredient(payload: IngredientForm): Promise<boolean> {
+  /** Fetch all recipes for dropdown (non-paginated) */
+  async function fetchRecipeDropdown(): Promise<void> {
+    isLoadingDropdown.value = true
+    try {
+      recipeDropdown.value = await apiGetDropdown()
+    } catch (err: unknown) {
+      // Tidak overwrite error state utama — log saja
+      console.error('Failed to load recipe dropdown', err)
+    } finally {
+      isLoadingDropdown.value = false
+    }
+  }
+
+  async function createRecipe(payload: RecipeForm): Promise<boolean> {
     isSubmitting.value = true
     error.value = null
 
@@ -120,16 +138,16 @@ export const useIngredientStore = defineStore('ingredient', () => {
       return true
     } catch (err: unknown) {
       error.value =
-        err instanceof Error ? err.message : 'Gagal menambahkan bahan baku.'
+        err instanceof Error ? err.message : 'Gagal menambahkan resep.'
       return false
     } finally {
       isSubmitting.value = false
     }
   }
 
-  async function updateIngredient(
+  async function updateRecipe(
     id: number,
-    payload: IngredientForm,
+    payload: RecipeForm,
   ): Promise<boolean> {
     isSubmitting.value = true
     error.value = null
@@ -140,14 +158,14 @@ export const useIngredientStore = defineStore('ingredient', () => {
       return true
     } catch (err: unknown) {
       error.value =
-        err instanceof Error ? err.message : 'Gagal memperbarui bahan baku.'
+        err instanceof Error ? err.message : 'Gagal memperbarui resep.'
       return false
     } finally {
       isSubmitting.value = false
     }
   }
 
-  async function deleteIngredient(id: number): Promise<boolean> {
+  async function deleteRecipe(id: number): Promise<boolean> {
     isSubmitting.value = true
     error.value = null
 
@@ -157,7 +175,7 @@ export const useIngredientStore = defineStore('ingredient', () => {
       return true
     } catch (err: unknown) {
       error.value =
-        err instanceof Error ? err.message : 'Gagal menghapus bahan baku.'
+        err instanceof Error ? err.message : 'Gagal menghapus resep.'
       return false
     } finally {
       isSubmitting.value = false
@@ -174,12 +192,12 @@ export const useIngredientStore = defineStore('ingredient', () => {
       filters.value[key] = value as string
       filters.value.page = 1
     }
-    fetchIngredients()
+    fetchRecipes()
   }
 
   function resetState(): void {
-    ingredients.value = []
-    selectedIngredient.value = null
+    recipes.value = []
+    selectedRecipe.value = null
     isLoading.value = false
     isSubmitting.value = false
     error.value = null
@@ -188,25 +206,28 @@ export const useIngredientStore = defineStore('ingredient', () => {
 
   return {
     // State
-    ingredients,
-    selectedIngredient,
+    recipes,
+    selectedRecipe,
     isLoading,
     isSubmitting,
     error,
     filters,
     pagination,
+    recipeDropdown,
+    isLoadingDropdown,
 
     // Getters
-    totalIngredients,
+    totalRecipes,
     avgCalorie,
     avgProtein,
 
     // Actions
-    fetchIngredients,
-    fetchIngredientDetail,
-    createIngredient,
-    updateIngredient,
-    deleteIngredient,
+    fetchRecipes,
+    fetchRecipeDetail,
+    fetchRecipeDropdown,
+    createRecipe,
+    updateRecipe,
+    deleteRecipe,
     setFilter,
     resetState,
   }

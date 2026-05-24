@@ -1,54 +1,81 @@
 <template>
   <tr class="resep-row" role="row">
-    <!-- Thumbnail + Nama + Badge -->
+    <!-- 1) Nama + Description -->
     <td class="resep-row__nama">
       <div class="resep-row__nama-inner">
         <div class="resep-row__thumb">
-          <img
-            v-if="item.image"
-            :src="item.image"
-            :alt="item.nama"
-            class="resep-row__thumb-img"
-          />
-          <span v-else class="material-symbols-outlined resep-row__thumb-icon">restaurant</span>
+          <span class="material-symbols-outlined resep-row__thumb-icon">restaurant</span>
         </div>
         <div class="resep-row__text">
-          <span class="resep-row__name">{{ item.nama }}</span>
-          <BaseBadge :text="item.status" :variant="item.statusVariant" />
+          <span class="resep-row__name">{{ item.name }}</span>
+          <span v-if="item.description" class="resep-row__desc">{{ item.description }}</span>
+          <span v-else class="resep-row__ingredients-count">
+            {{ item.ingredients?.length ?? 0 }} bahan
+          </span>
         </div>
       </div>
     </td>
 
-    <!-- Nutrisi -->
-    <td class="resep-row__num">{{ formatNum(item.kalori) }}</td>
-    <td class="resep-row__num">{{ formatNum(item.protein) }}</td>
-    <td class="resep-row__num">{{ formatNum(item.karbohidrat) }}</td>
-    <td class="resep-row__num">{{ formatNum(item.lemak) }}</td>
+    <!-- 2) Total Berat -->
+    <td class="resep-row__num">{{ formatDec(item.totals.weight) }} g</td>
 
-    <!-- Aksi -->
+    <!-- 3) Total Kalori -->
+    <td class="resep-row__num">{{ formatNum(Math.round(item.totals.calorie)) }} kcal</td>
+
+    <!-- 4) Total Protein -->
+    <td class="resep-row__num">{{ formatDec(item.totals.protein) }} g</td>
+
+    <!-- 5) Total Karbohidrat -->
+    <td class="resep-row__num">{{ formatDec(item.totals.carbohydrate) }} g</td>
+
+    <!-- 6) Total Lemak -->
+    <td class="resep-row__num">{{ formatDec(item.totals.fat) }} g</td>
+
+    <!-- 7) Aksi -->
     <td class="resep-row__aksi">
-      <button class="action-btn action-btn--edit" @click="$emit('edit', item)" aria-label="Edit">
-        <span class="material-symbols-outlined">edit</span>
-      </button>
-      <button class="action-btn action-btn--delete" @click="$emit('delete', item)" aria-label="Hapus">
-        <span class="material-symbols-outlined">delete</span>
-      </button>
+      <div class="action-group">
+        <button
+          class="action-btn action-btn--view"
+          aria-label="Lihat detail resep"
+          @click="$emit('view-detail', item)"
+        >
+          <span class="material-symbols-outlined">visibility</span>
+        </button>
+        <button
+          v-if="canEdit"
+          class="action-btn action-btn--edit"
+          aria-label="Edit resep"
+          @click="$emit('edit', item)"
+        >
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+        <button
+          v-if="canDelete"
+          class="action-btn action-btn--delete"
+          aria-label="Hapus resep"
+          @click="$emit('delete', item)"
+        >
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </div>
     </td>
   </tr>
 </template>
 
 <script setup lang="ts">
-import BaseBadge from '@/components/common/BaseBadge.vue'
-import type { ResepItem } from '@/types/resep'
-import { formatNum } from '@/utils/format'
+import type { Recipe } from '@/types/recipe'
+import { formatNum, formatDec } from '@/utils/format'
 
 defineProps<{
-  item: ResepItem
+  item: Recipe
+  canEdit: boolean
+  canDelete: boolean
 }>()
 
 defineEmits<{
-  (e: 'edit', item: ResepItem): void
-  (e: 'delete', item: ResepItem): void
+  (e: 'edit', item: Recipe): void
+  (e: 'delete', item: Recipe): void
+  (e: 'view-detail', item: Recipe): void
 }>()
 </script>
 
@@ -66,7 +93,7 @@ defineEmits<{
   }
 
   td {
-    padding: $space-4 $space-3;
+    padding: $space-5 $space-4;
     vertical-align: middle;
   }
 
@@ -82,8 +109,8 @@ defineEmits<{
   }
 
   &__thumb {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
@@ -94,27 +121,35 @@ defineEmits<{
     border: 1px solid $color-border-light;
   }
 
-  &__thumb-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
   &__thumb-icon {
-    font-size: 1.25rem;
+    font-size: $text-xl;
     color: $color-text-faint;
   }
 
   &__text {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: $space-1;
   }
 
   &__name {
     font-size: $text-base;
     font-weight: 600;
     color: $color-text-primary;
+  }
+
+  &__desc {
+    font-size: $text-xs;
+    color: $color-text-muted;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__ingredients-count {
+    font-size: $text-xs;
+    color: $color-text-faint;
   }
 
   // ── Numeric cells ──
@@ -124,12 +159,12 @@ defineEmits<{
     font-weight: 500;
     color: $color-text-secondary;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   // ── Action cell ──
   &__aksi {
-    text-align: center;
+    white-space: nowrap;
   }
 }
-
 </style>
