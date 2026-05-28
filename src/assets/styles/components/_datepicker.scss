@@ -1,0 +1,240 @@
+@use '../abstracts/variables' as *;
+
+/* ──────────────────────────────────────────────
+   VUE DATEPICKER – Premium Flat Style
+   Matches reference: Month/Year left, arrows far-right,
+   no clock, clean circular day cells, app-theme blue.
+   ────────────────────────────────────────────── */
+
+/* ── Calendar Container ── */
+body .dp__menu {
+  background-color: #ffffff !important;
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05),
+    0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+  padding: 20px !important;
+  width: 310px !important;
+  font-family: $font-body !important;
+}
+
+/* ── Theme Variables ── */
+body .dp__theme_light {
+  --dp-background-color: #ffffff;
+  --dp-text-color: #334155;
+  --dp-hover-color: #f1f5f9;
+  --dp-hover-text-color: #0f172a;
+  --dp-hover-icon-color: #0f172a;
+  --dp-primary-color: #1a56db;
+  --dp-primary-text-color: #1a56db;
+  --dp-secondary-color: #94a3b8;
+  --dp-border-color: #f1f5f9;
+  --dp-menu-border-color: #f1f5f9;
+  --dp-font-family: #{$font-body};
+}
+
+/* ══════════════════════════════════════════════
+   HEADER: Month/Year LEFT, arrows FAR RIGHT
+   DOM order: [PrevBtn] [MonthYearWrap] [NextBtn]
+   Visual:    [May 2026_______________][< ][> ]
+   ══════════════════════════════════════════════ */
+
+body .dp__month_year_row {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 16px !important;
+  padding: 0 4px !important;
+  gap: 8px !important;
+}
+
+/* Month/Year wrap: order first, EXPAND to fill all space → pushes arrows to the edge */
+body .dp__month_year_wrap {
+  width: auto !important;
+  flex: 1 1 auto !important;
+  /* ← KEY: expand to fill space */
+  order: -1 !important;
+  gap: 4px !important;
+  justify-content: flex-start !important;
+}
+
+/* Month & Year selector buttons */
+body .dp__month_year_select {
+  width: auto !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 6px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-family: $font-body !important;
+  height: auto !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+  flex: 0 0 auto !important;
+
+  &:hover {
+    background-color: #f1f5f9 !important;
+  }
+}
+
+/* Navigation arrows: circular grey buttons, pinned to right */
+body .dp__inner_nav {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: #f1f5f9 !important;
+  height: 36px !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  border: none !important;
+  color: #64748b !important;
+  transition: all $transition-fast !important;
+  flex-shrink: 0 !important;
+
+  &:hover {
+    background: #e2e8f0 !important;
+    color: #334155 !important;
+  }
+
+  svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   CALENDAR BODY
+   ══════════════════════════════════════════════ */
+
+/* Hide separator line */
+body .dp__calendar_header_separator {
+  display: none !important;
+}
+
+/* Weekday header: Sun Mon Tue ... */
+body .dp__calendar_header_item {
+  color: #475569 !important;
+  font-size: 0.875rem !important;
+  font-weight: 400 !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: $font-body !important;
+}
+
+/* Day cells */
+body .dp__cell_inner {
+  width: 38px !important;
+  height: 38px !important;
+  font-size: 0.9375rem !important;
+  line-height: 38px !important;
+  border-radius: 50% !important;
+  font-weight: 400 !important;
+  color: #334155 !important;
+  transition: all $transition-fast !important;
+  margin: 4px auto !important;
+
+  &:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+}
+
+/* Today */
+body .dp__today {
+  border: none !important;
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  font-weight: 500 !important;
+  border-radius: 50% !important;
+}
+
+/* ── Selected day: SOFT BLUE matching app primary (#1a56db) ── */
+body .dp__active_date {
+  background-color: #e8f0fe !important;
+  /* --color-primary-subtle */
+  color: #1a56db !important;
+  /* --color-primary */
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+
+  &:hover {
+    background-color: #d4e3fc !important;
+    color: #1a56db !important;
+  }
+}
+
+/* Previous/next month days */
+body .dp__cell_outside {
+  color: #cbd5e1 !important;
+}
+
+/* ══════════════════════════════════════════════
+   HIDE CLOCK / TIME PICKER / ACTION ROW
+   Nuclear approach: hide + zero-size everything
+   ══════════════════════════════════════════════ */
+
+body .dp__action_extra,
+body .dp__action_row,
+body .dp__time_input,
+body .dp__time_picker_inline_container {
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-height: 0 !important;
+  border: none !important;
+}
+
+/* ══════════════════════════════════════════════
+   RANGE STYLES
+   ══════════════════════════════════════════════ */
+
+body .dp__range_between {
+  background-color: #e8f0fe !important;
+  color: #1a56db !important;
+  border-radius: 0 !important;
+}
+
+body .dp__range_start {
+  border-radius: 50% 0 0 50% !important;
+  background-color: #1a56db !important;
+  color: #ffffff !important;
+}
+
+body .dp__range_end {
+  border-radius: 0 50% 50% 0 !important;
+  background-color: #1a56db !important;
+  color: #ffffff !important;
+}
+
+/* ── Highlighted Dates (Already Filled Weeks) ── */
+body .dp__cell_highlight {
+  background-color: #e8f0fe !important;
+  color: #1a56db !important;
+  border-radius: 50% !important;
+  font-weight: 500 !important;
+
+  &:hover {
+    background-color: #d4e3fc !important;
+    color: #1a56db !important;
+  }
+}
+
+/* ── Disabled Highlighted Cells (To block clicking) ── */
+body .dp__cell_disabled.dp__cell_highlight {
+  background-color: #f1f5f9 !important; /* Muted gray background */
+  color: #cbd5e1 !important;            /* Very light gray text */
+  cursor: not-allowed !important;
+  pointer-events: none !important;      /* Block click actions and hover states */
+  text-decoration: line-through !important; /* Optional: visually show it's disabled */
+}

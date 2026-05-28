@@ -1,6 +1,6 @@
 <template>
-  <div 
-    class="status-dropdown" 
+  <div
+    class="status-dropdown"
     :class="{ 'is-open': isOpen }"
     tabindex="0"
     @blur="closeDropdown"
@@ -11,11 +11,11 @@
         <span class="material-symbols-outlined">expand_more</span>
       </div>
     </div>
-    
+
     <Transition name="fade-slide">
       <div class="status-menu" v-if="isOpen">
-        <div 
-          v-for="(config, key) in MENU_STATUS_CONFIG" 
+        <div
+          v-for="(config, key) in MENU_STATUS_CONFIG"
           :key="key"
           class="status-option"
           :class="{ 'is-active': modelValue === key }"
@@ -34,7 +34,7 @@ import { ref } from 'vue'
 import MenuStatusBadge from './MenuStatusBadge.vue'
 import { type StatusPublikasi, MENU_STATUS_CONFIG } from '@/types/menu-planning'
 
-const props = defineProps<{
+defineProps<{
   modelValue: StatusPublikasi
 }>()
 

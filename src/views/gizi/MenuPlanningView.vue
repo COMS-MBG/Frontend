@@ -13,97 +13,250 @@
     <MenuNutritionSummary />
 
     <div class="menu-planning__controls">
-      <MenuPlanningToolbar 
-        @save="onSaveAll" 
-        @copy="onCopyLastWeek" 
+      <MenuPlanningToolbar
+        :menus="menus"
+        :current-menu="currentMenu"
+        :is-saving="isSaving"
+        :is-fetching="isFetching"
+        :is-dirty="isDirty"
+        :current-status="currentStatus"
+        :current-status-label="currentStatusLabel"
+        :can-create="canCreate"
+        :can-update="canUpdate"
+        :can-delete="canDelete"
+        @select-menu="onSelectMenu"
+        @save="onSaveAll"
+        @new-week="onNewWeek"
+        @delete="onOpenDeleteModal"
       />
     </div>
 
     <MenuPlanningTable
-      :days="menuStore.days"
-      :menu-options="resepOptions"
+      :days="days"
+      :recipes="recipeDropdown"
+      :can-update="canUpdate"
+      :loading="isPageInit || isFetching"
       @update-menu="onUpdateMenu"
-      @update-status="onUpdateStatus"
       @open-menu-modal="onOpenMenuModal"
     />
 
     <MenuSelectionModal
       :is-open="isModalOpen"
+      :recipes="recipeDropdown"
       @close="isModalOpen = false"
       @select="onModalSelect"
+    />
+
+    <ResultModal
+      v-model="isResultOpen"
+      :headline="resultHeadline"
+      :message="resultMessage"
+      :variant="resultVariant"
+    />
+
+    <ConfirmDeleteModal
+      v-model="isDeleteOpen"
+      :item-name="currentMenu?.week_range_label || currentMenu?.name || 'Perencanaan Menu'"
+      :is-submitting="isSaving"
+      @confirm="onDeleteConfirm"
+    />
+
+    <ConfirmBosanModal
+      v-model="isBosanOpen"
+      :is-submitting="isSaving"
+      @confirm="onSaveConfirm"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import PageHeader from '@/components/common/PageHeader.vue'
 import MenuPlanningToolbar from '@/components/gizi/menu-planning/MenuPlanningToolbar.vue'
 import MenuNutritionSummary from '@/components/gizi/menu-planning/MenuNutritionSummary.vue'
 import MenuPlanningTable from '@/components/gizi/menu-planning/MenuPlanningTable.vue'
 import MenuSelectionModal from '@/components/gizi/menu-planning/MenuSelectionModal.vue'
-import { useMenuPlanningStore } from '@/stores/menuPlanning.store'
+import ResultModal from '@/components/common/ResultModal.vue'
+import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal.vue'
+import ConfirmBosanModal from '@/components/gizi/menu-planning/ConfirmBosanModal.vue'
+import { useMenuPlanning } from '@/composables/useMenuPlanning'
 import { useRecipe } from '@/composables/useRecipe'
-import type { StatusPublikasi, MenuDayItem } from '@/types/menu-planning'
+import { useAntiBosanChecker } from '@/composables/useAntiBosanChecker'
+import type { Menu } from '@/types/menu-planning'
+import type { RecipeDropdownItem } from '@/types/recipe'
+import { storeToRefs } from 'pinia'
+import { useRecipeStore } from '@/stores/recipe.store'
+import { useToast } from '@/composables/useToast'
 
-const menuStore = useMenuPlanningStore()
-const { recipeDropdown, fetchRecipeDropdown } = useRecipe()
+const {
+  menus, currentMenu,
+  days, currentStatus, currentStatusLabel,
+  isSaving, isFetching, isDirty,
+  canCreate, canUpdate, canDelete,
+  fetchMenus, fetchMenuDetail, initNewWeek,
+  setDayRecipe, saveMenu, deleteMenu, resetState,
+} = useMenuPlanning()
+
+const { fetchRecipeDropdown } = useRecipe()
+const { hasRepetition } = useAntiBosanChecker()
+const recipeStore = useRecipeStore()
+const { recipeDropdown } = storeToRefs(recipeStore)
+const toast = useToast()
+const isPageInit = ref(true)
+
+const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  if (isDirty.value) {
+    e.preventDefault()
+    e.returnValue = ''
+  }
+}
 
 onMounted(async () => {
-  // Fetch semua resep untuk dropdown (non-paginated)
-  await fetchRecipeDropdown()
+  window.addEventListener('beforeunload', handleBeforeUnload)
+  try {
+    // Fetch recipe dropdown and all menus in parallel to speed up initial load
+    await Promise.all([
+      fetchRecipeDropdown(),
+      fetchMenus()
+    ])
 
-  // Set default week if none exists
-  if (!menuStore.week) {
-    menuStore.setWeek({
-      weekStart: '2026-04-20',
-      items: [
-        { date: '20 Apr 2026', dayName: 'Senin', menuId: 1, status: 'draft' },
-        { date: '21 Apr 2026', dayName: 'Selasa', menuId: 1, status: 'draft' },
-        { date: '22 Apr 2026', dayName: 'Rabu', menuId: null, status: 'draft' },
-        { date: '23 Apr 2026', dayName: 'Kamis', menuId: null, status: 'draft' },
-        { date: '24 Apr 2026', dayName: 'Jumat', menuId: null, status: 'draft' },
-      ]
-    })
+    // Auto-load the first menu if available
+    const firstMenu = menus.value[0]
+    if (firstMenu) {
+      await fetchMenuDetail(firstMenu.id)
+    }
+  } finally {
+    isPageInit.value = false
   }
 })
 
-const resepOptions = computed(() => {
-  return recipeDropdown.value.map(r => ({
-    value: r.id,
-    label: r.name
-  }))
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
 })
+
+onBeforeRouteLeave((to, from, next) => {
+  if (isDirty.value) {
+    const confirmLeave = confirm('Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin meninggalkan halaman ini?')
+    if (confirmLeave) {
+      next()
+    } else {
+      next(false)
+    }
+  } else {
+    next()
+  }
+})
+
+
 
 const isModalOpen = ref(false)
 const selectedDayIndex = ref<number | null>(null)
 
+// Result modal states
+const isResultOpen = ref(false)
+const resultHeadline = ref('')
+const resultMessage = ref('')
+const resultVariant = ref<'success' | 'error'>('success')
+
+// Delete modal state
+const isDeleteOpen = ref(false)
+
+// Warning Anti-Bosan modal state
+const isBosanOpen = ref(false)
+
+function onSelectMenu(menu: Menu) {
+  fetchMenuDetail(menu.id)
+}
+
 function onOpenMenuModal(dayIndex: number) {
+  if (!canUpdate.value) {
+    toast.error('Anda tidak memiliki hak akses (menus.update) untuk merencanakan menu.')
+    return
+  }
   selectedDayIndex.value = dayIndex
   isModalOpen.value = true
 }
 
-function onModalSelect(menuId: number) {
+function onModalSelect(recipeId: number) {
   if (selectedDayIndex.value !== null) {
-    menuStore.setMenu(selectedDayIndex.value, menuId)
+    setDayRecipe(selectedDayIndex.value, recipeId)
   }
 }
 
-function onUpdateMenu(dayIndex: number, menuId: number | null) {
-  menuStore.setMenu(dayIndex, menuId)
+function onUpdateMenu(dayIndex: number, recipeId: number | null) {
+  setDayRecipe(dayIndex, recipeId)
 }
 
-function onUpdateStatus(dayIndex: number, status: StatusPublikasi) {
-  menuStore.setStatus(dayIndex, status)
+function onNewWeek(weekStart: string) {
+  initNewWeek(weekStart)
 }
 
-function onCopyLastWeek() {
-  // TODO: implement actual copy logic
-  console.log('Salin minggu lalu')
+function onSaveAll() {
+  if (hasRepetition.value) {
+    isBosanOpen.value = true
+  } else {
+    executeSave()
+  }
 }
 
-async function onSaveAll() {
-  await menuStore.saveWeek()
+async function onSaveConfirm() {
+  isBosanOpen.value = false
+  await executeSave()
+}
+
+async function executeSave() {
+  // Use current menu name or generate new one based on the menu week start date
+  const weekStart = days.value[0]?.date
+  const name = currentMenu.value?.name || (weekStart ? `Menu Minggu ${weekStart}` : `Menu Minggu ${new Date().toISOString().slice(0, 10)}`)
+  const notes = currentMenu.value?.notes || undefined
+  
+  const success = await saveMenu(name, notes)
+  if (success) {
+    resultVariant.value = 'success'
+    resultHeadline.value = 'Berhasil Menyimpan'
+    resultMessage.value = 'Perencanaan menu gizi telah berhasil disimpan.'
+    isResultOpen.value = true
+  } else {
+    resultVariant.value = 'error'
+    resultHeadline.value = 'Gagal Menyimpan'
+    resultMessage.value = 'Gagal menyimpan perencanaan menu gizi. Silakan coba kembali.'
+    isResultOpen.value = true
+  }
+}
+
+function onOpenDeleteModal() {
+  isDeleteOpen.value = true
+}
+
+async function onDeleteConfirm() {
+  if (!currentMenu.value) return
+  
+  const deletedId = currentMenu.value.id
+  const success = await deleteMenu(deletedId)
+  isDeleteOpen.value = false
+  
+  if (success) {
+    resultVariant.value = 'success'
+    resultHeadline.value = 'Berhasil Menghapus'
+    resultMessage.value = 'Perencanaan menu gizi telah berhasil dihapus.'
+    isResultOpen.value = true
+
+    // Check if there is a menu left in the list
+    const firstMenu = menus.value[0]
+    if (firstMenu) {
+      // Fetch detail of the next menu in the background (non-blocking)
+      fetchMenuDetail(firstMenu.id)
+    } else {
+      // If no menus left, clear the store state
+      resetState()
+    }
+  } else {
+    resultVariant.value = 'error'
+    resultHeadline.value = 'Gagal Menghapus'
+    resultMessage.value = 'Gagal menghapus perencanaan menu gizi. Silakan coba kembali.'
+    isResultOpen.value = true
+  }
 }
 </script>
 

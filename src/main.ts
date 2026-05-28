@@ -6,6 +6,8 @@ import { configureAxios } from '@/api/axios'
 import { useAuthStore } from '@/stores/auth.store'
 
 // ── Global Styles ──────────────────────────────────────────
+// Library CSS MUST load BEFORE our overrides in main.scss
+import '@vuepic/vue-datepicker/dist/main.css'
 import '@/assets/styles/main.scss'   
 
 const app  = createApp(App)
