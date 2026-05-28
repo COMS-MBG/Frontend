@@ -2,6 +2,10 @@ import { computed } from 'vue'
 import { useMenuPlanningStore } from '@/stores/menuPlanning.store'
 import { useRecipeStore } from '@/stores/recipe.store'
 
+/**
+ * Computes the aggregate nutrition summary for all days in the current menu plan.
+ * Uses recipeDropdown (non-paginated, all recipes) for reliable lookup.
+ */
 export function useNutritionSummary() {
   const menuStore = useMenuPlanningStore()
   const recipeStore = useRecipeStore()
@@ -12,10 +16,10 @@ export function useNutritionSummary() {
     let totalKarbo = 0
     let totalLemak = 0
 
-    const days = menuStore.days
+    const days = menuStore.editDays
     days.forEach(day => {
-      if (day.menuId !== null) {
-        const recipe = recipeStore.recipes.find(r => r.id === day.menuId)
+      if (day.recipeId !== null) {
+        const recipe = recipeStore.recipeDropdown.find(r => r.id === day.recipeId)
         if (recipe) {
           totalKalori += recipe.totals.calorie
           totalProtein += recipe.totals.protein

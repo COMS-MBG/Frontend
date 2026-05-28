@@ -80,11 +80,15 @@
       <button
         v-if="showAdd"
         class="btn-primary btn-with-icon base-toolbar__btn-add"
+        :class="{ 'is-loading': addLoading, 'has-pulse': addPulsing }"
+        :disabled="addLoading || addDisabled"
         aria-label="Tambah Data"
-        @click="$emit('add')"
+        @click="!addLoading && !addDisabled && $emit('add')"
       >
-        <span class="material-symbols-outlined">add</span>
+        <span v-if="addLoading" class="material-symbols-outlined is-spinning">sync</span>
+        <span v-else class="material-symbols-outlined">add</span>
         {{ addLabel }}
+        <span v-if="addPulsing && !addLoading && !addDisabled" class="pulse-dot"></span>
       </button>
 
       <slot name="right-append"></slot>
@@ -124,6 +128,12 @@ const props = withDefaults(defineProps<{
   showAdd?: boolean
   /** Label for add button */
   addLabel?: string
+  /** Loading state for add button */
+  addLoading?: boolean
+  /** Disabled state for add button */
+  addDisabled?: boolean
+  /** Pulse animation state for add button */
+  addPulsing?: boolean
   /** Label for import button */
   importLabel?: string
   /** Label for export button */
@@ -145,6 +155,9 @@ const props = withDefaults(defineProps<{
   showPerPage: false,
   showAdd: false,
   addLabel: 'Tambah',
+  addLoading: false,
+  addDisabled: false,
+  addPulsing: false,
   importLabel: 'Import CSV',
   exportLabel: 'Export CSV',
   perPageValue: 10,
@@ -370,6 +383,42 @@ function onPerPageChange(val: string | number | null) {
       width: 100%;
       justify-content: center;
     }
+  }
+}
+
+.is-spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: $color-warning;
+  border-radius: 50%;
+  margin-left: $space-2;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
   }
 }
 </style>

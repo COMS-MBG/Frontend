@@ -5,6 +5,7 @@ import type {
   RecipeDeleteResponse,
   RecipeForm,
   Recipe,
+  RecipeDropdownItem,
 } from '@/types/recipe'
 
 const BASE = '/admin-sppg/nutrition/recipes'
@@ -34,10 +35,34 @@ export async function getRecipe(id: number): Promise<Recipe> {
 /**
  * Fetch all recipes for dropdown (no pagination).
  * GET /api/admin-sppg/nutrition/recipes/dropdown
+ *
+ * Backend returns flat fields: { id, name, total_calorie, total_protein, total_weight }
+ * We map them into the RecipeDropdownItem shape with a nested `totals` object.
  */
-export async function getRecipeDropdown(): Promise<Recipe[]> {
-  const { data } = await api.get<{ success: boolean; data: Recipe[] }>(`${BASE}/dropdown`)
-  return data.data
+export async function getRecipeDropdown(): Promise<RecipeDropdownItem[]> {
+  interface RawDropdownItem {
+    id: number
+    name: string
+    total_calorie: number | null
+    total_protein: number | null
+    total_carbohydrate: number | null
+    total_fat: number | null
+    total_weight: number | null
+  }
+
+  const { data } = await api.get<{ success: boolean; data: RawDropdownItem[] }>(`${BASE}/dropdown`)
+
+  return data.data.map(raw => ({
+    id: raw.id,
+    name: raw.name,
+    totals: {
+      calorie: raw.total_calorie ?? 0,
+      protein: raw.total_protein ?? 0,
+      carbohydrate: raw.total_carbohydrate ?? 0,
+      fat: raw.total_fat ?? 0,
+      weight: raw.total_weight ?? 0,
+    },
+  }))
 }
 
 /**
