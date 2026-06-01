@@ -9,7 +9,7 @@
       <!-- ── Logo / Brand ── -->
       <div class="sidebar-brand">
         <div class="brand-logo">
-          <img src="" alt="MBG Logo" class="brand-img" />
+          <img src="/images/Logo_bgn.png" alt="MBG Logo" class="brand-img" />
         </div>
         <div class="brand-info">
           <span class="brand-name">MBG Bandung</span>
