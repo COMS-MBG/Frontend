@@ -109,6 +109,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/hr/EmployeeAccessView.vue'),
         meta: { requiredPermission: 'employee.update' },
       },
+      {
+        path: 'manajemen-role',
+        name: 'roles',
+        component: () => import('@/views/hr/RoleView.vue'),
+        meta: { requiredPermission: 'employee.update' },
+      },
 
       // ── Partner Management ──
       {
