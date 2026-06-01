@@ -115,6 +115,13 @@ export const sidebarMenu: MenuItem[] = [
         routeName: 'hak-akses',
         permission: 'employee.update',
       },
+      {
+        id: 'manajemen-role',
+        title: 'Manajemen Role',
+        icon: 'supervised_user_circle',
+        routeName: 'roles',
+        permission: 'employee.update',
+      },
     ],
   },
 ]

@@ -120,7 +120,8 @@ export const useEmployeeStore = defineStore('employee', () => {
 
     try {
       await apiCreate(payload)
-      await silentRefresh()
+      // Silent refresh in the background (non-blocking so modals close instantly)
+      silentRefresh()
       return true
     } catch (err: unknown) {
       error.value =
@@ -141,7 +142,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     try {
       const res = await apiUpdate(id, payload)
       selectedEmployee.value = res.employee
-      await silentRefresh()
+      // Silent refresh in the background (non-blocking so modals close instantly)
+      silentRefresh()
       return true
     } catch (err: unknown) {
       error.value =
@@ -158,7 +160,8 @@ export const useEmployeeStore = defineStore('employee', () => {
 
     try {
       await apiDelete(id)
-      await silentRefresh()
+      // Silent refresh in the background (non-blocking so modals close instantly)
+      silentRefresh()
       return true
     } catch (err: unknown) {
       error.value =
@@ -191,7 +194,8 @@ export const useEmployeeStore = defineStore('employee', () => {
     try {
       const res = await apiAssignRole(id, payload)
       selectedEmployee.value = res.employee
-      await silentRefresh()
+      // Silent refresh in the background (non-blocking so modals close instantly)
+      silentRefresh()
       return true
     } catch (err: unknown) {
       error.value =
