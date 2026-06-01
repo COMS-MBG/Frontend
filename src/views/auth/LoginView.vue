@@ -9,10 +9,11 @@
 
     <!-- ── Logo / Brand ── -->
     <div class="brand">
-      <div class="brand-icon">
-        <span class="material-symbols-outlined">layers</span>
+      <img src="/images/Logo_bgn.png" alt="Logo BGN" class="brand-logo" />
+      <div class="brand-text">
+        <span class="brand-name">MBG Bandung</span>
+        <span class="brand-sub">Badan Gizi Nasional</span>
       </div>
-      <span class="brand-name">MBG Bandung</span>
     </div>
 
     <!-- ── Judul ── -->
