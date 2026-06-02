@@ -1,20 +1,20 @@
 // ── Partner Types ──────────────────────────────────────────
 
 export type PartnerBentuk = 'SD' | 'SMP' | 'SMA' | 'SMK' | 'MI' | 'MTs' | 'MA' | 'MAK'
-export type PartnerStatus = 'Negeri' | 'Swasta'
+export type PartnerStatus = 'public' | 'private'
 
 export interface Partner {
   id: string
-  nama_sekolah: string
+  school_name: string
   npsn: string | null
-  bentuk: PartnerBentuk
-  status: PartnerStatus
-  alamat: string | null
-  kecamatan: string | null
-  kabupaten_kota: string | null
+  school_type: PartnerBentuk
+  ownership_status: PartnerStatus
+  address: string | null
+  district: string | null
+  city: string | null
   latitude: number | null
   longitude: number | null
-  jumlah_porsi: number
+  portion_count: number
   sppg_id?: string | null
   created_at?: string
   updated_at?: string
@@ -22,11 +22,11 @@ export interface Partner {
 
 export interface PartnerSummary {
   total_schools: number
-  total_negeri: number
-  total_swasta: number
+  total_public: number
+  total_private: number
   total_sma: number
   total_smk: number
-  total_porsi: number
+  total_portion_count: number
 }
 
 export interface PartnerListMeta {
@@ -79,14 +79,14 @@ export interface PartnerImportResponse {
 
 /** Payload for CSV import preview row */
 export interface PartnerImportRow {
-  nama_sekolah: string
+  school_name: string
   npsn: string
-  bentuk: string
-  status: string
-  alamat: string
-  kecamatan: string
-  kabupaten_kota: string
+  school_type: string
+  ownership_status: string
+  address: string
+  district: string
+  city: string
   latitude: string
   longitude: string
-  jumlah_porsi: number
+  portion_count: number
 }

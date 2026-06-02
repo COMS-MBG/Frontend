@@ -16,12 +16,12 @@
     />
 
     <form @submit.prevent="onSubmit" class="partner-form">
-      <BaseFormGroup label="Nama Sekolah" id="nama_sekolah" required :error="errors.nama_sekolah">
+      <BaseFormGroup label="Nama Sekolah" id="school_name" required :error="errors.school_name">
         <BaseInput
-          id="nama_sekolah"
-          v-model="formData.nama_sekolah"
+          id="school_name"
+          v-model="formData.school_name"
           placeholder="Masukkan nama sekolah"
-          :error="errors.nama_sekolah || undefined"
+          :error="errors.school_name || undefined"
           :disabled="isSubmitting"
         />
       </BaseFormGroup>
@@ -36,69 +36,69 @@
             :disabled="isSubmitting"
           />
         </BaseFormGroup>
-        <BaseFormGroup label="Jumlah Porsi" id="jumlah_porsi" required :error="errors.jumlah_porsi">
+        <BaseFormGroup label="Jumlah Porsi" id="portion_count" required :error="errors.portion_count">
           <BaseInput
-            id="jumlah_porsi"
+            id="portion_count"
             type="number"
-            v-model="formData.jumlah_porsi"
+            v-model="formData.portion_count"
             placeholder="0"
-            :error="errors.jumlah_porsi || undefined"
+            :error="errors.portion_count || undefined"
             :disabled="isSubmitting"
           />
         </BaseFormGroup>
       </div>
 
       <div class="form-row">
-        <BaseFormGroup label="Bentuk Sekolah" id="bentuk" required>
+        <BaseFormGroup label="Bentuk Sekolah" id="school_type" required>
           <template #default>
             <AppSelect
-              :model-value="formData.bentuk"
+              :model-value="formData.school_type"
               :options="bentukOptions"
               placeholder="Pilih bentuk"
-              :error="errors.bentuk"
-              @update:model-value="formData.bentuk = String($event ?? '')"
+              :error="errors.school_type"
+              @update:model-value="formData.school_type = String($event ?? '')"
             />
           </template>
         </BaseFormGroup>
-        <BaseFormGroup label="Status" id="status" required>
+        <BaseFormGroup label="Status" id="ownership_status" required>
           <template #default>
             <AppSelect
-              :model-value="formData.status"
+              :model-value="formData.ownership_status"
               :options="statusOptions"
               placeholder="Pilih status"
-              :error="errors.status"
-              @update:model-value="formData.status = String($event ?? '')"
+              :error="errors.ownership_status"
+              @update:model-value="formData.ownership_status = String($event ?? '')"
             />
           </template>
         </BaseFormGroup>
       </div>
 
-      <BaseFormGroup label="Alamat" id="alamat" :error="errors.alamat">
+      <BaseFormGroup label="Alamat" id="address" :error="errors.address">
         <BaseInput
-          id="alamat"
-          v-model="formData.alamat"
+          id="address"
+          v-model="formData.address"
           placeholder="Jl. ..."
-          :error="errors.alamat || undefined"
+          :error="errors.address || undefined"
           :disabled="isSubmitting"
         />
       </BaseFormGroup>
 
       <div class="form-row">
-        <BaseFormGroup label="Kecamatan" id="kecamatan" :error="errors.kecamatan">
+        <BaseFormGroup label="Kecamatan" id="district" :error="errors.district">
           <BaseInput
-            id="kecamatan"
-            v-model="formData.kecamatan"
+            id="district"
+            v-model="formData.district"
             placeholder="Nama kecamatan"
-            :error="errors.kecamatan || undefined"
+            :error="errors.district || undefined"
             :disabled="isSubmitting"
           />
         </BaseFormGroup>
-        <BaseFormGroup label="Kabupaten/Kota" id="kabupaten_kota" :error="errors.kabupaten_kota">
+        <BaseFormGroup label="Kabupaten/Kota" id="city" :error="errors.city">
           <BaseInput
-            id="kabupaten_kota"
-            v-model="formData.kabupaten_kota"
+            id="city"
+            v-model="formData.city"
             placeholder="Nama kabupaten/kota"
-            :error="errors.kabupaten_kota || undefined"
+            :error="errors.city || undefined"
             :disabled="isSubmitting"
           />
         </BaseFormGroup>
@@ -160,12 +160,12 @@ import { partnerSchema } from '@/validation/partner.schema'
 
 // ── Types ──
 interface FormErrors {
-  nama_sekolah: string; npsn: string; bentuk: string; status: string
-  alamat: string; kecamatan: string; kabupaten_kota: string
-  latitude: string; longitude: string; jumlah_porsi: string
+  school_name: string; npsn: string; school_type: string; ownership_status: string
+  address: string; district: string; city: string
+  latitude: string; longitude: string; portion_count: string
 }
 const emptyErrors = (): FormErrors =>
-  ({ nama_sekolah: '', npsn: '', bentuk: '', status: '', alamat: '', kecamatan: '', kabupaten_kota: '', latitude: '', longitude: '', jumlah_porsi: '' })
+  ({ school_name: '', npsn: '', school_type: '', ownership_status: '', address: '', district: '', city: '', latitude: '', longitude: '', portion_count: '' })
 
 // ── Props / Emits ──
 const props = defineProps<{
@@ -189,10 +189,10 @@ const isSubmitting = computed(() => props.isSubmitting ?? false)
 
 // ── Form State ──
 const formData = reactive({
-  nama_sekolah: '', npsn: '', bentuk: '', status: '',
-  alamat: '', kecamatan: '', kabupaten_kota: '',
+  school_name: '', npsn: '', school_type: '', ownership_status: '',
+  address: '', district: '', city: '',
   latitude: null as number | null, longitude: null as number | null,
-  jumlah_porsi: 0 as number | null,
+  portion_count: 0 as number | null,
 })
 const errors: FormErrors = reactive(emptyErrors())
 const apiError = ref('')
@@ -205,8 +205,8 @@ const bentukOptions: SelectOption[] = [
   { label: 'MI',  value: 'MI'  }, { label: 'MTs', value: 'MTs' },
 ]
 const statusOptions: SelectOption[] = [
-  { label: 'Negeri', value: 'Negeri' },
-  { label: 'Swasta', value: 'Swasta' },
+  { label: 'Negeri', value: 'public' },
+  { label: 'Swasta', value: 'private' },
 ]
 
 // ── Populate form when modal opens ──
@@ -215,31 +215,38 @@ watch(() => props.isOpen, (isOpen) => {
     apiError.value = ''
     Object.assign(errors, emptyErrors())
     if (props.initialData) {
-      formData.nama_sekolah   = props.initialData.nama_sekolah
-      formData.npsn           = props.initialData.npsn || ''
-      formData.bentuk         = props.initialData.bentuk
-      formData.status         = props.initialData.status
-      formData.alamat         = props.initialData.alamat || ''
-      formData.kecamatan      = props.initialData.kecamatan || ''
-      formData.kabupaten_kota = props.initialData.kabupaten_kota || ''
-      formData.latitude       = props.initialData.latitude ?? null
-      formData.longitude      = props.initialData.longitude ?? null
-      formData.jumlah_porsi   = props.initialData.jumlah_porsi
+      formData.school_name      = props.initialData.school_name
+      formData.npsn             = props.initialData.npsn || ''
+      formData.school_type      = props.initialData.school_type
+      formData.ownership_status = props.initialData.ownership_status
+      formData.address          = props.initialData.address || ''
+      formData.district         = props.initialData.district || ''
+      formData.city             = props.initialData.city || ''
+      formData.latitude         = partnerCoordinates('lat')
+      formData.longitude        = partnerCoordinates('lng')
+      formData.portion_count    = props.initialData.portion_count
     } else {
-      formData.nama_sekolah = ''; formData.npsn = ''; formData.bentuk = ''
-      formData.status = ''; formData.alamat = ''; formData.kecamatan = ''
-      formData.kabupaten_kota = ''; formData.latitude = null; formData.longitude = null
-      formData.jumlah_porsi = 0
+      formData.school_name = ''; formData.npsn = ''; formData.school_type = ''
+      formData.ownership_status = ''; formData.address = ''; formData.district = ''
+      formData.city = ''; formData.latitude = null; formData.longitude = null
+      formData.portion_count = 0
     }
   }
 })
+
+// Extract coordinates safely
+function partnerCoordinates(type: 'lat' | 'lng'): number | null {
+  if (!props.initialData) return null
+  if (type === 'lat') return props.initialData.latitude ?? null
+  return props.initialData.longitude ?? null
+}
 
 // ── Client-side validation ──
 function validate(): boolean {
   Object.assign(errors, emptyErrors())
   const result = partnerSchema.safeParse({
     ...formData,
-    jumlah_porsi: Number(formData.jumlah_porsi) || 0,
+    portion_count: Number(formData.portion_count) || 0,
     latitude:  formData.latitude  !== null ? Number(formData.latitude)  : null,
     longitude: formData.longitude !== null ? Number(formData.longitude) : null,
   })
@@ -272,20 +279,21 @@ function onSubmit(): void {
   if (!validate()) return
 
   emit('submit', {
-    id:              props.initialData?.id,
-    nama_sekolah:   formData.nama_sekolah,
-    npsn:           formData.npsn || null,
-    bentuk:         formData.bentuk as Partner['bentuk'],
-    status:         formData.status as Partner['status'],
-    alamat:         formData.alamat || null,
-    kecamatan:      formData.kecamatan || null,
-    kabupaten_kota: formData.kabupaten_kota || null,
-    latitude:       formData.latitude  !== null ? Number(formData.latitude)  : null,
-    longitude:      formData.longitude !== null ? Number(formData.longitude) : null,
-    jumlah_porsi:   Number(formData.jumlah_porsi) || 0,
+    id:               props.initialData?.id,
+    school_name:      formData.school_name,
+    npsn:             formData.npsn || null,
+    school_type:      formData.school_type as Partner['school_type'],
+    ownership_status: formData.ownership_status as Partner['ownership_status'],
+    address:          formData.address || null,
+    district:         formData.district || null,
+    city:             formData.city || null,
+    latitude:         formData.latitude  !== null ? Number(formData.latitude)  : null,
+    longitude:        formData.longitude !== null ? Number(formData.longitude) : null,
+    portion_count:    Number(formData.portion_count) || 0,
   })
 }
 
+// Close handler
 function onClose(): void {
   emit('update:isOpen', false)
 }

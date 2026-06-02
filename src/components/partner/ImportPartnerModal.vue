@@ -67,7 +67,7 @@
           <thead><tr><th>No</th><th>Nama Sekolah</th><th>NPSN</th><th>Bentuk</th><th>Status</th><th>Kecamatan</th><th>Kab/Kota</th><th>Porsi</th></tr></thead>
           <tbody>
             <tr v-for="(row, i) in previewRows.slice(0, 20)" :key="i">
-              <td>{{ i + 1 }}</td><td>{{ row.nama_sekolah }}</td><td>{{ row.npsn || '—' }}</td><td>{{ row.bentuk }}</td><td>{{ row.status }}</td><td>{{ row.kecamatan || '—' }}</td><td>{{ row.kabupaten_kota || '—' }}</td><td>{{ row.jumlah_porsi }}</td>
+              <td>{{ i + 1 }}</td><td>{{ row.school_name }}</td><td>{{ row.npsn || '—' }}</td><td>{{ row.school_type }}</td><td>{{ getOwnershipInfo(row.ownership_status).label }}</td><td>{{ row.district || '—' }}</td><td>{{ row.city || '—' }}</td><td>{{ row.portion_count }}</td>
             </tr>
           </tbody>
         </table>
@@ -107,6 +107,7 @@ import { computed, watch, ref } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import { usePartnerImport } from '@/composables/usePartnerImport'
 import { generateCsvTemplate } from '@/services/partnerServices'
+import { getOwnershipInfo } from '@/utils/partner'
 
 const props = defineProps<{ isOpen: boolean }>()
 const emit = defineEmits<{ (e: 'update:isOpen', v: boolean): void; (e: 'imported'): void }>()

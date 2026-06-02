@@ -137,7 +137,7 @@ export function useDistribution() {
     try {
       await scheduleApi.create(payload)
       toast.success('Jadwal pengiriman berhasil dibuat.')
-      silentRefresh()
+      await silentRefresh()
       return true
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Gagal membuat jadwal.'
@@ -156,7 +156,7 @@ export function useDistribution() {
     try {
       await scheduleApi.update(id, payload)
       toast.success('Jadwal pengiriman berhasil diperbarui.')
-      silentRefresh()
+      await silentRefresh()
       return true
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Gagal mengupdate jadwal.'
@@ -175,7 +175,7 @@ export function useDistribution() {
     try {
       await scheduleApi.destroy(id)
       toast.success('Jadwal pengiriman berhasil dihapus.')
-      silentRefresh()
+      await silentRefresh()
       return true
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Gagal menghapus jadwal.'
@@ -194,7 +194,7 @@ export function useDistribution() {
     try {
       await scheduleApi.submitTask(id)
       toast.success('Tugas berhasil dikirim ke kurir.')
-      silentRefresh()
+      await silentRefresh()
       return true
     } catch {
       toast.error('Gagal mengirim tugas. Silakan coba lagi.')
@@ -209,7 +209,7 @@ export function useDistribution() {
     try {
       await scheduleApi.acceptTask(id)
       toast.success('Tugas berhasil diterima.')
-      silentRefresh()
+      await silentRefresh()
       return true
     } catch {
       toast.error('Gagal menerima tugas.')
@@ -224,7 +224,7 @@ export function useDistribution() {
     try {
       await scheduleApi.confirmDelivery(id, notes)
       toast.success('Pengiriman berhasil dikonfirmasi.')
-      silentRefresh()
+      await silentRefresh()
       return true
     } catch {
       toast.error('Gagal mengonfirmasi pengiriman.')
@@ -239,7 +239,7 @@ export function useDistribution() {
     try {
       await scheduleApi.requestRevision(id, notes)
       toast.success('Permintaan revisi berhasil dikirim ke kurir.')
-      silentRefresh()
+      await silentRefresh()
       return true
     } catch {
       toast.error('Gagal mengirim permintaan revisi.')

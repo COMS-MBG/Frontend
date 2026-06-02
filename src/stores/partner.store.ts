@@ -30,11 +30,11 @@ export const usePartnerStore = defineStore('partner', () => {
   // ── Summary State (from server) ────────────────────────────
   const summary = ref<PartnerSummary>({
     total_schools: 0,
-    total_negeri: 0,
-    total_swasta: 0,
+    total_public: 0,
+    total_private: 0,
     total_sma: 0,
     total_smk: 0,
-    total_porsi: 0,
+    total_portion_count: 0,
   })
 
   // ── Getters ────────────────────────────────────────────────
@@ -61,6 +61,7 @@ export const usePartnerStore = defineStore('partner', () => {
     selectedStatus.value = filter
   }
 
+  // Set default values when resetting the toolbar, status parameter defaults to 'all'
   function setRowsPerPage(num: number): void {
     rowsPerPage.value = num
   }
@@ -80,14 +81,16 @@ export const usePartnerStore = defineStore('partner', () => {
       page,
       per_page: rowsPerPage.value,
       search:   searchQuery.value || undefined,
-      bentuk:   selectedBentuk.value !== 'all' ? selectedBentuk.value : undefined,
-      status:   selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
+      school_type: selectedBentuk.value !== 'all' ? selectedBentuk.value : undefined,
+      ownership_status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
     }
   }
 
   /** Fetch partner list from API with current filters/pagination */
-  async function fetchItems(page = 1): Promise<void> {
-    isLoading.value = true
+  async function fetchItems(page = 1, silent = false): Promise<void> {
+    if (!silent) {
+      isLoading.value = true
+    }
     error.value     = null
 
     try {
@@ -97,7 +100,9 @@ export const usePartnerStore = defineStore('partner', () => {
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Gagal memuat data partner.'
     } finally {
-      isLoading.value = false
+      if (!silent) {
+        isLoading.value = false
+      }
     }
   }
 
@@ -111,29 +116,29 @@ export const usePartnerStore = defineStore('partner', () => {
     }
   }
 
-  /** Create a new partner via API, then refresh list + summary */
+  /** Create a new partner via API, then refresh list + summary silently */
   async function createItem(payload: Omit<Partner, 'id' | 'created_at' | 'updated_at'>): Promise<Partner> {
     const res = await partnerApi.create(payload)
-    await Promise.all([fetchItems(meta.value.current_page), fetchSummary()])
+    await Promise.all([fetchItems(meta.value.current_page, true), fetchSummary()])
     return res.data
   }
 
-  /** Update a partner via API, then refresh list + summary */
+  /** Update a partner via API, then refresh list + summary silently */
   async function updateItem(id: string, payload: Partial<Partner>): Promise<Partner> {
     const res = await partnerApi.update(id, payload)
-    await Promise.all([fetchItems(meta.value.current_page), fetchSummary()])
+    await Promise.all([fetchItems(meta.value.current_page, true), fetchSummary()])
     return res.data
   }
 
-  /** Delete a partner via API, then refresh list + summary */
+  /** Delete a partner via API, then refresh list + summary silently */
   async function deleteItem(id: string): Promise<void> {
     await partnerApi.delete(id)
-    await Promise.all([fetchItems(meta.value.current_page), fetchSummary()])
+    await Promise.all([fetchItems(meta.value.current_page, true), fetchSummary()])
   }
 
-  /** Refresh everything after import */
+  /** Refresh everything after import silently */
   async function refreshAfterImport(): Promise<void> {
-    await Promise.all([fetchItems(1), fetchSummary()])
+    await Promise.all([fetchItems(1, true), fetchSummary()])
   }
 
   // ── Expose ─────────────────────────────────────────────────

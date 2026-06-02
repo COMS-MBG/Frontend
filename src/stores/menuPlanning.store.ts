@@ -56,8 +56,10 @@ export const useMenuPlanningStore = defineStore('menuPlanning', () => {
   /**
    * Fetch paginated list of all menu plans.
    */
-  async function fetchMenus(): Promise<void> {
-    isLoading.value = true
+  async function fetchMenus(silent = false): Promise<void> {
+    if (!silent) {
+      isLoading.value = true
+    }
     error.value = null
 
     try {
@@ -78,7 +80,9 @@ export const useMenuPlanningStore = defineStore('menuPlanning', () => {
       error.value =
         err instanceof Error ? err.message : 'Gagal memuat daftar menu.'
     } finally {
-      isLoading.value = false
+      if (!silent) {
+        isLoading.value = false
+      }
     }
   }
 
@@ -163,7 +167,7 @@ export const useMenuPlanningStore = defineStore('menuPlanning', () => {
       }
 
       // Refresh the list silently while keeping the old badge state
-      await fetchMenus()
+      await fetchMenus(true)
 
       // Now that all async operations are finished, apply the new menu state to FE
       currentMenu.value = savedMenu
@@ -186,7 +190,7 @@ export const useMenuPlanningStore = defineStore('menuPlanning', () => {
       await apiDelete(id)
       
       // Refresh the list silently while keeping the old FE state displayed
-      await fetchMenus()
+      await fetchMenus(true)
       return true
     } catch (err: unknown) {
       error.value =

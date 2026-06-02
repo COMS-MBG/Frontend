@@ -34,7 +34,7 @@ let idCounter = 0
 </script>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 
 const props = defineProps<{
   label?: string
@@ -44,6 +44,8 @@ const props = defineProps<{
   helpText?: string
   disabled?: boolean
 }>()
+
+provide('isInFormGroup', true)
 
 // SSR-safe unique ID (no Math.random)
 const uniqueId = `fg-${++idCounter}`

@@ -16,7 +16,7 @@
       :class="{ 'is-invalid': !!error }"
       v-bind="$attrs"
     />
-    <p v-if="error" :id="errorId" class="error-text">{{ error }}</p>
+    <p v-if="error && !isInFormGroup" :id="errorId" class="error-text">{{ error }}</p>
   </div>
 </template>
 
@@ -25,9 +25,11 @@ let inputIdCounter = 0
 </script>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 
 defineOptions({ inheritAttrs: false })
+
+const isInFormGroup = inject('isInFormGroup', false)
 
 const props = withDefaults(defineProps<{
   modelValue?: string | number | null
