@@ -5,11 +5,12 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster'
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import { useDistributionStore } from '@/stores/distribution.store'
+import { useDistribution } from '@/composables/useDistribution'
 import MapOverlayPanel from './MapOverlayPanel.vue'
-import { getStatusColor } from '@/utils/distribution'
+import { getStatusInfo } from '@/utils/distribution'
+import type { DistributionItem } from '@/types/distribution'
 
-const store = useDistributionStore()
+const { items, optimizedRoute } = useDistribution()
 let map: L.Map | null = null
 let markerCluster: L.MarkerClusterGroup | null = null
 let polylineGroup: L.LayerGroup | null = null
@@ -33,7 +34,7 @@ onMounted(() => {
   renderMapFeatures()
 })
 
-watch(() => store.filtered, () => {
+watch([items, optimizedRoute], () => {
   renderMapFeatures()
 }, { deep: true })
 
@@ -58,23 +59,37 @@ function renderMapFeatures() {
 
   // Batching arrays for performance
   const markers: L.Marker[] = []
+
+  // Draw Route Lines
+  if (optimizedRoute.value && optimizedRoute.value.geojson) {
+    L.geoJSON(optimizedRoute.value.geojson, {
+      style: { color: '#60a5fa', weight: 9, opacity: 0.3 }
+    }).addTo(polylineGroup)
+
+    L.geoJSON(optimizedRoute.value.geojson, {
+      style: { color: '#2563eb', weight: 5, opacity: 0.8 }
+    }).addTo(polylineGroup)
+
+    const coords = optimizedRoute.value.geojson.coordinates
+    coords.forEach((coord: [number, number]) => {
+      allBounds.push([coord[1], coord[0]])
+    })
+  } else {
+    items.value.forEach((item: DistributionItem) => {
+      const routeCoords: [number, number][] = [center, [item.lat, item.lng]]
+      L.polyline(routeCoords, { color: '#60a5fa', weight: 7, opacity: 0.4 }).addTo(polylineGroup!)
+      L.polyline(routeCoords, { color: '#2563eb', weight: 3, opacity: 0.9 }).addTo(polylineGroup!)
+    })
+  }
   
-  store.filtered.forEach(item => {
+  items.value.forEach((item: DistributionItem) => {
     allBounds.push([item.lat, item.lng])
-    
-    // Solid Route Lines (Google Maps Style)
-    const routeCoords: [number, number][] = [center, [item.lat, item.lng]]
-    
-    // Outer outline (glow)
-    L.polyline(routeCoords, { color: '#60a5fa', weight: 7, opacity: 0.4 }).addTo(polylineGroup!)
-    // Inner line
-    L.polyline(routeCoords, { color: '#2563eb', weight: 3, opacity: 0.9 }).addTo(polylineGroup!)
 
     // Destination Pin
-    const statusInfo = getStatusColor(item.status)
+    const statusInfo = getStatusInfo(item.status)
     const pinIcon = L.divIcon({
       className: 'leaflet-custom-icon',
-      html: `<div class="pin bg-${statusInfo.class}"><span class="material-symbols-outlined">school</span></div>`,
+      html: `<div class="pin bg-${statusInfo.variant}"><span class="material-symbols-outlined">school</span></div>`,
       iconSize: [32, 32],
       iconAnchor: [16, 32]
     })
@@ -85,7 +100,7 @@ function renderMapFeatures() {
     )
 
     // Car Tracker for active fleets
-    if (item.status === 'in_progress') {
+    if (item.status === 'delivering') {
       const fraction = 0.55 // Car is 55% of the way there
       const fleetLat = center[0] + (item.lat - center[0]) * fraction
       const fleetLng = center[1] + (item.lng - center[1]) * fraction
@@ -148,7 +163,7 @@ function renderMapFeatures() {
     align-items: center;
     padding: $space-4 $space-5;
     border-bottom: 1px solid $color-border-light;
-    background-color: #fafafa;
+    background-color: $color-bg-surface;
 
     .title {
       margin: 0;
@@ -214,7 +229,7 @@ function renderMapFeatures() {
   height: 32px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+  box-shadow: $shadow-sm;
   color: white;
   border: 2px solid white;
   
@@ -232,6 +247,8 @@ function renderMapFeatures() {
   &.bg-success { background-color: $color-success; }
   &.bg-primary { background-color: $color-primary; }
   &.bg-warning { background-color: $color-warning; }
+  &.bg-info    { background-color: $color-info; }
+  &.bg-danger  { background-color: $color-danger; }
 }
 
 :deep(.car-tracker) {
@@ -243,7 +260,7 @@ function renderMapFeatures() {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  box-shadow: $shadow-md;
   color: $color-primary;
 
   span { 
@@ -259,11 +276,11 @@ function renderMapFeatures() {
 }
 
 :deep(.leaflet-popup-content-wrapper) {
-  border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
 }
 :deep(.leaflet-popup-content) {
   font-family: $font-body;
-  font-size: 0.875rem;
+  font-size: $text-base;
 }
 </style>

@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useDistributionStore } from '@/stores/distribution.store'
+import { useDistribution } from '@/composables/useDistribution'
 import { useDebounce } from '@/composables/useDebounce'
 import BaseTableToolbar from '@/components/common/BaseTableToolbar.vue'
+import AppSelect from '@/components/common/AppSelect.vue'
 import type { SelectOption } from '@/types/form'
 
-const store = useDistributionStore()
+const { filters, setSearchQuery, setPerPage, setFilter } = useDistribution()
 
 // ── Search State & Debounce ───────────────────────────
-const localSearch = ref(store.searchQuery)
+const localSearch = ref('')
 const debouncedSearch = useDebounce(localSearch, 300)
 
 watch(debouncedSearch, (newVal) => {
-  store.setSearchQuery(newVal)
-})
-
-watch(() => store.searchQuery, (val) => {
-  localSearch.value = val
+  setSearchQuery(newVal)
 })
 
 function onSearchInput(val: string) {
@@ -27,22 +24,32 @@ function onSearchInput(val: string) {
 const perPageOptions: SelectOption[] = [
   { label: '5', value: 5 },
   { label: '10', value: 10 },
+  { label: '15', value: 15 },
   { label: '25', value: 25 },
-  { label: '50', value: 50 },
 ]
 
 function onPerPageChange(val: number) {
-  store.setLimit(val)
+  setPerPage(val)
 }
 
-// ── Upload Action ─────────────────────────────────────
-const isUploading = ref(false)
-const onUploadCsv = async () => {
-  if (isUploading.value) return
-  isUploading.value = true
-  // Mock upload delay
-  await new Promise(res => setTimeout(res, 800))
-  isUploading.value = false
+// ── Status Filter ─────────────────────────────────────
+const statusOptions: SelectOption[] = [
+  { label: 'Semua Status', value: '' },
+  { label: 'Menunggu', value: 'in_order' },
+  { label: 'Diterima', value: 'accepted' },
+  { label: 'Di Perjalanan', value: 'delivering' },
+  { label: 'Terkirim', value: 'delivered' },
+  { label: 'Dikonfirmasi', value: 'confirmed' },
+  { label: 'Ditolak', value: 'rejected' },
+  { label: 'Revisi Bukti', value: 'revision_required' },
+]
+
+const selectedStatus = ref('')
+
+function onStatusChange(val: string | number | null) {
+  const strVal = String(val ?? '')
+  selectedStatus.value = strVal
+  setFilter('status', strVal || undefined)
 }
 </script>
 
@@ -51,9 +58,9 @@ const onUploadCsv = async () => {
     :search-value="localSearch"
     @update:search-value="onSearchInput"
     :show-search="true"
-    :show-filter="false"
+    :show-filter="true"
     :show-per-page="true"
-    :per-page-value="store.limit"
+    :per-page-value="filters.per_page"
     :per-page-options="perPageOptions"
     @update:per-page-value="onPerPageChange"
     :show-add="false"
@@ -61,18 +68,14 @@ const onUploadCsv = async () => {
     :show-export="false"
     search-placeholder="Cari sekolah atau kurir..."
   >
-    <!-- Custom Primary Upload Button -->
-    <template #right-append>
-      <button 
-        class="btn-primary btn-with-icon toolbar-btn" 
-        @click="onUploadCsv"
-        :disabled="isUploading"
-      >
-        <span v-if="isUploading" class="material-symbols-outlined is-spinning">sync</span>
-        <span v-else class="material-symbols-outlined">upload_file</span>
-        {{ isUploading ? 'Mengunggah...' : 'Unggah CSV' }}
-      </button>
+    <!-- Status Filter -->
+    <template #filter>
+      <AppSelect
+        :model-value="selectedStatus"
+        :options="statusOptions"
+        placeholder="Semua Status"
+        @update:model-value="onStatusChange"
+      />
     </template>
   </BaseTableToolbar>
 </template>
-

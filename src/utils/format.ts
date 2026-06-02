@@ -46,3 +46,12 @@ export function formatDate(iso: string): string {
   const d = new Date(iso)
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
 }
+
+/** Format ISO date string to Indonesian locale with hours and minutes (e.g. "4 Mei 2026, 16:32") */
+export function formatDateTime(iso: string): string {
+  const d = new Date(iso)
+  const dateStr = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+  const hours = String(d.getHours()).padStart(2, '0')
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+  return `${dateStr}, ${hours}:${minutes}`
+}
