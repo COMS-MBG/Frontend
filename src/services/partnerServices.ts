@@ -1,53 +1,65 @@
 import type { PartnerImportRow } from '@/types/partner'
 
 const COLUMN_MAP: Record<string, keyof PartnerImportRow | null> = {
-  // nama_sekolah
-  'nama sekolah':    'nama_sekolah',
-  'school name':     'nama_sekolah',
+  // school_name
+  'nama sekolah':      'school_name',
+  'nama_sekolah':      'school_name',
+  'school name':       'school_name',
+  'school_name':       'school_name',
   // npsn
-  'npsn':            'npsn',
-  // bentuk
-  'bentuk':          'bentuk',
-  'jenis':           'bentuk',
-  // status
-  'status':          'status',
-  // alamat
-  'alamat':          'alamat',
-  'address':         'alamat',
-  // kecamatan
-  'kecamatan':       'kecamatan',
-  // kabupaten_kota
-  'kabupaten/kota':  'kabupaten_kota',
-  'kabupaten kota':  'kabupaten_kota',
-  'kota':            'kabupaten_kota',
+  'npsn':              'npsn',
+  // school_type
+  'bentuk':            'school_type',
+  'jenis':             'school_type',
+  'school type':       'school_type',
+  'school_type':       'school_type',
+  // ownership_status
+  'status':            'ownership_status',
+  'ownership status':  'ownership_status',
+  'ownership_status':  'ownership_status',
+  // address
+  'alamat':            'address',
+  'address':           'address',
+  // district
+  'kecamatan':         'district',
+  'district':          'district',
+  // city
+  'kabupaten/kota':    'city',
+  'kabupaten kota':    'city',
+  'kabupaten_kota':    'city',
+  'kota':              'city',
+  'city':              'city',
   // latitude
-  'latitude':        'latitude',
-  'lat':             'latitude',
-  'lintang':         'latitude',
+  'latitude':          'latitude',
+  'lat':               'latitude',
+  'lintang':           'latitude',
   // longitude
-  'longitude':       'longitude',
-  'lng':             'longitude',
-  'long':            'longitude',
-  'bujur':           'longitude',
-  // jumlah_porsi
-  'jumlah porsi':    'jumlah_porsi',
-  'porsi':           'jumlah_porsi',
-  'total porsi':     'jumlah_porsi',
+  'longitude':         'longitude',
+  'lng':               'longitude',
+  'long':              'longitude',
+  'bujur':             'longitude',
+  // portion_count
+  'jumlah porsi':      'portion_count',
+  'jumlah_porsi':      'portion_count',
+  'porsi':             'portion_count',
+  'total porsi':       'portion_count',
+  'portion count':     'portion_count',
+  'portion_count':     'portion_count',
   // skip-only
-  'no':              null,
+  'no':                null,
 }
 
 /** Internal keys that must be covered by at least one CSV header alias */
 const REQUIRED_KEYS: Array<keyof PartnerImportRow> = [
-  'nama_sekolah', 'bentuk', 'status', 'jumlah_porsi',
+  'school_name', 'school_type', 'ownership_status', 'portion_count',
 ]
 
 /** Human-readable labels for required keys (error messages) */
 const REQUIRED_LABELS: Record<string, string> = {
-  nama_sekolah: 'Nama Sekolah',
-  bentuk:       'Bentuk',
-  status:       'Status',
-  jumlah_porsi: 'Jumlah Porsi',
+  school_name:      'Nama Sekolah',
+  school_type:      'Bentuk',
+  ownership_status: 'Status',
+  portion_count:    'Jumlah Porsi',
 }
 
 export interface CsvValidationResult {
@@ -167,20 +179,20 @@ export function parseCsvFile(file: File): Promise<CsvValidationResult> {
       for (let i = 1; i < lines.length; i++) {
         const values = parseCsvLine(lines[i]!, delimiter)
         const row: PartnerImportRow = {
-          nama_sekolah:   getVal(values, columnIndexes, 'nama_sekolah'),
-          npsn:           getVal(values, columnIndexes, 'npsn'),
-          bentuk:         getVal(values, columnIndexes, 'bentuk'),
-          status:         getVal(values, columnIndexes, 'status'),
-          alamat:         getVal(values, columnIndexes, 'alamat'),
-          kecamatan:      getVal(values, columnIndexes, 'kecamatan'),
-          kabupaten_kota: getVal(values, columnIndexes, 'kabupaten_kota'),
-          latitude:       getVal(values, columnIndexes, 'latitude'),
-          longitude:      getVal(values, columnIndexes, 'longitude'),
-          jumlah_porsi:   parseInt(getVal(values, columnIndexes, 'jumlah_porsi') || '0', 10) || 0,
+          school_name:      getVal(values, columnIndexes, 'school_name'),
+          npsn:             getVal(values, columnIndexes, 'npsn'),
+          school_type:      getVal(values, columnIndexes, 'school_type'),
+          ownership_status: getVal(values, columnIndexes, 'ownership_status'),
+          address:          getVal(values, columnIndexes, 'address'),
+          district:         getVal(values, columnIndexes, 'district'),
+          city:             getVal(values, columnIndexes, 'city'),
+          latitude:         getVal(values, columnIndexes, 'latitude'),
+          longitude:        getVal(values, columnIndexes, 'longitude'),
+          portion_count:    parseInt(getVal(values, columnIndexes, 'portion_count') || '0', 10) || 0,
         }
 
         // Skip rows with empty school name
-        if (row.nama_sekolah.trim()) {
+        if (row.school_name.trim()) {
           rows.push(row)
         }
       }

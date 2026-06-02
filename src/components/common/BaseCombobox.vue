@@ -72,16 +72,18 @@
     </Transition>
 
     <!-- Error message -->
-    <p v-if="error" class="combobox-error">{{ error }}</p>
+    <p v-if="error && !isInFormGroup" class="combobox-error">{{ error }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, inject } from 'vue'
 import type { SelectOption } from '@/types/form'
 
 /** @deprecated Use SelectOption from '@/types/form' instead */
 export type ComboboxOption = SelectOption
+
+const isInFormGroup = inject('isInFormGroup', false)
 
 const props = defineProps<{
   modelValue: string | number | null

@@ -16,7 +16,7 @@
         <div class="detail-grid">
           <div class="detail-item">
             <span class="detail-item__label">Nama Sekolah</span>
-            <span class="detail-item__value">{{ partner.nama_sekolah }}</span>
+            <span class="detail-item__value">{{ partner.school_name }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">NPSN</span>
@@ -27,13 +27,13 @@
           <div class="detail-item">
             <span class="detail-item__label">Bentuk</span>
             <span class="detail-item__value">
-              <BaseBadge :text="partner.bentuk" :variant="bentukVariant" />
+              <BaseBadge :text="partner.school_type" :variant="bentukVariant" />
             </span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">Status</span>
             <span class="detail-item__value">
-              <BaseBadge :text="partner.status" :variant="statusVariant" />
+              <BaseBadge :text="ownershipInfo.label" :variant="ownershipInfo.variant" />
             </span>
           </div>
         </div>
@@ -48,15 +48,15 @@
         <div class="detail-grid">
           <div class="detail-item detail-item--full">
             <span class="detail-item__label">Alamat</span>
-            <span class="detail-item__value">{{ partner.alamat || '—' }}</span>
+            <span class="detail-item__value">{{ partner.address || '—' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">Kecamatan</span>
-            <span class="detail-item__value">{{ partner.kecamatan || '—' }}</span>
+            <span class="detail-item__value">{{ partner.district || '—' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-item__label">Kabupaten/Kota</span>
-            <span class="detail-item__value">{{ partner.kabupaten_kota || '—' }}</span>
+            <span class="detail-item__value">{{ partner.city || '—' }}</span>
           </div>
         </div>
       </section>
@@ -71,7 +71,7 @@
           <div class="detail-item">
             <span class="detail-item__label">Jumlah Porsi</span>
             <span class="detail-item__value detail-item__value--hero">
-              {{ formatNumber(partner.jumlah_porsi) }}
+              {{ formatNumber(partner.portion_count) }}
             </span>
           </div>
           <div class="detail-item">
@@ -98,6 +98,7 @@ import { computed } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseBadge from '@/components/common/BaseBadge.vue'
 import type { Partner } from '@/types/partner'
+import { getOwnershipInfo } from '@/utils/partner'
 
 const props = defineProps<{
   isOpen: boolean
@@ -116,7 +117,7 @@ const isOpenModel = computed({
 })
 
 const bentukVariant = computed(() => {
-  switch (props.partner?.bentuk) {
+  switch (props.partner?.school_type) {
     case 'SMA': return 'info'
     case 'SMK': return 'warning'
     case 'MA':
@@ -125,8 +126,8 @@ const bentukVariant = computed(() => {
   }
 })
 
-const statusVariant = computed(() => {
-  return props.partner?.status === 'Negeri' ? 'success' : 'default'
+const ownershipInfo = computed(() => {
+  return getOwnershipInfo(props.partner?.ownership_status)
 })
 
 function formatNumber(val: number): string {

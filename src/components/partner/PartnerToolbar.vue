@@ -80,8 +80,8 @@ function onBentukChange(val: string | number | null) {
 // ── Status Filter ─────────────────────────────────────
 const statusOptions: SelectOption[] = [
   { label: 'Semua Status', value: 'all' },
-  { label: 'Negeri', value: 'Negeri' },
-  { label: 'Swasta', value: 'Swasta' },
+  { label: 'Negeri', value: 'public' },
+  { label: 'Swasta', value: 'private' },
 ]
 
 function onStatusChange(val: string | number | null) {

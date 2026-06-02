@@ -11,11 +11,11 @@
     <!-- 2. SUMMARY STAT CARDS -->
     <div class="summary-row">
       <StatCard label="TOTAL SEKOLAH"  icon="domain"                :value="String(summary.total_schools)" variant="horizontal" icon-variant="blue"   />
-      <StatCard label="SEKOLAH NEGERI" icon="account_balance"       :value="String(summary.total_negeri)"  variant="horizontal" icon-variant="green"  />
-      <StatCard label="SEKOLAH SWASTA" icon="apartment"             :value="String(summary.total_swasta)"  variant="horizontal" icon-variant="purple" />
+      <StatCard label="SEKOLAH NEGERI" icon="account_balance"       :value="String(summary.total_public)"  variant="horizontal" icon-variant="green"  />
+      <StatCard label="SEKOLAH SWASTA" icon="apartment"             :value="String(summary.total_private)" variant="horizontal" icon-variant="purple" />
       <StatCard label="SMA"            icon="school"                :value="String(summary.total_sma)"     variant="horizontal" icon-variant="blue"   />
       <StatCard label="SMK"            icon="precision_manufacturing" :value="String(summary.total_smk)"   variant="horizontal" icon-variant="orange" />
-      <StatCard label="TOTAL PORSI"    icon="restaurant"            :value="String(summary.total_porsi)"   variant="horizontal" icon-variant="green"  />
+      <StatCard label="TOTAL PORSI"    icon="restaurant"            :value="String(summary.total_portion_count)" variant="horizontal" icon-variant="green"  />
     </div>
 
     <!-- 3. TOOLBAR -->
@@ -89,6 +89,7 @@
     <PartnerDeleteModal
       :is-open="isDeleteOpen"
       :partner="deleteTarget"
+      :is-submitting="isDeleting"
       @update:is-open="isDeleteOpen = $event"
       @confirm="onDeleteConfirm"
     />
@@ -180,7 +181,7 @@ const isDetailOpen    = ref(false)
 const isImportOpen    = ref(false)
 const isDeleteOpen    = ref(false)
 const isSuccessOpen   = ref(false)
-const successMode     = ref<'create' | 'edit'>('create')
+const successMode     = ref<'create' | 'edit' | 'delete'>('create')
 const successName     = ref<string | null>(null)
 const isSubmitting    = ref(false)
 const isDeleting      = ref(false)
@@ -234,11 +235,16 @@ async function onDeleteConfirm(): Promise<void> {
   if (!deleteTarget.value || isDeleting.value) return
   isDeleting.value = true
 
+  const schoolName = deleteTarget.value.school_name
   try {
     await partnerStore.deleteItem(deleteTarget.value.id)
     isDeleteOpen.value = false
     deleteTarget.value = null
-    toast.success('Sekolah mitra berhasil dihapus.')
+    
+    // Show success modal
+    successMode.value = 'delete'
+    successName.value = schoolName
+    isSuccessOpen.value = true
   } catch {
     toast.error('Gagal menghapus data. Silakan coba lagi.')
   } finally {
@@ -259,7 +265,7 @@ async function onSubmit(data: Partial<Partner>): Promise<void> {
       await partnerStore.createItem(data as Omit<Partner, 'id' | 'created_at' | 'updated_at'>)
       successMode.value = 'create'
     }
-    successName.value = data.nama_sekolah ?? null
+    successName.value = data.school_name ?? null
     isFormOpen.value  = false
     editTarget.value  = null
     isSuccessOpen.value = true   // ← open success modal

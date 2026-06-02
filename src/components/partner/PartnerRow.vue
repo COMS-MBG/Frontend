@@ -7,31 +7,31 @@
           <span class="material-symbols-outlined partner-row__thumb-icon">school</span>
         </div>
         <div class="partner-row__text">
-          <span class="partner-row__name">{{ item.nama_sekolah }}</span>
-          <span class="partner-row__alamat">{{ item.alamat || '—' }}</span>
+          <span class="partner-row__name">{{ item.school_name }}</span>
+          <span class="partner-row__alamat">{{ item.address || '—' }}</span>
         </div>
       </div>
     </td>
 
     <!-- 2) Bentuk -->
     <td class="partner-row__center">
-      <BaseBadge :text="item.bentuk" :variant="bentukVariant" />
+      <BaseBadge :text="item.school_type" :variant="bentukVariant" />
     </td>
 
     <!-- 3) Status -->
     <td class="partner-row__center">
-      <BaseBadge :text="item.status" :variant="statusVariant" />
+      <BaseBadge :text="ownershipInfo.label" :variant="ownershipInfo.variant" />
     </td>
 
     <!-- 4) Kecamatan -->
-    <td class="partner-row__left">{{ item.kecamatan || '—' }}</td>
+    <td class="partner-row__left">{{ item.district || '—' }}</td>
 
     <!-- 5) Kabupaten/Kota -->
-    <td class="partner-row__left">{{ item.kabupaten_kota || '—' }}</td>
+    <td class="partner-row__left">{{ item.city || '—' }}</td>
 
     <!-- 6) Jumlah Porsi -->
     <td class="partner-row__right partner-row__porsi">
-      {{ formatNumber(item.jumlah_porsi) }}
+      {{ formatNumber(item.portion_count) }}
     </td>
 
     <!-- 7) Aksi -->
@@ -67,6 +67,7 @@
 import { computed } from 'vue'
 import BaseBadge from '@/components/common/BaseBadge.vue'
 import type { Partner } from '@/types/partner'
+import { getOwnershipInfo } from '@/utils/partner'
 
 const props = defineProps<{
   item: Partner
@@ -79,7 +80,7 @@ defineEmits<{
 }>()
 
 const bentukVariant = computed(() => {
-  switch (props.item.bentuk) {
+  switch (props.item.school_type) {
     case 'SMA': return 'info'
     case 'SMK': return 'warning'
     case 'MA':
@@ -88,8 +89,8 @@ const bentukVariant = computed(() => {
   }
 })
 
-const statusVariant = computed(() => {
-  return props.item.status === 'Negeri' ? 'success' : 'default'
+const ownershipInfo = computed(() => {
+  return getOwnershipInfo(props.item.ownership_status)
 })
 
 function formatNumber(val: number): string {

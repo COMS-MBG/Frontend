@@ -93,8 +93,8 @@ export const useRoleStore = defineStore('role', () => {
 
     try {
       await roleApi.create(payload)
-      // Silent refresh in the background (non-blocking so modals close instantly)
-      fetchItems(true)
+      // Await silent refresh so data is loaded before modals close/show success
+      await fetchItems(true)
       return true
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Gagal membuat role baru.'
@@ -111,8 +111,8 @@ export const useRoleStore = defineStore('role', () => {
 
     try {
       await roleApi.update(id, payload)
-      // Silent refresh in the background (non-blocking so modals close instantly)
-      fetchItems(true)
+      // Await silent refresh so data is loaded before modals close/show success
+      await fetchItems(true)
       return true
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Gagal memperbarui role.'
@@ -129,8 +129,8 @@ export const useRoleStore = defineStore('role', () => {
 
     try {
       await roleApi.delete(id)
-      // Silent refresh in the background (non-blocking so modals close instantly)
-      fetchItems(true)
+      // Await silent refresh so data is loaded before modals close/show success
+      await fetchItems(true)
       return true
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Gagal menghapus role.'

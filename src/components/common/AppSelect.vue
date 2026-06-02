@@ -44,13 +44,15 @@
       </div>
     </Transition>
     
-    <p v-if="error" class="app-select-error">{{ error }}</p>
+    <p v-if="error && !isInFormGroup" class="app-select-error">{{ error }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, inject } from 'vue'
 import type { SelectOption } from '@/types/form'
+
+const isInFormGroup = inject('isInFormGroup', false)
 
 const props = defineProps<{
   modelValue: string | number | null
