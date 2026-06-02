@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { useDistributionSummary } from '@/composables/useDistributionSummary'
+import { computed } from 'vue'
+import { useDistribution } from '@/composables/useDistribution'
 import StatCard from '@/components/common/StatCard.vue'
+import { getOnTimeSubtitle } from '@/utils/distribution'
 
-const { totalToday, inProgressCount, onTimeRate } = useDistributionSummary()
+const { totalToday, inProgressCount, onTimeRate } = useDistribution()
+
+/** Dynamic subtitle based on actual on-time percentage */
+const onTimeSubtitle = computed(() => getOnTimeSubtitle(onTimeRate.value))
 </script>
 
 <template>
@@ -27,7 +32,7 @@ const { totalToday, inProgressCount, onTimeRate } = useDistributionSummary()
       label="ESTIMASI TIBA TEPAT WAKTU"
       icon="timer"
       :value="onTimeRate + '%'"
-      subtitle="Sangat Baik"
+      :subtitle="onTimeSubtitle"
       variant="horizontal"
       iconVariant="green"
     />

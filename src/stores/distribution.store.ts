@@ -1,92 +1,137 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import Fuse from 'fuse.js'
-import type { DistributionItem, DeliveryStatus } from '@/types/distribution'
+import { toDistributionItem } from '@/utils/distribution'
+import type {
+  DeliverySchedule,
+  DistributionItem,
+  AvailableCourier,
+  PaginationMeta,
+  OptimizedRoute,
+} from '@/types/distribution'
 
+/**
+ * Distribution Store — THIN STATE LAYER
+ *
+ * ✅ Global reactive state
+ * ✅ Computed getters
+ * ✅ Simple state setters
+ *
+ * ❌ NO API calls
+ * ❌ NO orchestration
+ * ❌ NO WebSocket logic
+ * ❌ NO business logic
+ *
+ * All orchestration is handled by useDistribution() composable.
+ */
 export const useDistributionStore = defineStore('distribution', () => {
-  // ── State ───────────────────────────────────────────────
-  const items = ref<DistributionItem[]>([])
-  const searchQuery = ref<string>('')
-  const selectedDateFilter = ref<string>('')
-  const isLoading = ref<boolean>(false)
-  const page = ref<number>(1)
-  const limit = ref<number>(10)
+  // ── Raw State ──────────────────────────────────────────
+  const schedules = ref<DeliverySchedule[]>([])
+  const summarySchedules = ref<DeliverySchedule[]>([]) // global unpaginated dataset for KPI metrics
+  const selectedSchedule = ref<DeliverySchedule | null>(null)
+  const availableCouriers = ref<AvailableCourier[]>([])
+  const optimizedRoute = ref<OptimizedRoute | null>(null)
 
-  // ── Fuzzy Search Setup ──────────────────────────────────
-  const fuseInstance = computed(() => {
-    return new Fuse(items.value, {
-      keys: ['sekolah', 'kurir', 'kendaraan', 'status'],
-      threshold: 0.3,
-      distance: 100,
-      ignoreLocation: true
-    })
+  const pagination = ref<PaginationMeta>({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
   })
 
-  // ── Getters ─────────────────────────────────────────────
-  const filtered = computed(() => {
-    if (!searchQuery.value.trim()) {
-      return items.value
+  const filters = ref({
+    page: 1,
+    per_page: 10,
+    status: '' as string,
+    courier_id: undefined as number | undefined,
+    school_id: undefined as number | undefined,
+  })
+
+  const searchQuery = ref('')
+  const isLoading = ref(false)
+  const isDetailLoading = ref(false)
+  const isSubmitting = ref(false)
+  const isOptimizing = ref(false)
+  const error = ref<string | null>(null)
+
+  // ── Derived State ──────────────────────────────────────
+  /** Flat items for DistributionRow/Table components */
+  const items = computed<DistributionItem[]>(() =>
+    schedules.value.map(toDistributionItem),
+  )
+
+  /** Client-side filtered items based on search query */
+  const filteredItems = computed<DistributionItem[]>(() => {
+    const q = searchQuery.value.trim().toLowerCase()
+    if (!q) return items.value
+    return items.value.filter(item =>
+      item.sekolah.toLowerCase().includes(q) ||
+      item.kurir.toLowerCase().includes(q) ||
+      (item.kendaraan && item.kendaraan.toLowerCase().includes(q)),
+    )
+  })
+
+  // ── Summary Getters ────────────────────────────────────
+  // Computed from global unfiltered summarySchedules — ignores pagination/filter shifts
+  const totalToday = computed(() => summarySchedules.value.length)
+
+  const inProgressCount = computed(() =>
+    summarySchedules.value.filter(s => s.status === 'delivering').length,
+  )
+
+  const onTimeRate = computed(() => {
+    const total = summarySchedules.value.length
+    if (total === 0) return 0
+    const onTime = summarySchedules.value.filter(
+      s => s.status === 'confirmed' || s.status === 'delivered',
+    ).length
+    return Math.round((onTime / total) * 100 * 10) / 10
+  })
+
+  // ── Reset ──────────────────────────────────────────────
+  function resetState(): void {
+    schedules.value = []
+    summarySchedules.value = []
+    selectedSchedule.value = null
+    availableCouriers.value = []
+    optimizedRoute.value = null
+    pagination.value = { current_page: 1, last_page: 1, total: 0 }
+    filters.value = {
+      page: 1,
+      per_page: 10,
+      status: '',
+      courier_id: undefined,
+      school_id: undefined,
     }
-    return fuseInstance.value.search(searchQuery.value).map(result => result.item)
-  })
-
-  const paginated = computed(() => {
-    const allFiltered = filtered.value
-    const start = (page.value - 1) * limit.value
-    return allFiltered.slice(start, start + limit.value)
-  })
-
-  const totalPages = computed(() => {
-    const allFiltered = filtered.value
-    return Math.ceil(allFiltered.length / limit.value)
-  })
-
-  const totalToday = computed(() => items.value.length)
-  const inProgressCount = computed(() => items.value.filter(i => i.status === 'in_progress').length)
-  const onTimeRate = computed(() => 94.2) // static for now
-
-  // ── Actions ─────────────────────────────────────────────
-  function setSearchQuery(newQuery: string) {
-    searchQuery.value = newQuery
-    page.value = 1
-  }
-
-  function setDateFilter(newDate: string) {
-    selectedDateFilter.value = newDate
-    page.value = 1
-  }
-
-  function setPage(newPage: number) {
-    page.value = newPage
-  }
-
-  function setLimit(newLimit: number) {
-    limit.value = newLimit
-    page.value = 1
-  }
-
-  function setItems(data: DistributionItem[]) {
-    items.value = data
-  }
-
-  function updateStatus(id: number, status: DeliveryStatus) {
-    const item = items.value.find(i => i.id === id)
-    if (item) item.status = status
-  }
-
-  async function startDelivery(id: number) {
-    isLoading.value = true
-    await new Promise(res => setTimeout(res, 500))
-    updateStatus(id, 'in_progress')
+    searchQuery.value = ''
     isLoading.value = false
+    isDetailLoading.value = false
+    isSubmitting.value = false
+    isOptimizing.value = false
+    error.value = null
   }
 
   return {
     // state
-    items, searchQuery, selectedDateFilter, isLoading, page, limit,
-    // getters
-    filtered, paginated, totalPages, totalToday, inProgressCount, onTimeRate,
-    // actions
-    setSearchQuery, setDateFilter, setPage, setLimit, setItems, updateStatus, startDelivery
+    schedules,
+    summarySchedules,
+    selectedSchedule,
+    availableCouriers,
+    optimizedRoute,
+    pagination,
+    filters,
+    searchQuery,
+    isLoading,
+    isDetailLoading,
+    isSubmitting,
+    isOptimizing,
+    error,
+    // derived
+    items,
+    filteredItems,
+    // summary getters
+    totalToday,
+    inProgressCount,
+    onTimeRate,
+    // reset
+    resetState,
   }
 })

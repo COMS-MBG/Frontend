@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useDistributionSummary } from '@/composables/useDistributionSummary'
+import { useDistribution } from '@/composables/useDistribution'
 
-const { inProgressCount } = useDistributionSummary()
+const { inProgressCount, isOptimizing, optimizeRoute } = useDistribution()
 </script>
 
 <template>
@@ -29,8 +29,18 @@ const { inProgressCount } = useDistributionSummary()
           <div class="progress-fill" style="width: 88%"></div>
         </div>
       </div>
-      <button class="map-overlay__btn" aria-label="Optimasi Rute AI">
-        ✨ Optimasi Rute AI
+      <button 
+        class="map-overlay__btn" 
+        :disabled="isOptimizing"
+        @click="optimizeRoute"
+        aria-label="Optimasi Rute AI"
+      >
+        <template v-if="isOptimizing">
+          Mengoptimasi...
+        </template>
+        <template v-else>
+          Optimasi Rute AI
+        </template>
       </button>
     </div>
   </div>
@@ -41,23 +51,23 @@ const { inProgressCount } = useDistributionSummary()
 
 .map-overlay {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: $space-5;
+  right: $space-5;
   width: 280px;
-  background: rgba(255, 255, 255, 0.95);
+  background-color: $color-bg-overlay;
   backdrop-filter: blur(8px);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  border-radius: $radius-lg;
+  padding: $space-4;
+  box-shadow: $shadow-lg;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: $space-5;
 
   &__section {
     h4 {
-      margin: 0 0 12px 0;
-      font-size: 0.75rem;
+      margin: 0 0 $space-3 0;
+      font-size: $text-xs;
       color: $color-text-muted;
       letter-spacing: 0.5px;
     }
@@ -66,18 +76,18 @@ const { inProgressCount } = useDistributionSummary()
   &__stat {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-size: 0.875rem;
+    gap: $space-2;
+    margin-bottom: $space-2;
+    font-size: $text-base;
     font-weight: 500;
 
     .dot {
       width: 8px;
       height: 8px;
-      border-radius: 50%;
+      border-radius: $radius-pill;
       
-      &--active { background: $color-primary; }
-      &--standby { background: #f59e0b; }
+      &--active { background-color: $color-primary; }
+      &--standby { background-color: $color-warning; }
     }
 
     .value {
@@ -87,44 +97,46 @@ const { inProgressCount } = useDistributionSummary()
   }
 
   &__progress {
-    margin-bottom: 16px;
+    margin-bottom: $space-4;
 
     .progress-header {
       display: flex;
       justify-content: space-between;
-      font-size: 0.75rem;
+      font-size: $text-xs;
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 0.375rem;
     }
 
     .progress-bar {
       height: 6px;
-      background: $color-bg-subtle;
-      border-radius: 999px;
+      background-color: $color-bg-subtle;
+      border-radius: $radius-pill;
       overflow: hidden;
 
       .progress-fill {
         height: 100%;
-        background: $color-primary;
-        border-radius: 999px;
+        background-color: $color-primary;
+        border-radius: $radius-pill;
       }
     }
   }
 
   &__btn {
     width: 100%;
-    padding: 10px;
-    background: $color-primary;
+    padding: 0.625rem;
+    background-color: $color-primary;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: $radius-md;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color $transition-base;
 
     &:hover {
-      background: var(--color-primary-dark, #1e3a8a);
+      background-color: $color-primary-dark;
     }
   }
 }
 </style>
+
+
