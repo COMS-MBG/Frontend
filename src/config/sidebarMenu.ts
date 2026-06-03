@@ -64,6 +64,13 @@ export const sidebarMenu: MenuItem[] = [
         routeName: 'peta-spasial',
         permission: 'distribution.read',
       },
+      {
+        id: 'riwayat-pengiriman',
+        title: 'Riwayat Pengiriman',
+        icon: 'history',
+        routeName: 'riwayat-pengiriman',
+        permission: 'distribution.read',
+      },
     ],
   },
   {

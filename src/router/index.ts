@@ -75,6 +75,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/distribusi/PetaSpasialView.vue'),
         meta: { requiredPermission: 'distribution.read' },
       },
+      {
+        path: 'riwayat-pengiriman',
+        name: 'riwayat-pengiriman',
+        component: () => import('@/views/distribusi/RiwayatPengirimanView.vue'),
+        meta: { requiredPermission: 'distribution.read' },
+      },
 
       // ── Laporan ──
       {
