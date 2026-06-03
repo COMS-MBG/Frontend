@@ -1,8 +1,7 @@
 <template>
   <div class="base-filter-date-wrapper">
     <VueDatePicker 
-      :model-value="modelValue" 
-      @update:model-value="onUpdate"
+      v-model="internalDate" 
       :enable-time-picker="false"
       position="right"
       hide-input-icon
@@ -70,6 +69,28 @@ const onUpdate = (date: Date | Date[] | null) => {
   }
 }
 
+// Convert string / string[] to Date objects so VueDatePicker doesn't trigger change event on mount
+const internalDate = computed({
+  get(): Date | Date[] | null {
+    if (!props.modelValue || (Array.isArray(props.modelValue) && props.modelValue.length === 0)) {
+      return props.range ? [] : null
+    }
+    
+    if (Array.isArray(props.modelValue)) {
+      const dates = props.modelValue
+        .map(v => v ? new Date(v) : null)
+        .filter((d): d is Date => d !== null && !isNaN(d.getTime()))
+      return dates
+    }
+    
+    const d = new Date(props.modelValue)
+    return isNaN(d.getTime()) ? null : d
+  },
+  set(val: Date | Date[] | null) {
+    onUpdate(val)
+  }
+})
+
 const formattedDate = computed(() => {
   if (!props.modelValue || (Array.isArray(props.modelValue) && props.modelValue.length === 0)) return ''
   
@@ -86,15 +107,7 @@ const formattedDate = computed(() => {
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
 })
 
-function formatInternalDate(date: Date | Date[] | string | null): string {
-  if (!date) return 'Pilih Tanggal'
-  const d = Array.isArray(date) ? date[0] : (typeof date === 'string' ? new Date(date) : date)
-  if (!d || isNaN(d.getTime())) return 'Pilih Tanggal'
-  const dd = String(d.getDate()).padStart(2, '0')
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const yyyy = d.getFullYear()
-  return `${dd} / ${mm} / ${yyyy}`
-}
+
 </script>
 
 <style scoped lang="scss">
