@@ -13,10 +13,10 @@ export const revisionNotesSchema = z
 // ── Schedule Create Schema ───────────────────────────────────────────────────
 
 export const createScheduleSchema = z.object({
-  courier_id: z.number({ required_error: 'Kurir wajib dipilih.' }).min(1, 'Kurir wajib dipilih.'),
-  school_id: z.number({ required_error: 'Sekolah wajib dipilih.' }).min(1, 'Sekolah wajib dipilih.'),
+  courier_id: z.number({ message: 'Kurir wajib dipilih.' }).min(1, 'Kurir wajib dipilih.'),
+  school_id: z.number({ message: 'Sekolah wajib dipilih.' }).min(1, 'Sekolah wajib dipilih.'),
   vehicle_type: z.enum(['motorcycle', 'car', 'van', 'truck'], {
-    required_error: 'Tipe kendaraan wajib dipilih.',
+    message: 'Tipe kendaraan wajib dipilih.',
   }),
   vehicle_plate: z.string().optional(),
   scheduled_at: z.string().min(1, 'Tanggal jadwal wajib diisi.'),

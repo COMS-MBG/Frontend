@@ -52,6 +52,7 @@ export function toDistributionItem(schedule: DeliverySchedule): DistributionItem
     lat: schedule.school?.latitude ?? 0,
     lng: schedule.school?.longitude ?? 0,
     scheduledAt: schedule.scheduled_at,
+    latestLocation: schedule.latest_location ?? null,
   }
 }
 
