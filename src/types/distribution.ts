@@ -201,6 +201,7 @@ export interface DistributionItem {
   lat: number
   lng: number
   scheduledAt?: string | null
+  latestLocation: LatestLocationInfo | null
 }
 
 // ── Paginated API Response ───────────────────────────────────────────────────
