@@ -132,3 +132,53 @@ export const sidebarMenu: MenuItem[] = [
     ],
   },
 ]
+
+/**
+ * Menu khusus Super Admin — completely separate from admin SPPG menu.
+ * Super Admin does NOT see the regular admin menu at all.
+ */
+export const superAdminMenu: MenuItem[] = [
+  {
+    id: 'sa-dashboard',
+    title: 'Dashboard',
+    icon: 'dashboard',
+    routeName: 'super-admin-dashboard',
+  },
+  {
+    id: 'sa-sppg',
+    title: 'Manajemen SPPG',
+    icon: 'domain',
+    children: [
+      {
+        id: 'sa-sppg-list',
+        title: 'Data SPPG',
+        icon: 'list_alt',
+        routeName: 'super-admin-sppg',
+      },
+      {
+        id: 'sa-sppg-submission',
+        title: 'Pengajuan SPPG',
+        icon: 'assignment',
+        routeName: 'super-admin-submission',
+      },
+    ],
+  },
+  {
+    id: 'sa-map',
+    title: 'Map Rekomendasi',
+    icon: 'map',
+    routeName: 'super-admin-map',
+  },
+  {
+    id: 'sa-school',
+    title: 'Manajemen Sekolah',
+    icon: 'school',
+    routeName: 'super-admin-school',
+  },
+  {
+    id: 'sa-finance',
+    title: 'Keuangan',
+    icon: 'account_balance_wallet',
+    routeName: 'super-admin-finance',
+  },
+]

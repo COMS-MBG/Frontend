@@ -1,14 +1,15 @@
 <template>
   <span class="base-badge" :class="`base-badge--${variant}`">
-    {{ text }}
+    <slot>{{ text }}</slot>
   </span>
 </template>
 
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  text: string
+  text?: string
   variant?: 'success' | 'warning' | 'danger' | 'info' | 'default'
 }>(), {
+  text: '',
   variant: 'default'
 })
 </script>

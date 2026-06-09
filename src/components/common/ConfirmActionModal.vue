@@ -10,7 +10,7 @@
 
       <!-- Message -->
       <p class="confirm-action__message">
-        <slot>{{ message }}</slot>
+        <slot><span v-html="message"></span></slot>
       </p>
 
       <!-- Optional Notes Input -->
