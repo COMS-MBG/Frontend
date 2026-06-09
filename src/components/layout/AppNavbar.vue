@@ -69,7 +69,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
-const { user, userName, userRole, isLoading, logout } = useAuth()
+const { user, userName, userRole, isLoading, logout, isSuperAdmin } = useAuth()
 const router = useRouter()
 
 // ── Dropdown state ─────────────────────────────────────────────────────────
@@ -104,11 +104,11 @@ async function handleLogout() {
 
 function goProfile() {
   dropdownOpen.value = false
-  router.push({ name: 'profile' })
+  router.push({ name: isSuperAdmin.value ? 'sa-profile' : 'profile' })
 }
 
 function goSettings() {
   dropdownOpen.value = false
-  router.push({ name: 'settings' })
+  router.push({ name: isSuperAdmin.value ? 'sa-settings' : 'settings' })
 }
 </script>

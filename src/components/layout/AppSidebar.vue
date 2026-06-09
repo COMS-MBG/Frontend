@@ -81,7 +81,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { sidebarMenu, type MenuItem } from '@/config/sidebarMenu'
+import { sidebarMenu, superAdminMenu, type MenuItem } from '@/config/sidebarMenu'
 import { useAuth } from '@/composables/useAuth'
 
 const props = defineProps<{
@@ -94,12 +94,15 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
-const { checkPermission } = useAuth()
+const { checkPermission, isSuperAdmin } = useAuth()
+
+// Super Admin sees a completely separate menu — no role switching
+const activeMenu = computed(() => isSuperAdmin.value ? superAdminMenu : sidebarMenu)
 
 // ── Permission-based menu filtering ───────────────────────────────────────────
 
 const visibleMenus = computed(() =>
-  sidebarMenu.filter(menu => {
+  activeMenu.value.filter(menu => {
     if (!menu.permission) return true
     return checkPermission(menu.permission)
   })
@@ -138,7 +141,7 @@ function isParentActive(item: MenuItem): boolean {
 
 // Buka otomatis parent jika salah satu child-nya aktif saat halaman dimuat
 onMounted(() => {
-  sidebarMenu.forEach(item => {
+  activeMenu.value.forEach(item => {
     if (item.children && isParentActive(item)) {
       openMenus.value[item.id] = true
     }
@@ -147,7 +150,7 @@ onMounted(() => {
 
 // Buka otomatis parent jika rute berpindah ke salah satu child-nya
 watch(() => route.name, () => {
-  sidebarMenu.forEach(item => {
+  activeMenu.value.forEach(item => {
     if (item.children && isParentActive(item)) {
       openMenus.value[item.id] = true
     }

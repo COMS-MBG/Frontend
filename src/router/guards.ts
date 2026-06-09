@@ -22,7 +22,19 @@ export function setupAuthGuard(router: Router): void {
 
     // ── Guest-only route — already authenticated ────────────────────
     if (guestOnly && isAuth) {
-      return next({ name: 'dashboard' })
+      const defaultRoute = authStore.isSuperAdmin ? 'super-admin-dashboard' : 'dashboard'
+      return next({ name: defaultRoute })
+    }
+
+    // ── Redirect super_admin away from regular dashboard ────────────
+    if (isAuth && authStore.isSuperAdmin && to.path.startsWith('/dashboard')) {
+      if (to.name === 'profile') {
+        return next({ name: 'sa-profile' })
+      }
+      if (to.name === 'settings') {
+        return next({ name: 'sa-settings' })
+      }
+      return next({ name: 'super-admin-dashboard' })
     }
 
     // ── Authenticated but no user data → fetch from server ──────────

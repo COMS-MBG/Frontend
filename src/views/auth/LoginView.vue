@@ -144,7 +144,7 @@ import BaseLoadingOverlay from '@/components/common/BaseLoadingOverlay.vue'
 
 const router = useRouter()
 const route  = useRoute()
-const { isLoading, error, login, clearError } = useAuth()
+const { isLoading, error, login, clearError, isSuperAdmin } = useAuth()
 
 const showPassword = ref(false)
 const rememberMe   = ref(false)
@@ -213,7 +213,8 @@ async function handleLogin() {
       storageService.clearRememberedEmail()
     }
 
-    const redirectTo = (route.query.redirect as string) || '/dashboard'
+    const defaultRoute = isSuperAdmin.value ? '/super-admin' : '/dashboard'
+    const redirectTo = (route.query.redirect as string) || defaultRoute
     router.push(redirectTo)
   } catch {
     

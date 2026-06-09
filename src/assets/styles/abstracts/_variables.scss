@@ -11,6 +11,7 @@
 
   // COLOR — Success (Green)
   --color-success: #059669;
+  --color-success-dark: #047857;
   --color-success-bg: #ecfdf5;
   --color-success-border: #a7f3d0;
   --color-success-subtle: #ecfdf5;
@@ -24,6 +25,7 @@
 
   // COLOR — Warning (Amber)
   --color-warning: #f59e0b;
+  --color-warning-dark: #b45309;
   --color-warning-bg: #fffbeb;
   --color-warning-border: #fde68a;
   --color-warning-subtle: #fff4e5;
@@ -75,6 +77,7 @@
 
   // COLOR — Success (Green)
   --color-success: #10b981;
+  --color-success-dark: #34d399;
   --color-success-bg: rgba(16, 185, 129, 0.15);
   --color-success-border: rgba(16, 185, 129, 0.3);
   --color-success-subtle: rgba(16, 185, 129, 0.15);
@@ -88,6 +91,7 @@
 
   // COLOR — Warning (Amber)
   --color-warning: #fbbf24;
+  --color-warning-dark: #fbbf24;
   --color-warning-bg: rgba(251, 191, 36, 0.15);
   --color-warning-border: rgba(251, 191, 36, 0.3);
   --color-warning-subtle: rgba(251, 191, 36, 0.15);
@@ -142,6 +146,7 @@ $color-primary-subtle: var(--color-primary-subtle);
 
 // COLOR — Success
 $color-success:        var(--color-success);
+$color-success-dark:   var(--color-success-dark);
 $color-success-bg:     var(--color-success-bg);
 $color-success-border: var(--color-success-border);
 $color-success-subtle: var(--color-success-subtle);
@@ -155,6 +160,7 @@ $color-danger-border:  var(--color-danger-border);
 
 // COLOR — Warning
 $color-warning:        var(--color-warning);
+$color-warning-dark:   var(--color-warning-dark);
 $color-warning-bg:     var(--color-warning-bg);
 $color-warning-border: var(--color-warning-border);
 $color-warning-subtle: var(--color-warning-subtle);
@@ -211,6 +217,7 @@ $radius-pill: 999px;
 $space-1:  0.25rem;
 $space-2:  0.5rem;
 $space-3:  0.75rem;
+$space-3-5: 0.875rem;
 $space-4:  1rem;
 $space-5:  1.25rem;
 $space-6:  1.5rem;

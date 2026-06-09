@@ -139,6 +139,56 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
+  // ═══════════════════════════════════════════════════════════════
+  // SUPER ADMIN ROUTES — separate layout group with role guard
+  // ═══════════════════════════════════════════════════════════════
+  {
+    path: '/super-admin',
+    component: MainLayout,
+    meta: { requiresAuth: true, roles: ['super_admin'] },
+    children: [
+      {
+        path: '',
+        name: 'super-admin-dashboard',
+        component: () => import('@/views/superadmin/SuperAdminDashboardView.vue'),
+      },
+      {
+        path: 'sppg',
+        name: 'super-admin-sppg',
+        component: () => import('@/views/superadmin/SuperAdminSppgView.vue'),
+      },
+      {
+        path: 'sppg/:id',
+        name: 'super-admin-sppg-detail',
+        component: () => import('@/views/superadmin/SuperAdminSppgDetailView.vue'),
+        meta: { activeMenu: 'super-admin-sppg' },
+      },
+      {
+        path: 'submission',
+        name: 'super-admin-submission',
+        component: () => import('@/views/superadmin/SuperAdminSubmissionView.vue'),
+      },
+      {
+        path: 'map',
+        name: 'super-admin-map',
+        component: () => import('@/views/superadmin/SuperAdminMapView.vue'),
+      },
+      {
+        path: 'school',
+        name: 'super-admin-school',
+        component: () => import('@/views/superadmin/SuperAdminSchoolView.vue'),
+      },
+      {
+        path: 'finance',
+        name: 'super-admin-finance',
+        component: () => import('@/views/superadmin/SuperAdminFinanceView.vue'),
+      },
+      // Profile & Settings (shared)
+      { path: 'profile', name: 'sa-profile', component: () => import('@/views/user/ProfileView.vue') },
+      { path: 'settings', name: 'sa-settings', component: () => import('@/views/settings/SettingsView.vue') },
+    ],
+  },
+
   { path: '/:pathMatch(.*)*', redirect: '/login' },
 ]
 

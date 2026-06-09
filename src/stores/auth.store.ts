@@ -17,8 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!user.value)
   const userName = computed(() => user.value?.name ?? '')
 
-  /** @deprecated Use userName instead */
-  const fullName = computed(() => user.value?.name ?? '')
+
 
   /** Display role label for navbar — reads flat role_name from API */
   const userRole = computed<string | null>(() => user.value?.role_name ?? null)
@@ -202,7 +201,6 @@ export const useAuthStore = defineStore('auth', () => {
     // Getters
     isAuthenticated,
     userName,
-    fullName,
     userRole,
     userRoles,
     userPermissions,

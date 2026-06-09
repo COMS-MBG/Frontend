@@ -76,4 +76,59 @@
       transform: translateY(-1px);
     }
   }
+
+  &--success {
+    color: $color-success;
+    background-color: $color-success-bg;
+    &:hover {
+      background-color: $color-success;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
+
+  &--warning {
+    color: $color-warning;
+    background-color: $color-warning-bg;
+    &:hover {
+      background-color: $color-warning;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// ── Spacing Utilities ───────────────────────────────────────
+.mb-4 {
+  margin-bottom: $space-4 !important;
+}
+
+.mb-6 {
+  margin-bottom: $space-6 !important;
+}
+
+// ── Text & Typography Utilities ──────────────────────────────
+.text-danger {
+  color: $color-danger !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+// ── Animation Utilities ──────────────────────────────────────
+.is-spinning {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
