@@ -1,0 +1,252 @@
+// COMPONENT — Button (Modular & Reusable)
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ────────────────────────────────────────
+// 🔵  PRIMARY — Tombol utama, filled solid
+// ────────────────────────────────────────
+.btn-primary {
+  @include btn-base($color-primary, $color-text-inverse);
+  padding: 0.65rem $space-5;
+  box-shadow: $shadow-btn;
+
+  &:hover:not(:disabled) {
+    box-shadow: $shadow-primary-hover;
+  }
+}
+
+// ────────────────────────────────────────
+// 🔵  PRIMARY GRADIENT — Tombol utama dengan gradient
+//     (contoh: tombol Masuk di halaman login)
+// ────────────────────────────────────────
+.btn-primary-gradient {
+  @include btn-base(
+    linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%),
+    $color-text-inverse
+  );
+  padding: 0.875rem;
+  box-shadow: $shadow-btn;
+
+  &:hover:not(:disabled) {
+    box-shadow: $shadow-primary-hover;
+  }
+}
+
+// ────────────────────────────────────────
+// ⬜  OUTLINED — Tombol dengan border tanpa fill
+//     (contoh: tombol Manajemen Armada)
+// ────────────────────────────────────────
+.btn-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem $space-5;
+  border-radius: $radius-md;
+  font-size: $text-base;
+  font-weight: 600;
+  font-family: $font-body;
+  cursor: pointer;
+  background: transparent;
+  color: $color-primary;
+  border: 2px solid $color-primary;
+  transition: background $transition-fast, transform 0.1s;
+
+  &:hover:not(:disabled) {
+    background: $color-primary-light;
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+// ────────────────────────────────────────
+// ⬜  OUTLINED LIGHT — Outlined pada background gelap
+//     (contoh: pada LogisticsCard / InsightMapCard)
+// ────────────────────────────────────────
+.btn-outlined-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem $space-5;
+  border-radius: $radius-md;
+  font-size: $text-base;
+  font-weight: 600;
+  font-family: $font-body;
+  cursor: pointer;
+  background: transparent;
+  color: $color-text-inverse;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  transition: background $transition-fast, transform 0.1s;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+// ────────────────────────────────────────
+// ✅  SUCCESS — Tombol aksi hijau
+// ────────────────────────────────────────
+.btn-success {
+  @include btn-base($color-success, $color-text-inverse);
+  padding: 0.65rem $space-5;
+}
+
+// ────────────────────────────────────────
+// ❌  DANGER — Tombol aksi merah
+// ────────────────────────────────────────
+.btn-danger {
+  @include btn-base($color-danger, $color-text-inverse);
+  padding: 0.65rem $space-5;
+}
+
+// ────────────────────────────────────────
+// ⚠️  WARNING — Tombol aksi kuning/amber
+// ────────────────────────────────────────
+.btn-warning {
+  @include btn-base($color-warning, $color-text-inverse);
+  padding: 0.65rem $space-5;
+}
+
+// ────────────────────────────────────────
+// 👻  GHOST — Tombol transparan, hover ringan
+//     (contoh: tombol ikon di navbar)
+// ────────────────────────────────────────
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-2;
+  border: none;
+  border-radius: $radius-md;
+  background: transparent;
+  color: $color-text-muted;
+  font-family: $font-body;
+  font-size: $text-base;
+  cursor: pointer;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover:not(:disabled) {
+    background-color: $color-primary-light;
+    color: $color-primary;
+  }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+// ────────────────────────────────────────
+// ⚪  SECONDARY — Tombol sekunder (abu-abu/muted)
+// ────────────────────────────────────────
+.btn-secondary {
+  @include btn-base($color-bg-subtle, $color-text-secondary);
+  padding: 0.65rem $space-5;
+  border: 1px solid $color-border;
+  
+  &:hover:not(:disabled) {
+    background: $color-border;
+    color: $color-text-primary;
+  }
+}
+
+// ────────────────────────────────────────
+// ⬜  INVERTED — Tombol putih (untuk background gelap)
+// ────────────────────────────────────────
+.btn-inverted {
+  @include btn-base($color-text-inverse, $color-primary);
+  padding: 0.65rem $space-5;
+  box-shadow: $shadow-sm;
+
+  &:hover:not(:disabled) {
+    box-shadow: $shadow-md;
+    color: $color-primary-dark;
+  }
+}
+
+// ────────────────────────────────────────
+// ❌  OUTLINE DANGER — Outline merah
+// ────────────────────────────────────────
+.btn-outline-danger {
+  @extend .btn-outlined;
+  color: $color-danger;
+  border-color: $color-danger;
+
+  &:hover:not(:disabled) {
+    background: $color-danger-bg;
+    color: $color-danger-dark;
+  }
+}
+
+// ────────────────────────────────────────
+// ✅  OUTLINE SUCCESS — Outline hijau
+// ────────────────────────────────────────
+.btn-outline-success {
+  @extend .btn-outlined;
+  color: $color-success;
+  border-color: $color-success;
+
+  &:hover:not(:disabled) {
+    background: $color-success-bg;
+    color: $color-success;
+  }
+}
+
+// ────────────────────────────────────────
+// ⚠️  OUTLINE WARNING — Outline kuning
+// ────────────────────────────────────────
+.btn-outline-warning {
+  @extend .btn-outlined;
+  color: $color-warning;
+  border-color: $color-warning;
+
+  &:hover:not(:disabled) {
+    background: $color-warning-bg;
+    color: $color-warning;
+  }
+}
+
+// ────────────────────────────────────────
+// 🔘  SIZE MODIFIERS
+// ────────────────────────────────────────
+.btn-sm {
+  padding: 0.4rem $space-3 !important;
+  font-size: $text-sm !important;
+}
+
+.btn-lg {
+  padding: 0.875rem $space-8 !important;
+  font-size: $text-md !important;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-pill {
+  border-radius: $radius-pill !important;
+}
+
+// ────────────────────────────────────────
+// 🔄  ICON BUTTON — Tombol ikon persegi
+// ────────────────────────────────────────
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: $radius-md;
+  background: transparent;
+  color: $color-text-muted;
+  cursor: pointer;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover:not(:disabled) {
+    background-color: $color-primary-light;
+    color: $color-primary;
+  }
+
+  .material-symbols-outlined { font-size: 1.25rem; }
+}

@@ -1,0 +1,304 @@
+// ── Super Admin Map Page Styles ──────────────────────────────────────────────
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.sa-map-page {
+  &__map-card {
+    position: relative;
+  }
+
+  &__map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 520px;
+  }
+
+  &__map-container {
+    width: 100%;
+    height: 100%;
+    background: $color-bg-subtle;
+    z-index: 1;
+  }
+
+  &__route-loading {
+    position: absolute;
+    top: 52px;
+    left: $space-3;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(#1e293b, 0.85);
+    backdrop-filter: blur(8px);
+    color: #f8fafc;
+    padding: 8px $space-4;
+    border-radius: $radius-md;
+    font-size: $text-xs;
+    font-weight: 600;
+    box-shadow: $shadow-md;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  &__route-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: sa-route-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes sa-route-spin {
+  to { transform: rotate(360deg); }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.sa-map-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: $space-4;
+  align-items: start;
+  margin-top: $space-5;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sa-map-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+// ── Global Leaflet Custom divIcon styles ─────────────────────────────────────
+
+.custom-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.map-marker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.24);
+  width: 100%;
+  height: 100%;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+
+  span {
+    font-size: 14px;
+  }
+}
+
+.marker-sppg {
+  background: $color-primary;
+  border-width: 3px;
+  span { font-size: 18px; }
+}
+
+.marker-school-served { background: $color-success; }
+.marker-school-unserved { background: $color-danger; }
+.marker-school-takeover { background: $color-warning; }
+
+.marker-proposed-green {
+  background: $color-success;
+  position: relative;
+}
+
+.marker-proposed-yellow {
+  background: $color-warning;
+  position: relative;
+}
+
+.marker-proposed-red {
+  background: $color-danger;
+  position: relative;
+}
+
+.marker-proposed-grey {
+  background: $color-text-faint;
+  position: relative;
+}
+
+.marker-draft-green {
+  background: $color-success;
+  border-color: $color-warning;
+  border-width: 3px;
+  position: relative;
+}
+
+.marker-draft-yellow {
+  background: $color-warning;
+  border-color: $color-warning;
+  border-width: 3px;
+  position: relative;
+}
+
+.marker-draft-red {
+  background: $color-danger;
+  border-color: $color-warning;
+  border-width: 3px;
+  position: relative;
+}
+
+.marker-draft-grey {
+  background: $color-text-faint;
+  border-color: $color-border;
+  border-width: 3px;
+  position: relative;
+}
+
+.marker-recommendation {
+  background: $color-primary-dark; // or purple
+  border-color: $color-warning;
+  border-width: 3px;
+  position: relative;
+  span { font-size: 20px; color: #fff; }
+}
+
+.marker-optimal {
+  background: $color-success;
+  border-color: $color-warning;
+  border-width: 3px;
+  position: relative;
+  span { font-size: 20px; color: #fff; }
+}
+
+.marker-draft-draggable {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-color: $color-warning;
+  border-width: 3px;
+  position: relative;
+  cursor: grab;
+  span { font-size: 22px; color: #fff; }
+
+  &:active { cursor: grabbing; }
+}
+
+/* Pulsing waves animations */
+.pulse-ring {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 40px;
+  height: 40px;
+  border: 3px solid $color-primary;
+  border-radius: 50%;
+  animation: pulse-ring-animation 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+}
+
+.pulse-ring-green {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 36px;
+  height: 36px;
+  border: 2px solid $color-success;
+  border-radius: 50%;
+  animation: pulse-ring-animation 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+}
+
+.pulse-ring-amber {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 36px;
+  height: 36px;
+  border: 2px solid $color-warning;
+  border-radius: 50%;
+  animation: pulse-ring-animation 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+}
+
+.pulse-ring-draft {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 44px;
+  height: 44px;
+  border: 3px solid $color-primary;
+  border-radius: 50%;
+  animation: pulse-ring-animation 1.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+}
+
+.pulse-ring-red {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 44px;
+  height: 44px;
+  border: 3px solid $color-danger;
+  border-radius: 50%;
+  animation: pulse-ring-animation 1.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+}
+
+.pulse-ring-red-small {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 36px;
+  height: 36px;
+  border: 2px solid $color-danger;
+  border-radius: 50%;
+  animation: pulse-ring-animation 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+}
+
+@keyframes pulse-ring-animation {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Popup styling */
+.sa-map-popup {
+  padding: 4px 6px;
+
+  h5 {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 6px 0;
+    color: $color-text-primary;
+  }
+
+  p {
+    font-size: 11px;
+    margin: 0 0 4px 0;
+    color: $color-text-secondary;
+    line-height: 1.4;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 1px 5px;
+    font-size: 9px;
+    font-weight: 500;
+    border-radius: 4px;
+
+    &--success { background: $color-success-bg; color: $color-success; }
+    &--warning { background: $color-warning-bg; color: $color-warning; }
+    &--danger { background: $color-danger-bg; color: $color-danger-dark; }
+    &--info { background: $color-info-bg; color: $color-info; }
+  }
+}

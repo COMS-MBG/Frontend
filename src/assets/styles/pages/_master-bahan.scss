@@ -1,0 +1,49 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ════════════════════════════════════════════════════════════════
+// PAGE: Master Bahan Baku
+// BEM: .master-bahan / .master-bahan__*
+// ════════════════════════════════════════════════════════════════
+
+.master-bahan {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  font-family: $font-body;
+
+  &__stat {
+    max-width: 320px;
+  }
+
+  &__toolbar {
+    // Toolbar wrapper — layout delegated to component
+  }
+
+  &__table {
+    // Table wrapper — layout delegated to component
+  }
+
+  &__footer {
+    // Footer/pagination wrapper
+  }
+}
+
+// ── Button helpers (page-scoped) ──
+.master-bahan .btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  white-space: nowrap;
+
+  .material-symbols-outlined {
+    font-size: 1.15rem;
+  }
+}
+
+// ── Responsive ──
+@include tablet {
+  .master-bahan__stat {
+    max-width: none;
+  }
+}

@@ -1,0 +1,129 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.menu-planning {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  font-family: $font-body;
+
+  &__toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: $space-4;
+
+    .week-selector {
+      width: 280px;
+    }
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-4;
+    margin-bottom: $space-4;
+
+    @include tablet {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__table-wrapper {
+    @include card-base($radius-lg, $shadow-xs);
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: $font-body;
+    background: $color-bg-surface;
+
+    thead {
+      tr {
+        background-color: $color-bg-subtle;
+        border-bottom: 1px solid $color-border;
+      }
+    }
+
+    th {
+      padding: $space-3 $space-5;
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $color-text-primary;
+      white-space: nowrap;
+    }
+    
+    td {
+      padding: $space-3 $space-5;
+      text-align: left;
+      border-bottom: 1px solid $color-border-light;
+      vertical-align: middle;
+    }
+  }
+
+  .text-center {
+    text-align: center !important;
+  }
+
+  &__row {
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background-color: $color-bg-subtle;
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  &__day-col {
+    min-width: 120px;
+    
+    strong {
+      display: block;
+      color: $color-text-primary;
+      font-size: $text-sm;
+      font-weight: 700;
+    }
+    
+    small {
+      color: $color-text-muted;
+      font-size: 0.75rem;
+    }
+  }
+
+  &__menu-col {
+    min-width: 250px;
+  }
+
+  &__nutrition-col {
+    min-width: 300px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__anti-bosan-col {
+    min-width: 140px;
+  }
+
+  &__status-col {
+    min-width: 180px;
+  }
+
+  &__aksi-col {
+    min-width: 100px;
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,187 @@
+export interface MenuItem {
+  id: string
+  title: string
+  icon: string
+  routeName?: string
+  permission?: string
+  hidden?: boolean  // Jika true, menu tidak tampil di sidebar (tanpa dihapus dari config)
+  children?: MenuItem[]
+}
+
+export const sidebarMenu: MenuItem[] = [
+  {
+    id: 'dashboard',
+    title: 'Dashboard',
+    icon: 'dashboard',
+    routeName: 'dashboard',
+    permission: 'dashboard.read',
+  },
+  {
+    id: 'manajemen-gizi',
+    title: 'Manajemen Gizi',
+    icon: 'settings_accessibility',
+    permission: 'nutrition.read',
+    children: [
+      {
+        id: 'master-bahan',
+        title: 'Master Data Bahan Baku',
+        icon: 'kitchen',
+        routeName: 'master-bahan',
+        permission: 'ingredients.read',
+      },
+      {
+        id: 'master-resep',
+        title: 'Master Data Resep',
+        icon: 'receipt_long',
+        routeName: 'master-resep',
+        permission: 'recipes.read',
+      },
+      {
+        id: 'stok-bahan',
+        title: 'Stok Bahan Baku',
+        icon: 'inventory_2',
+        routeName: 'stok-bahan',
+        permission: 'stock.read',
+      },
+      {
+        id: 'perencanaan-menu',
+        title: 'Perencanaan Menu',
+        icon: 'restaurant_menu',
+        routeName: 'perencanaan-menu',
+        permission: 'menus.read',
+      },
+    ],
+  },
+  {
+    id: 'distribusi',
+    title: 'Distribusi',
+    icon: 'local_shipping',
+    permission: 'distribution.read',
+    children: [
+      {
+        id: 'jadwal-pengiriman',
+        title: 'Jadwal Pengiriman',
+        icon: 'calendar_month',
+        routeName: 'jadwal-pengiriman',
+        permission: 'distribution.read',
+      },
+      {
+        id: 'riwayat-pengiriman',
+        title: 'Riwayat Pengiriman',
+        icon: 'history',
+        routeName: 'riwayat-pengiriman',
+        permission: 'distribution.read',
+      },
+    ],
+  },
+  {
+    id: 'sekolah-mitra',
+    title: 'Sekolah Mitra',
+    icon: 'school',
+    routeName: 'sekolah-mitra',
+    permission: 'partner.read',
+  },
+  {
+    id: 'laporan',
+    title: 'Laporan',
+    icon: 'bar_chart',
+    permission: 'report.read',
+    hidden: true, // Sementara disembunyikan — fitur laporan belum siap ditampilkan
+    children: [
+      {
+        id: 'laporan-operasional',
+        title: 'Operasional',
+        icon: 'analytics',
+        routeName: 'laporan',
+        permission: 'report.read',
+      },
+      {
+        id: 'laporan-keuangan',
+        title: 'Keuangan',
+        icon: 'account_balance_wallet',
+        routeName: 'laporan-keuangan',
+        permission: 'finance.read',
+      },
+    ],
+  },
+  {
+    id: 'hr',
+    title: 'Data Karyawan',
+    icon: 'badge',
+    permission: 'employee.read',
+    children: [
+      {
+        id: 'karyawan',
+        title: 'Manajemen Karyawan',
+        icon: 'group',
+        routeName: 'karyawan',
+        permission: 'employee.read',
+      },
+      {
+        id: 'hak-akses',
+        title: 'Hak Akses',
+        icon: 'admin_panel_settings',
+        routeName: 'hak-akses',
+        permission: 'employee.update',
+      },
+      {
+        id: 'manajemen-role',
+        title: 'Manajemen Role',
+        icon: 'supervised_user_circle',
+        routeName: 'roles',
+        permission: 'employee.update',
+      },
+    ],
+  },
+]
+
+/**
+ * Menu khusus Super Admin — completely separate from admin SPPG menu.
+ * Super Admin does NOT see the regular admin menu at all.
+ */
+export const superAdminMenu: MenuItem[] = [
+  {
+    id: 'sa-dashboard',
+    title: 'Dashboard',
+    icon: 'dashboard',
+    routeName: 'super-admin-dashboard',
+  },
+  {
+    id: 'sa-sppg',
+    title: 'Manajemen SPPG',
+    icon: 'domain',
+    children: [
+      {
+        id: 'sa-sppg-list',
+        title: 'Data SPPG',
+        icon: 'list_alt',
+        routeName: 'super-admin-sppg',
+      },
+      {
+        id: 'sa-sppg-submission',
+        title: 'Pengajuan SPPG',
+        icon: 'assignment',
+        routeName: 'super-admin-submission',
+      },
+    ],
+  },
+  {
+    id: 'sa-map',
+    title: 'Map Rekomendasi',
+    icon: 'map',
+    routeName: 'super-admin-map',
+  },
+  {
+    id: 'sa-school',
+    title: 'Manajemen Sekolah',
+    icon: 'school',
+    routeName: 'super-admin-school',
+  },
+  {
+    id: 'sa-finance',
+    title: 'Keuangan',
+    icon: 'account_balance_wallet',
+    routeName: 'super-admin-finance',
+    hidden: true, // Sementara disembunyikan — fitur keuangan belum siap ditampilkan
+  },
+]

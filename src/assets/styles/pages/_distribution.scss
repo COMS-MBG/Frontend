@@ -1,0 +1,53 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.distribution-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $space-2;
+}
+
+.distribution__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4;
+  flex-wrap: wrap;
+
+  &-search {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  &-actions {
+    display: flex;
+    gap: $space-3;
+    align-items: center;
+
+    .base-date-input {
+      padding: $space-2 $space-3;
+      border: 1px solid $color-border;
+      border-radius: $radius-md;
+      outline: none;
+      font-family: inherit;
+      color: inherit;
+      
+      &:focus {
+        border-color: $color-primary;
+      }
+    }
+  }
+}
+
+.distribution__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $space-6;
+}

@@ -15,4 +15,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Auto-import variables & mixins ke semua komponen Vue
+        // Tidak perlu @use manual di setiap <style lang="scss">
+        additionalData: `
+          @use "@/assets/styles/abstracts/variables" as *;
+          @use "@/assets/styles/abstracts/mixins" as *;
+        `,
+      },
+    },
+  },
 })

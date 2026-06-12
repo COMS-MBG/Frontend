@@ -1,0 +1,49 @@
+// ═══════════════════════════════════════════════════════════
+// PAGE — Laporan Operasional
+// Styling khusus halaman LaporanView.vue
+// ═══════════════════════════════════════════════════════════
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// ── Base ──
+.laporan-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  font-family: $font-body;
+  color: $color-text-primary;
+}
+
+// ── Stat Cards Grid ──
+.laporan__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-4;
+}
+
+// ── Charts Grid ──
+.laporan__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+}
+
+@include tablet {
+  .laporan__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .laporan__charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include mobile {
+  .laporan-page {
+    gap: $space-4;
+  }
+
+  .laporan__stats {
+    grid-template-columns: 1fr;
+  }
+}

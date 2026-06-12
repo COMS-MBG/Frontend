@@ -1,0 +1,134 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  white-space: nowrap;
+
+  .material-symbols-outlined {
+    font-size: 1.15rem;
+  }
+}
+
+// ── Table Action Buttons ────────────────────────────────────
+// Shared between BahanRow and ResepRow.
+// Centralised to prevent divergent styling.
+
+.action-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid transparent;
+  border-radius: $radius-md;
+  background: transparent;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  .material-symbols-outlined {
+    font-size: 1.15rem;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+
+  &--edit {
+    color: $color-primary;
+    background-color: $color-primary-subtle;
+    &:hover {
+      background-color: $color-primary;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
+
+  &--delete {
+    color: $color-danger;
+    background-color: $color-danger-bg;
+    &:hover {
+      background-color: $color-danger;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
+
+  &--view {
+    color: $color-info;
+    background-color: $color-info-bg;
+    &:hover {
+      background-color: $color-info;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
+
+  &--success {
+    color: $color-success;
+    background-color: $color-success-bg;
+    &:hover {
+      background-color: $color-success;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
+
+  &--warning {
+    color: $color-warning;
+    background-color: $color-warning-bg;
+    &:hover {
+      background-color: $color-warning;
+      color: $color-text-inverse;
+      box-shadow: $shadow-sm;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// ── Spacing Utilities ───────────────────────────────────────
+.mb-4 {
+  margin-bottom: $space-4 !important;
+}
+
+.mb-6 {
+  margin-bottom: $space-6 !important;
+}
+
+// ── Text & Typography Utilities ──────────────────────────────
+.text-danger {
+  color: $color-danger !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+// ── Animation Utilities ──────────────────────────────────────
+.is-spinning {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

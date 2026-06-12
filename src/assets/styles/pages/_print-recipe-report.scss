@@ -1,0 +1,322 @@
+@use '../abstracts/variables' as *;
+
+// ════════════════════════════════════════════════════════════════════════════
+// PRINT RECIPE REPORT — FORMAL GOVERNMENT-STYLE (NO COLORS)
+//
+// Design: Black-on-white, bordered tables, kop surat letterhead,
+// Roman-numeral sections, narrative paragraphs, signature block.
+// Inspired by standard Indonesian government document formatting.
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Page & Global overrides ───────────────────────────────────────────────────
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html, body, #app {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .main-layout,
+  .sidebar-overlay,
+  .toast-container {
+    display: none !important;
+  }
+}
+
+// ── Overlay ───────────────────────────────────────────────────────────────────
+.prr-overlay {
+  display: none;
+
+  @media print {
+    display: block;
+    background: #ffffff;
+  }
+}
+
+// ── Watermark (position:fixed → every printed page) ───────────────────────────
+.prr-watermark {
+  @media print {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    opacity: 0.06;
+    text-align: center;
+    pointer-events: none;
+    z-index: 9999;
+    color: #000000;
+
+    &__line1 {
+      font-size: 2.4rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    &__line2 {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin: 4px 0 0;
+      white-space: nowrap;
+    }
+  }
+}
+
+// ── Page container ────────────────────────────────────────────────────────────
+.prr-page {
+  @media print {
+    position: relative;
+    padding: 15mm 20mm 12mm;
+    font-family: 'Times New Roman', 'Georgia', serif;
+    font-size: 11pt;
+    color: #000000;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// KOP SURAT (Letterhead)
+// ════════════════════════════════════════════════════════════════════════════
+.prr-kop {
+  @media print {
+    text-align: center;
+    padding-bottom: 3mm;
+
+    &__instansi {
+      margin: 0;
+      font-size: 11pt;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    &__lembaga {
+      margin: 0;
+      font-size: 14pt;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    &__alamat {
+      margin: 2px 0 0;
+      font-size: 9pt;
+      font-style: italic;
+    }
+  }
+}
+
+.prr-kop-line {
+  @media print {
+    border: none;
+    border-top: 3px double #000000;
+    margin: 0 0 6mm;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// JUDUL DOKUMEN
+// ════════════════════════════════════════════════════════════════════════════
+.prr-judul {
+  @media print {
+    text-align: center;
+    margin-bottom: 6mm;
+
+    h2 {
+      margin: 0;
+      font-size: 13pt;
+      font-weight: 700;
+      text-decoration: underline;
+      letter-spacing: 0.04em;
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 10pt;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SECTIONS (Roman numerals)
+// ════════════════════════════════════════════════════════════════════════════
+.prr-section {
+  @media print {
+    margin-bottom: 5mm;
+
+    &__title {
+      font-size: 11pt;
+      font-weight: 700;
+      margin: 0 0 2mm 0;
+    }
+
+    &__desc {
+      margin: 0 0 3mm 0;
+      font-size: 10pt;
+      text-align: justify;
+      text-indent: 10mm;
+    }
+  }
+}
+
+// ── Narrative paragraph ───────────────────────────────────────────────────────
+.prr-paragraph {
+  @media print {
+    margin: 0 0 3mm 0;
+    font-size: 10pt;
+    text-align: justify;
+    text-indent: 10mm;
+    line-height: 1.7;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// KEY-VALUE TABLE (Informasi Umum)
+// ════════════════════════════════════════════════════════════════════════════
+.prr-kv-table {
+  @media print {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+    margin-bottom: 2mm;
+
+    td {
+      padding: 2px 4px;
+      vertical-align: top;
+      border: none;
+    }
+
+    &__label {
+      width: 28%;
+      padding-left: 10mm;
+    }
+
+    &__sep {
+      width: 3%;
+    }
+
+    &__value {
+      width: 69%;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// BORDERED TABLE (data tables)
+// ════════════════════════════════════════════════════════════════════════════
+.prr-bordered-table {
+  @media print {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+    margin-bottom: 2mm;
+
+    th, td {
+      border: 1px solid #000000;
+      padding: 3px 8px;
+      vertical-align: middle;
+    }
+
+    thead th {
+      text-align: center;
+      font-weight: 700;
+      font-size: 10pt;
+    }
+
+    .col-no {
+      width: 7%;
+      text-align: center;
+    }
+
+    .col-right {
+      text-align: right;
+    }
+
+    .col-center {
+      text-align: center;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SIGNATURE BLOCK (Tanda Tangan)
+// ════════════════════════════════════════════════════════════════════════════
+.prr-ttd {
+  @media print {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12mm;
+    page-break-inside: avoid;
+
+    &__col {
+      width: 42%;
+      text-align: center;
+
+      &--left {
+        text-align: center;
+      }
+
+      &--right {
+        text-align: center;
+      }
+    }
+
+    &__role {
+      margin: 0;
+      font-size: 10pt;
+    }
+
+    &__space {
+      height: 22mm;
+    }
+
+    &__name {
+      margin: 0;
+      font-size: 10pt;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    &__jabatan {
+      margin: 2px 0 0;
+      font-size: 9pt;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FOOTER
+// ════════════════════════════════════════════════════════════════════════════
+.prr-footer {
+  @media print {
+    margin-top: 8mm;
+    padding-top: 3mm;
+    border-top: 1px solid #000000;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.5pt;
+    font-style: italic;
+    color: #555555;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+// ── Screen: always hidden ─────────────────────────────────────────────────────
+@media screen {
+  .prr-overlay {
+    display: none !important;
+  }
+}
