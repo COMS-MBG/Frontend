@@ -12,7 +12,7 @@ export function configureAxios(options: { onUnauthorized: () => void }): void {
 
 const api: AxiosInstance = axios.create({
   baseURL: `${BASE_URL}/api`,
-  timeout: 15_000,
+  timeout: 120_000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

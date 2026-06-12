@@ -8,10 +8,12 @@ import type { SppgDraft } from '@/types/superadmin-submission'
  */
 export function useSuperAdminSubmission() {
   // ── Local state ────────────────────────────────────────────────
-  const submissions  = ref<SppgDraft[]>([])
-  const isLoading    = ref(false)
-  const isSubmitting = ref(false)
-  const error        = ref<string | null>(null)
+  const submissions        = ref<SppgDraft[]>([])
+  const selectedSubmission = ref<SppgDraft | null>(null)
+  const isLoading          = ref(false)
+  const isLoadingDetail    = ref(false)
+  const isSubmitting       = ref(false)
+  const error              = ref<string | null>(null)
 
   // ── Computed ───────────────────────────────────────────────────
   const draftCount = computed(() => submissions.value.filter(s => s.status === 'draft').length)
@@ -32,10 +34,22 @@ export function useSuperAdminSubmission() {
     }
   }
 
-
+  async function fetchSubmissionDetail(id: number | string): Promise<void> {
+    isLoadingDetail.value = true
+    error.value = null
+    selectedSubmission.value = null
+    try {
+      const res = await submissionApi.getSubmission(id)
+      selectedSubmission.value = res.data
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Gagal memuat detail pengajuan.'
+      throw err
+    } finally {
+      isLoadingDetail.value = false
+    }
+  }
 
   // ── CRUD ───────────────────────────────────────────────────────
-
 
   async function deleteSubmission(id: number | string): Promise<void> {
     isSubmitting.value = true
@@ -70,7 +84,9 @@ export function useSuperAdminSubmission() {
 
   return {
     submissions,
+    selectedSubmission,
     isLoading,
+    isLoadingDetail,
     isSubmitting,
     error,
     draftCount,
@@ -78,6 +94,7 @@ export function useSuperAdminSubmission() {
     isEmpty,
 
     fetchSubmissions,
+    fetchSubmissionDetail,
     deleteSubmission,
     submitDraft,
   }

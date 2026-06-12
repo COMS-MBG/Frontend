@@ -4,6 +4,7 @@ export interface MenuItem {
   icon: string
   routeName?: string
   permission?: string
+  hidden?: boolean  // Jika true, menu tidak tampil di sidebar (tanpa dihapus dari config)
   children?: MenuItem[]
 }
 
@@ -22,6 +23,13 @@ export const sidebarMenu: MenuItem[] = [
     permission: 'nutrition.read',
     children: [
       {
+        id: 'master-bahan',
+        title: 'Master Data Bahan Baku',
+        icon: 'kitchen',
+        routeName: 'master-bahan',
+        permission: 'ingredients.read',
+      },
+      {
         id: 'master-resep',
         title: 'Master Data Resep',
         icon: 'receipt_long',
@@ -29,11 +37,11 @@ export const sidebarMenu: MenuItem[] = [
         permission: 'recipes.read',
       },
       {
-        id: 'master-bahan',
-        title: 'Master Data Bahan Baku',
-        icon: 'kitchen',
-        routeName: 'master-bahan',
-        permission: 'ingredients.read',
+        id: 'stok-bahan',
+        title: 'Stok Bahan Baku',
+        icon: 'inventory_2',
+        routeName: 'stok-bahan',
+        permission: 'stock.read',
       },
       {
         id: 'perencanaan-menu',
@@ -58,13 +66,6 @@ export const sidebarMenu: MenuItem[] = [
         permission: 'distribution.read',
       },
       {
-        id: 'peta-spasial',
-        title: 'Peta Spasial & Analitik',
-        icon: 'map',
-        routeName: 'peta-spasial',
-        permission: 'distribution.read',
-      },
-      {
         id: 'riwayat-pengiriman',
         title: 'Riwayat Pengiriman',
         icon: 'history',
@@ -85,6 +86,7 @@ export const sidebarMenu: MenuItem[] = [
     title: 'Laporan',
     icon: 'bar_chart',
     permission: 'report.read',
+    hidden: true, // Sementara disembunyikan — fitur laporan belum siap ditampilkan
     children: [
       {
         id: 'laporan-operasional',
@@ -180,5 +182,6 @@ export const superAdminMenu: MenuItem[] = [
     title: 'Keuangan',
     icon: 'account_balance_wallet',
     routeName: 'super-admin-finance',
+    hidden: true, // Sementara disembunyikan — fitur keuangan belum siap ditampilkan
   },
 ]

@@ -45,28 +45,10 @@
       </div>
     </div>
 
-    <!-- Row 3: Actionable Insights (Finance & Quick Actions) -->
-    <div class="sa-dashboard-grid__row-bottom">
-      <!-- Finance Widget Skeleton -->
-      <div class="grid-col-1-2">
-        <div class="sa-dashboard-card finance-widget-card-skeleton">
-          <div class="widget-header-skeleton">
-            <div class="skeleton-shimmer header-title-skeleton" />
-            <div class="skeleton-shimmer header-meta-skeleton" />
-          </div>
-          <div class="widget-body-skeleton">
-            <div class="finance-metrics-skeleton">
-              <div v-for="i in 3" :key="i" class="metric-box-skeleton skeleton-shimmer" />
-            </div>
-            <div class="finance-feed-skeleton">
-              <div class="skeleton-shimmer text-line w-30 mb-3" />
-              <div v-for="i in 2" :key="i" class="feed-item-skeleton skeleton-shimmer" />
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Row 3: Actionable Insights (Quick Actions) -->
+    <div class="sa-dashboard-grid__row-bottom" style="grid-template-columns: 1fr;">
       <!-- GIS Draft Feed Skeleton -->
-      <div class="grid-col-1-2">
+      <div>
         <div class="sa-dashboard-card drafts-feed-card-skeleton">
           <div class="widget-header-skeleton">
             <div class="skeleton-shimmer header-title-skeleton" />

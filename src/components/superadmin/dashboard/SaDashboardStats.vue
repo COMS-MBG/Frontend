@@ -122,8 +122,8 @@ defineProps<{
   }
 
   &.has-alert {
-    border-color: rgba($color-warning, 0.4);
-    background: rgba($color-warning, 0.01);
+    border-color: var(--color-warning-border);
+    background-color: var(--color-warning-bg);
   }
 
   &__top {

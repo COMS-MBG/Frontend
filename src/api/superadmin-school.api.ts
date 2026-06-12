@@ -76,7 +76,7 @@ export async function importSchools(file: File): Promise<SchoolImportResponse> {
   formData.append('file', file)
   const { data } = await api.post<SchoolImportResponse>(`${BASE}/import`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
-    timeout: 60_000,
+    timeout: 120_000,
   })
   return data
 }

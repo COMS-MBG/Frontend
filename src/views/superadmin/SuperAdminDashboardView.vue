@@ -116,16 +116,9 @@ function navigateTo(routeName: string) {
         </div>
       </div>
 
-      <!-- Row 3: Actionable Insights (Finance Widget 1/2 and Quick Actions 1/2) -->
-      <div class="sa-dashboard-grid__row-bottom">
-        <div class="grid-col-1-2">
-          <SaDashboardFinanceWidget 
-            :summary="financialSummary" 
-            @approve="approveReport" 
-            @reject="rejectReport" 
-          />
-        </div>
-        <div class="grid-col-1-2">
+      <!-- Row 3: Actionable Insights (Quick Actions) -->
+      <div class="sa-dashboard-grid__row-bottom" style="grid-template-columns: 1fr;">
+        <div>
           <SaDashboardDraftsFeed :drafts="draftsList" @navigate="navigateTo" />
         </div>
       </div>
