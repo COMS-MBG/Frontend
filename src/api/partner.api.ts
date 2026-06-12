@@ -56,7 +56,7 @@ export const partnerApi = {
 
     const { data } = await api.post<PartnerImportResponse>(`${BASE}/import`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 60_000, // 60s for large uploads
+      timeout: 120_000, // 120s for large uploads
     })
     return data
   },

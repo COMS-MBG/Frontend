@@ -55,6 +55,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/gizi/KalkulatorGiziView.vue'),
         meta: { activeMenu: 'master-resep', requiredPermission: 'recipes.read' },
       },
+      {
+        path: 'stok',
+        name: 'stok-bahan',
+        component: () => import('@/views/stock/StockView.vue'),
+        meta: { requiredPermission: 'stock.read' },
+      },
 
       // ── Distribusi ──
       {

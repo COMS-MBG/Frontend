@@ -50,7 +50,7 @@
           <span class="material-symbols-outlined action-icon action-icon--green">map</span>
           <div class="action-text">
             <h4>Map Rekomendasi</h4>
-            <p>Visualisasi spasial & K-Means</p>
+            <p>Visualisasi spasial & Rekomendasi Lokasi</p>
           </div>
         </div>
       </BaseCard>
@@ -136,7 +136,7 @@ defineEmits<{
       align-items: center;
       text-align: center;
       padding: $space-4 $space-3;
-      gap: $space-2.5;
+      gap: $space-2-5;
     }
 
     .action-icon {

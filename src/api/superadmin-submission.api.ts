@@ -57,7 +57,7 @@ export async function deleteSubmission(id: number | string): Promise<SubmissionD
 /** POST /api/super-admin/sppg-submissions/{id}/submit — Finalize draft → SPPG */
 export async function submitSubmission(id: number | string): Promise<SubmissionSubmitResponse> {
   const { data } = await api.post<SubmissionSubmitResponse>(`${BASE}/${id}/submit`, {}, {
-    timeout: 60_000 // 60 seconds for heavy database seeding & cloud DB latency
+    timeout: 120_000 // 120 seconds for heavy database seeding & cloud DB latency
   })
   return data
 }

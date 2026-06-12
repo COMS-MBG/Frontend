@@ -29,7 +29,7 @@
           <div class="draft-info">
             <div class="draft-title">
               <span class="sub-number">{{ draft.submission_number }}</span>
-              <span class="draft-source">{{ draft.source === 'dinas' ? 'Pengajuan Dinas' : 'Rekomendasi K-Means' }}</span>
+              <span class="draft-source">{{ draft.source === 'dinas' ? 'Pengajuan Dinas' : 'Rekomendasi Sistem' }}</span>
             </div>
             <div class="draft-region">
               <span class="material-symbols-outlined icon-pin">location_on</span>

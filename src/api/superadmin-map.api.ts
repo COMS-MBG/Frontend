@@ -45,7 +45,7 @@ const BASE = '/super-admin/map'
 /** GET /api/super-admin/map/data — All GIS layers in one single call */
 export async function getMapData(): Promise<MapDataResponse> {
   const { data } = await api.get<MapDataResponse>(`${BASE}/data`, {
-    timeout: 60_000 // 60 seconds for heavy GIS calculations
+    timeout: 120_000 // 120 seconds for heavy GIS calculations
   })
   return data
 }

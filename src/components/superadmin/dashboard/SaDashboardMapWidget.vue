@@ -250,7 +250,7 @@ onBeforeUnmount(() => {
   background: var(--color-bg-overlay);
   border: 1px solid $color-border;
   border-radius: $radius-md;
-  padding: $space-2.5 $space-3-5;
+  padding: $space-2-5 $space-3-5;
   box-shadow: $shadow-sm;
   z-index: 1000;
   display: flex;

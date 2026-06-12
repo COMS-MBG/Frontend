@@ -7,7 +7,15 @@
           <span class="material-symbols-outlined sa-submission-row__thumb-icon">assignment</span>
         </div>
         <div class="sa-submission-row__text">
-          <span class="sa-submission-row__number">{{ item.submission_number }}</span>
+          <span 
+            class="sa-submission-row__number clickable" 
+            role="button" 
+            tabindex="0"
+            @click="$emit('view', item)"
+            @keydown.enter="$emit('view', item)"
+          >
+            {{ item.submission_number }}
+          </span>
           <span class="sa-submission-row__desc">{{ item.partners?.length ?? 0 }} Sekolah Mitra</span>
         </div>
       </div>
@@ -59,6 +67,7 @@ defineProps<{
 defineEmits<{
   (e: 'submit', item: SppgDraft): void
   (e: 'delete', item: SppgDraft): void
+  (e: 'view', item: SppgDraft): void
 }>()
 </script>
 
@@ -117,6 +126,16 @@ defineEmits<{
     font-weight: 600;
     color: $color-primary;
     font-family: $font-mono;
+
+    &.clickable {
+      cursor: pointer;
+      transition: color $transition-fast;
+
+      &:hover {
+        color: $color-primary-dark;
+        text-decoration: underline;
+      }
+    }
   }
 
   &__desc {

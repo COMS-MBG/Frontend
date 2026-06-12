@@ -13,11 +13,12 @@ import ResultModal from '@/components/common/ResultModal.vue'
 import SaSubmissionStats from '@/components/superadmin/submission/SaSubmissionStats.vue'
 import SaSubmissionTable from '@/components/superadmin/submission/SaSubmissionTable.vue'
 import SaSubmissionRow from '@/components/superadmin/submission/SaSubmissionRow.vue'
+import SaSubmissionDetailModal from '@/components/superadmin/submission/SaSubmissionDetailModal.vue'
 
 const {
-  submissions, isLoading, isSubmitting, error,
+  submissions, selectedSubmission, isLoading, isLoadingDetail, isSubmitting, error,
   draftCount, registeredCount, isEmpty,
-  fetchSubmissions, deleteSubmission, submitDraft,
+  fetchSubmissions, fetchSubmissionDetail, deleteSubmission, submitDraft,
 } = useSuperAdminSubmission()
 
 const toast = useToast()
@@ -26,6 +27,7 @@ const toast = useToast()
 const showDeleteModal  = ref(false)
 const showSubmitModal  = ref(false)
 const showResultModal  = ref(false)
+const showDetailModal  = ref(false)
 const deletingItem     = ref<{ id: number; number: string } | null>(null)
 const submittingItem   = ref<{ id: number; number: string } | null>(null)
 
@@ -74,6 +76,16 @@ async function handleSubmit() {
     resultModalMessage.value = error.value || 'Gagal memfinalisasi pengajuan draf menjadi SPPG resmi.'
     resultModalVariant.value = 'error'
     showResultModal.value = true
+  }
+}
+
+async function onView(item: SppgDraft) {
+  showDetailModal.value = true
+  try {
+    await fetchSubmissionDetail(item.id)
+  } catch {
+    toast.error('Gagal memuat detail pengajuan')
+    showDetailModal.value = false
   }
 }
 
@@ -138,6 +150,7 @@ const skeletonColumns: SkeletonColumn[] = [
           :row-number="idx + 1"
           @submit="onSubmit"
           @delete="onDelete"
+          @view="onView"
         />
       </SaSubmissionTable>
 
@@ -164,6 +177,12 @@ const skeletonColumns: SkeletonColumn[] = [
       :headline="resultModalHeadline"
       :message="resultModalMessage"
       :variant="resultModalVariant"
+    />
+
+    <SaSubmissionDetailModal
+      v-model:is-open="showDetailModal"
+      :submission="selectedSubmission"
+      :is-loading="isLoadingDetail"
     />
   </div>
 </template>

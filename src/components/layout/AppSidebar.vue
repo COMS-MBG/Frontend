@@ -103,6 +103,7 @@ const activeMenu = computed(() => isSuperAdmin.value ? superAdminMenu : sidebarM
 
 const visibleMenus = computed(() =>
   activeMenu.value.filter(menu => {
+    if (menu.hidden) return false
     if (!menu.permission) return true
     return checkPermission(menu.permission)
   })
@@ -110,6 +111,7 @@ const visibleMenus = computed(() =>
 
 function getVisibleChildren(menu: MenuItem): MenuItem[] {
   return menu.children?.filter(child => {
+    if (child.hidden) return false
     if (!child.permission) return true
     return checkPermission(child.permission)
   }) ?? []
