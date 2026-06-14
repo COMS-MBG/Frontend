@@ -39,6 +39,8 @@ export interface SubmissionLayer {
   point_status: string
   map_confirmed: boolean
   status: string
+  source?: string          // 'internal' | 'public' | 'external'
+  needs_geocode?: boolean  // true jika koordinat diambil dari form1_data (geocoding belum tersimpan di kolom utama)
   partners: SubmissionLayerPartner[]
 }
 

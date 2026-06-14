@@ -8,6 +8,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import { useDistribution } from '@/composables/useDistribution'
 import { useRouting } from '@/composables/useRouting'
 import { spatialApi } from '@/api/distribution.api'
+import { getOsrmRouteMulti } from '@/api/routing.api'
 import MapOverlayPanel from './MapOverlayPanel.vue'
 import { getStatusInfo } from '@/utils/distribution'
 import type { DistributionItem } from '@/types/distribution'
@@ -25,6 +26,7 @@ let markerCluster: L.MarkerClusterGroup | null = null
 let polylineGroup: L.LayerGroup | null = null
 
 const depotCenter = ref<[number, number]>([-6.914744, 107.609810])
+const optimizedRoadCoords = ref<[number, number][]>([])
 let activeRenderId = 0
 
 onMounted(async () => {
@@ -58,7 +60,22 @@ onMounted(async () => {
   await renderMapFeatures()
 })
 
-watch([items, optimizedRoute], async () => {
+// When optimizedRoute changes, fetch road-following geometry from OSRM via browser
+watch(optimizedRoute, async (newRoute) => {
+  if (newRoute && newRoute.ordered_waypoints && newRoute.ordered_waypoints.length > 0) {
+    // Build waypoints: depot origin + ordered stops
+    const waypointsForOsrm = [
+      { lat: depotCenter.value[0], lng: depotCenter.value[1] },
+      ...newRoute.ordered_waypoints.map((wp: { lat: number; lng: number }) => ({ lat: wp.lat, lng: wp.lng }))
+    ]
+    optimizedRoadCoords.value = await getOsrmRouteMulti(waypointsForOsrm)
+  } else {
+    optimizedRoadCoords.value = []
+  }
+  await renderMapFeatures()
+}, { deep: true })
+
+watch(items, async () => {
   await renderMapFeatures()
 }, { deep: true })
 
@@ -96,19 +113,26 @@ async function renderMapFeatures() {
   const markers: L.Marker[] = []
 
   // Draw Route Lines
-  if (optimizedRoute.value && optimizedRoute.value.geojson) {
-    // Render optimized multi-stop route
-    L.geoJSON(optimizedRoute.value.geojson, {
-      style: { color: '#60a5fa', weight: 9, opacity: 0.25, lineCap: 'round', lineJoin: 'round' }
-    }).addTo(polylineGroup)
+  if (optimizedRoute.value && optimizedRoadCoords.value.length > 0) {
+    // Render optimized multi-stop route using road-following coords fetched from OSRM via browser
+    L.polyline(optimizedRoadCoords.value, {
+      color: '#60a5fa',
+      weight: 9,
+      opacity: 0.25,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(polylineGroup!)
 
-    L.geoJSON(optimizedRoute.value.geojson, {
-      style: { color: '#2563eb', weight: 5, opacity: 0.8, lineCap: 'round', lineJoin: 'round' }
-    }).addTo(polylineGroup)
+    L.polyline(optimizedRoadCoords.value, {
+      color: '#2563eb',
+      weight: 5,
+      opacity: 0.8,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(polylineGroup!)
 
-    const coords = optimizedRoute.value.geojson.coordinates
-    coords.forEach((coord: [number, number]) => {
-      allBounds.push([coord[1], coord[0]])
+    optimizedRoadCoords.value.forEach((coord) => {
+      allBounds.push(coord)
     })
   } else {
     // Render OSRM-based road routes per destination
