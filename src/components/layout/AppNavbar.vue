@@ -6,16 +6,8 @@
       <span class="navbar-title">MBG Supply Dashboard</span>
     </div>
 
-    <!-- ── Kanan: Notifikasi + User Card ── -->
+    <!-- ── Kanan: User Card ── -->
     <div class="navbar-right">
-
-      <!-- Ikon Notifikasi -->
-      <button class="icon-btn" aria-label="Notifikasi">
-        <span class="material-symbols-outlined">notifications</span>
-        <span class="notif-badge" aria-hidden="true"></span>
-      </button>
-
-      <div class="navbar-divider"></div>
 
       <!-- User Card (klik untuk toggle dropdown) -->
       <div class="user-card" @click="toggleDropdown" ref="cardRef">

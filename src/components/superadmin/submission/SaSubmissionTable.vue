@@ -16,6 +16,10 @@
         <slot />
       </tbody>
     </table>
+
+    <div v-if="$slots.pagination" class="sa-submission-table__footer">
+      <slot name="pagination" />
+    </div>
   </div>
 </template>
 
@@ -72,5 +76,11 @@
     text-align: center;
     width: 120px;
   }
+}
+
+.sa-submission-table__footer {
+  padding: $space-4 $space-5;
+  border-top: 1px solid $color-border;
+  background-color: $color-bg-surface;
 }
 </style>

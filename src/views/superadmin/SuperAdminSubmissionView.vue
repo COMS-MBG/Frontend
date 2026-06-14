@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useSuperAdminSubmission } from '@/composables/useSuperAdminSubmission'
 import { useToast } from '@/composables/useToast'
+import { usePagination } from '@/composables/usePagination'
 import type { SppgDraft } from '@/types/superadmin-submission'
 import PageHeader from '@/components/common/PageHeader.vue'
 import BaseTableSkeleton from '@/components/common/BaseTableSkeleton.vue'
 import type { SkeletonColumn, SkeletonHeader } from '@/components/common/BaseTableSkeleton.vue'
 import BaseEmptyState from '@/components/common/BaseEmptyState.vue'
+import BasePagination from '@/components/common/BasePagination.vue'
 import ConfirmDeleteModal from '@/components/common/ConfirmDeleteModal.vue'
 import ConfirmActionModal from '@/components/common/ConfirmActionModal.vue'
 import ResultModal from '@/components/common/ResultModal.vue'
 import SaSubmissionStats from '@/components/superadmin/submission/SaSubmissionStats.vue'
+import SaSubmissionToolbar from '@/components/superadmin/submission/SaSubmissionToolbar.vue'
 import SaSubmissionTable from '@/components/superadmin/submission/SaSubmissionTable.vue'
 import SaSubmissionRow from '@/components/superadmin/submission/SaSubmissionRow.vue'
 import SaSubmissionDetailModal from '@/components/superadmin/submission/SaSubmissionDetailModal.vue'
@@ -22,6 +25,36 @@ const {
 } = useSuperAdminSubmission()
 
 const toast = useToast()
+
+// ── Search & Filter State ─────────────────────────────────────────
+const searchQuery = ref('')
+const statusFilter = ref('all')
+const perPage = ref(10)
+
+// ── Computed Filtered Submissions ──────────────────────────────────
+const filteredSubmissions = computed(() => {
+  return submissions.value.filter((item) => {
+    // 1. Search Query
+    if (searchQuery.value) {
+      const query = searchQuery.value.toLowerCase()
+      const matchesNumber = item.submission_number?.toLowerCase().includes(query)
+      
+      const nameInForm1 = (item.form1_data as any)?.name?.toLowerCase() || ''
+      const matchesName = nameInForm1.includes(query)
+      
+      if (!matchesNumber && !matchesName) return false
+    }
+
+    // 2. Status Filter
+    if (statusFilter.value !== 'all') {
+      if (item.status !== statusFilter.value) return false
+    }
+
+    return true
+  })
+})
+
+const { page, paginatedItems, totalItems } = usePagination(filteredSubmissions, perPage)
 
 // ── Modal state ───────────────────────────────────────────────────
 const showDeleteModal  = ref(false)
@@ -89,6 +122,24 @@ async function onView(item: SppgDraft) {
   }
 }
 
+// Dipanggil saat Form 2 berhasil disimpan dari dalam modal
+function onDetailRefreshed(updatedDraft: SppgDraft) {
+  // Update selectedSubmission agar modal langsung menampilkan data baru
+  if (selectedSubmission.value?.id === updatedDraft.id) {
+    selectedSubmission.value = updatedDraft
+  }
+  // Refresh list di background
+  fetchSubmissions()
+  toast.success('Data Admin SPPG berhasil disimpan')
+}
+
+// Dipanggil saat submit berhasil dari dalam modal
+async function onDetailSubmitted() {
+  showDetailModal.value = false
+  await fetchSubmissions()
+  toast.success('Pengajuan berhasil difinalisasi menjadi SPPG terdaftar!')
+}
+
 onMounted(() => fetchSubmissions())
 
 // ── Skeleton Config ──────────────────────────────────────────
@@ -117,7 +168,7 @@ const skeletonColumns: SkeletonColumn[] = [
   <div class="sa-submission-page">
     <PageHeader
       title="Pengajuan SPPG"
-      subtitle="Kelola draft pengajuan SPPG baru"
+      subtitle="Kelola draf pengajuan SPPG baru"
       :breadcrumb="['Super Admin', 'Manajemen SPPG', 'Pengajuan SPPG']"
       class="mb-6"
     />
@@ -128,6 +179,15 @@ const skeletonColumns: SkeletonColumn[] = [
       :total-count="submissions.length"
     />
 
+    <SaSubmissionToolbar
+      :search-value="searchQuery"
+      :filter-value="statusFilter"
+      :per-page-value="perPage"
+      @update:search-value="searchQuery = $event"
+      @update:filter-value="statusFilter = $event"
+      @update:per-page-value="perPage = $event"
+    />
+
     <BaseTableSkeleton
       v-if="isLoading"
       :rows="6"
@@ -135,24 +195,42 @@ const skeletonColumns: SkeletonColumn[] = [
       :headers="skeletonHeaders"
     />
 
-      <BaseEmptyState
-        v-else-if="isEmpty"
-        icon="assignment"
-        title="Belum ada pengajuan SPPG"
-        description="Pengajuan akan muncul di sini setelah dibuat."
+    <BaseEmptyState
+      v-else-if="isEmpty"
+      icon="assignment"
+      title="Belum ada pengajuan SPPG"
+      description="Pengajuan akan muncul di sini setelah dibuat."
+    />
+
+    <BaseEmptyState
+      v-else-if="filteredSubmissions.length === 0"
+      icon="search"
+      title="Tidak ada hasil pencarian"
+      description="Coba ubah kata kunci atau filter pencarian Anda."
+    />
+
+    <SaSubmissionTable v-else>
+      <SaSubmissionRow
+        v-for="(item, idx) in paginatedItems"
+        :key="item.id"
+        :item="item"
+        :row-number="(page - 1) * perPage + idx + 1"
+        @submit="onSubmit"
+        @delete="onDelete"
+        @view="onView"
       />
 
-      <SaSubmissionTable v-else>
-        <SaSubmissionRow
-          v-for="(item, idx) in submissions"
-          :key="item.id"
-          :item="item"
-          :row-number="idx + 1"
-          @submit="onSubmit"
-          @delete="onDelete"
-          @view="onView"
+      <template #pagination>
+        <BasePagination
+          v-if="totalItems > perPage"
+          v-model="page"
+          :total="totalItems"
+          :per-page="perPage"
+          item-label="pengajuan"
         />
-      </SaSubmissionTable>
+      </template>
+    </SaSubmissionTable>
+
 
     <ConfirmDeleteModal
       v-model="showDeleteModal"
@@ -183,6 +261,8 @@ const skeletonColumns: SkeletonColumn[] = [
       v-model:is-open="showDetailModal"
       :submission="selectedSubmission"
       :is-loading="isLoadingDetail"
+      @refreshed="onDetailRefreshed"
+      @submitted="onDetailSubmitted"
     />
   </div>
 </template>

@@ -150,16 +150,84 @@
               <div class="account-card__header">
                 <span class="material-symbols-outlined account-icon">admin_panel_settings</span>
                 <span class="account-role">Admin SPPG</span>
+                <span class="account-required-badge">Wajib</span>
+                <button
+                  v-if="!isEditingForm2 && submission?.status === 'draft'"
+                  class="btn-edit-inline"
+                  @click="startEditForm2"
+                >
+                  <span class="material-symbols-outlined" style="font-size:16px">edit</span>
+                  {{ adminAccount.name ? 'Edit' : 'Isi Sekarang' }}
+                </button>
               </div>
               <div class="account-card__body">
-                <div class="info-row">
-                  <span class="label">Nama Lengkap</span>
-                  <span class="value font-semibold">{{ adminAccount.name || '—' }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">Alamat Email</span>
-                  <span class="value font-mono">{{ adminAccount.email || '—' }}</span>
-                </div>
+
+                <!-- Mode Edit Form 2 -->
+                <template v-if="isEditingForm2">
+                  <div class="edit-form-grid">
+                    <BaseInput
+                      v-model="form2Draft.name"
+                      label="Nama Lengkap"
+                      placeholder="Nama Admin SPPG"
+                      required
+                    />
+                    <BaseInput
+                      v-model="form2Draft.email"
+                      type="email"
+                      label="Email"
+                      placeholder="email@domain.com"
+                      required
+                    />
+                    <BaseInput
+                      v-model="form2Draft.password"
+                      type="password"
+                      label="Password"
+                      placeholder="Min. 8 karakter"
+                      required
+                    />
+                    <BaseInput
+                      v-model="form2Draft.phone"
+                      label="No. HP / WhatsApp"
+                      placeholder="08xxxxxxxxxx"
+                    />
+                  </div>
+                  <div class="edit-actions">
+                    <BaseButton variant="secondary" size="sm" @click="cancelEditForm2">Batal</BaseButton>
+                    <BaseButton
+                      variant="primary"
+                      size="sm"
+                      :disabled="isSavingForm2"
+                      @click="saveForm2"
+                      full-width
+                    >
+                      {{ isSavingForm2 ? 'Menyimpan...' : 'Simpan Data' }}
+                    </BaseButton>
+                  </div>
+                  <p v-if="form2Error" class="edit-error">{{ form2Error }}</p>
+                </template>
+
+                <!-- Mode Read Form 2 -->
+                <template v-else>
+                  <template v-if="adminAccount.name">
+                    <div class="info-row">
+                      <span class="label">Nama Lengkap</span>
+                      <span class="value font-semibold">{{ adminAccount.name }}</span>
+                    </div>
+                    <div class="info-row">
+                      <span class="label">Alamat Email</span>
+                      <span class="value font-mono">{{ adminAccount.email }}</span>
+                    </div>
+                    <div class="info-row" v-if="adminAccount.phone">
+                      <span class="label">No. HP</span>
+                      <span class="value">{{ adminAccount.phone }}</span>
+                    </div>
+                  </template>
+                  <div v-else class="account-empty account-empty--required">
+                    <span class="material-symbols-outlined empty-icon">warning</span>
+                    <span>Data Admin SPPG belum diisi — klik <strong>"Isi Sekarang"</strong> di atas</span>
+                  </div>
+                </template>
+
               </div>
             </div>
 
@@ -278,6 +346,16 @@
 
     <template #footer>
       <button class="btn-secondary" @click="onClose">Tutup</button>
+      <button
+        v-if="submission?.status === 'draft'"
+        class="btn-submit-draft"
+        :disabled="!canSubmit || isSubmitting"
+        :title="!canSubmit ? submitBlockReason : 'Daftarkan SPPG ini'"
+        @click="handleSubmit"
+      >
+        <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle">rocket_launch</span>
+        {{ isSubmitting ? 'Memproses...' : 'Submit & Daftarkan SPPG' }}
+      </button>
     </template>
   </BaseModal>
 </template>
@@ -286,6 +364,9 @@
 import { computed, ref, watch } from 'vue'
 import BaseModal from '@/components/common/BaseModal.vue'
 import BaseBadge from '@/components/common/BaseBadge.vue'
+import BaseInput from '@/components/common/BaseInput.vue'
+import BaseButton from '@/components/common/BaseButton.vue'
+import { updateSubmission, submitSubmission } from '@/api/superadmin-submission.api'
 import type { SppgDraft } from '@/types/superadmin-submission'
 
 const props = defineProps<{
@@ -297,6 +378,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
   (e: 'close'): void
+  (e: 'refreshed', draft: SppgDraft): void
+  (e: 'submitted'): void
 }>()
 
 const isOpenModel = computed({
@@ -360,6 +443,96 @@ function formatDate(isoStr?: string | null): string {
     })
   } catch {
     return '—'
+  }
+}
+
+// ── Form 2 Edit State ─────────────────────────────────────────────────────────
+const isEditingForm2 = ref(false)
+const isSavingForm2  = ref(false)
+const form2Error     = ref('')
+const form2Draft = ref({ name: '', email: '', password: '', phone: '' })
+
+function startEditForm2() {
+  form2Draft.value = {
+    name:     adminAccount.value.name     || '',
+    email:    adminAccount.value.email    || '',
+    password: '',
+    phone:    adminAccount.value.phone    || '',
+  }
+  form2Error.value = ''
+  isEditingForm2.value = true
+}
+
+function cancelEditForm2() {
+  isEditingForm2.value = false
+  form2Error.value = ''
+}
+
+async function saveForm2() {
+  if (!form2Draft.value.name || !form2Draft.value.email || !form2Draft.value.password) {
+    form2Error.value = 'Nama, email, dan password wajib diisi.'
+    return
+  }
+  if (form2Draft.value.password.length < 8) {
+    form2Error.value = 'Password minimal 8 karakter.'
+    return
+  }
+  if (!props.submission?.id) return
+
+  isSavingForm2.value = true
+  form2Error.value = ''
+  try {
+    const res = await updateSubmission(props.submission.id, {
+      form2_data: {
+        name:     form2Draft.value.name,
+        email:    form2Draft.value.email,
+        password: form2Draft.value.password,
+        phone:    form2Draft.value.phone || null,
+      }
+    })
+    if (res.success) {
+      isEditingForm2.value = false
+      emit('refreshed', res.data)
+    } else {
+      form2Error.value = res.message || 'Gagal menyimpan data.'
+    }
+  } catch (err: any) {
+    form2Error.value = err?.response?.data?.message || 'Terjadi kesalahan jaringan.'
+  } finally {
+    isSavingForm2.value = false
+  }
+}
+
+// ── Submit Draft ─────────────────────────────────────────────────────────────
+const isSubmitting = ref(false)
+
+const canSubmit = computed(() => {
+  const s = props.submission
+  if (!s) return false
+  return !!(s.form1_data && s.form2_data && s.map_confirmed && (s.partners?.length ?? 0) > 0)
+})
+
+const submitBlockReason = computed(() => {
+  const s = props.submission
+  if (!s) return ''
+  if (!s.form1_data) return 'Form 1 (Data SPPG) belum terisi'
+  if (!s.form2_data) return 'Form 2 (Admin SPPG) belum terisi — isi di tab Akun Pengurus'
+  if (!s.map_confirmed) return 'Titik lokasi belum dikonfirmasi di peta'
+  if (!(s.partners?.length)) return 'Belum ada sekolah mitra'
+  return ''
+})
+
+async function handleSubmit() {
+  if (!props.submission?.id || !canSubmit.value) return
+  isSubmitting.value = true
+  try {
+    await submitSubmission(props.submission.id)
+    emit('submitted')
+    emit('update:isOpen', false)
+  } catch (err: any) {
+    alert(err?.response?.data?.message || 'Gagal submit pengajuan.')
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -798,4 +971,99 @@ function onClose() {
 .text-primary { color: $color-primary; }
 .text-muted { color: $color-text-muted; }
 .text-secondary { color: $color-text-secondary; }
+
+// ── Form 2 Inline Edit ──
+.account-required-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffc107;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.btn-edit-inline {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid $color-border;
+  color: $color-primary;
+  font-size: $text-xs;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $color-primary;
+    color: white;
+    border-color: $color-primary;
+  }
+}
+
+.edit-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.edit-actions {
+  display: flex;
+  gap: $space-2;
+  margin-top: $space-3;
+}
+
+.edit-error {
+  margin: 4px 0 0;
+  font-size: $text-xs;
+  color: $color-danger;
+  font-weight: 500;
+}
+
+.account-empty--required {
+  color: #856404;
+  background: #fffbeb;
+  border: 1px dashed #ffc107;
+  border-radius: $radius-md;
+  padding: $space-4;
+  font-size: $text-xs;
+
+  .empty-icon { color: #f59e0b; }
+}
+
+// ── Footer Submit Button ──
+.btn-submit-draft {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all $transition-fast;
+  box-shadow: 0 2px 8px rgba($color-primary, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($color-primary, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    background: $color-text-muted;
+  }
+}
 </style>
