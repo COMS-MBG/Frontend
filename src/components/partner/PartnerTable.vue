@@ -30,8 +30,6 @@
               icon="domain_disabled"
               title="Belum ada data sekolah mitra"
               description="Mulai tambahkan sekolah mitra atau import data dari file CSV."
-              action-label="Tambah Partner"
-              @action="$emit('add')"
             />
           </td>
         </tr>

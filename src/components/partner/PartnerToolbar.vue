@@ -8,7 +8,7 @@
     :per-page-value="store.rowsPerPage"
     :per-page-options="perPageOptions"
     @update:per-page-value="onPerPageChange"
-    :show-add="true"
+    :show-add="false"
     :show-import="true"
     :show-export="false"
     add-label="Tambah Partner"
