@@ -42,8 +42,6 @@
       icon="school"
       title="Belum ada data sekolah mitra"
       description="Mulai tambahkan sekolah mitra atau import data dari file CSV."
-      action-label="Tambah Partner"
-      @action="onAdd"
     />
 
     <!-- 7. DATA TABLE + PAGINATION -->
